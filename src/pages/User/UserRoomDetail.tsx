@@ -19,19 +19,15 @@ import { BsTrash3 } from "react-icons/bs";
 
 const initialShapes: ShapeData[] = [];
 
-//  path =   "/users/:userId/:homeId/:roomId"
-
 export default function UserRoomDetail() {
   const { userId, homeId, roomId } = useParams<{ userId: string; homeId: string; roomId: string }>();
   console.log("userId:", userId, "homeId:", homeId, "roomId:", roomId);
   const [shapes, setShapes] = useState<ShapeData[]>(initialShapes);
   const [selectedId, selectShape] = useState<string | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
-  // const [stageSize, setStageSize] = useState({ width: 0, height: 0 });
   const [imageSize, setImageSize] = useState({ width: 0, height: 0, scaleX: 1, scaleY: 1 });
   const [imageId, setImageId] = useState(null);
   const [isItemListVisible, setIsItemListVisible] = useState(true);
-  console.log("isItemListVisible", isItemListVisible);
 
   const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
 
@@ -101,7 +97,7 @@ export default function UserRoomDetail() {
     selectShape(null);
   };
 
-  const saveHandler = () => {
+  const saveHandler = async () => {
     const hasEmptyName = shapes.some((shape) => shape.itemName.trim() === "");
 
     if (hasEmptyName) {
@@ -118,38 +114,60 @@ export default function UserRoomDetail() {
       if (shape.type === "circle") {
         return {
           ...baseData,
-          cicleData: {
-            x: shape.x,
-            y: shape.y,
-            radius: shape.radius,
+          circleData: {
+            x: Number(shape.x.toFixed(2)),
+            y: Number(shape.y.toFixed(2)),
+            radius: Number(shape.radius.toFixed(2)),
           },
         };
       } else if (shape.type === "rectangle") {
         return {
           ...baseData,
           rectangleData: {
-            x: shape.x,
-            y: shape.y,
-            width: shape.width,
-            height: shape.height,
-            rotation: shape.rotation,
+            x: Number(shape.x.toFixed(2)),
+            y: Number(shape.y.toFixed(2)),
+            width: Number(shape.width.toFixed(2)),
+            height: Number(shape.height.toFixed(2)),
+            rotation: Number(shape.rotation.toFixed(2)),
           },
         };
       } else if (shape.type === "ellipse") {
         return {
           ...baseData,
-          rectangleData: {
-            x: shape.x,
-            y: shape.y,
-            radiusX: shape.radiusX,
-            radiusY: shape.radiusY,
-            rotation: shape.rotation,
+          ellipseData: {
+            x: Number(shape.x.toFixed(2)),
+            y: Number(shape.y.toFixed(2)),
+            radiusX: Number(shape.radiusX.toFixed(2)),
+            radiusY: Number(shape.radiusY.toFixed(2)),
+            rotation: Number(shape.rotation.toFixed(2)),
           },
         };
       }
     });
 
-    console.log(savedData);
+    console.log({ items: savedData });
+
+    const apiUrl = `${API_CONFIG.BACK_API}/users/${userId}/homes/${homeId}/rooms/${roomId}/items`;
+    try {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ items: savedData }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to save items (status: ${response.status})`);
+      }
+
+      const result = await response.json();
+      console.log("저장 성공:", result);
+
+      alert("아이템이 성공적으로 저장되었습니다.");
+    } catch (error) {
+      alert("아이템 저장 중 오류가 발생했습니다.");
+    }
   };
 
   const handleNameChange = (id: string, value: string) => {
@@ -170,23 +188,6 @@ export default function UserRoomDetail() {
       input?.focus();
     }
   }, [selectedId]);
-
-  // useEffect(() => {
-  //   // 브라우저 환경에서만 실행
-  //   if (typeof window !== "undefined") {
-  //     const handleResize = () => {
-  //       setStageSize({ width: window.innerWidth, height: window.innerHeight });
-  //     };
-
-  //     handleResize();
-
-  //     window.addEventListener("resize", handleResize);
-
-  //     return () => {
-  //       window.removeEventListener("resize", handleResize);
-  //     };
-  //   }
-  // }, []);
 
   useEffect(() => {
     const fetchUserRoom = async () => {
@@ -211,10 +212,10 @@ export default function UserRoomDetail() {
 
       const imgWidth = image.width;
       const imgHeight = image.height;
-      // 가로 & 세로 비율을 유지하면서 stage에 맞추기
+
       const scaleX = stageWidth / imgWidth;
       const scaleY = stageHeight / imgHeight;
-      const scale = Math.min(scaleX, scaleY); // 최소 스케일값을 적용 (contain 방식)
+      const scale = Math.min(scaleX, scaleY);
 
       setImageSize({
         width: imgWidth * scale,
