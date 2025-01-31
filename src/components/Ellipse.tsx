@@ -1,12 +1,16 @@
 import React, { useEffect, useRef } from "react";
 import { Ellipse, Transformer } from "react-konva";
 import Konva from "konva";
+import { EllipseData } from "../types/items";
 
 interface EllipseProps {
-  shapeProps: Konva.ShapeConfig;
+  // shapeProps: Konva.ShapeConfig;
+  shapeProps: EllipseData["ellipseData"];
+
   isSelected: boolean;
   onSelect: () => void;
-  onChange: (newAttrs: Konva.ShapeConfig) => void;
+  // onChange: (newAttrs: Konva.ShapeConfig) => void;
+  onChange: (newAttrs: EllipseData["ellipseData"]) => void;
 }
 
 const EllipseShape: React.FC<EllipseProps> = ({ shapeProps, isSelected, onSelect, onChange }) => {
@@ -26,13 +30,13 @@ const EllipseShape: React.FC<EllipseProps> = ({ shapeProps, isSelected, onSelect
   return (
     <>
       <Ellipse
-        radiusX={30}
-        radiusY={70}
+        {...shapeProps}
+        draggable
+        stroke={"yellow"}
+        strokeWidth={4}
         onClick={onSelect}
         onTap={onSelect}
         ref={shapeRef}
-        {...shapeProps}
-        draggable
         opacity={0.6}
         onDragEnd={(e) => {
           onChange({

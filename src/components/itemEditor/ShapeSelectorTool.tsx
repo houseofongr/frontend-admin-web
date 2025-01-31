@@ -16,13 +16,13 @@ export default function ShapeSelectorTool({ addRect, addCircle, addEllipse }: Sh
           <span className="text-sm font-light">Shape Selector</span>
         </div>
         <div className="flex gap-4 justify-center py-3">
-          <button className="p-3 bg-red-300 text-gray text-xs" onClick={addRect}>
+          <button className="p-3 bg-blue-400 text-gray text-xs" onClick={addRect}>
             Rectangle
           </button>
-          <button className="bg-yellow-300 px-3 py-5 rounded-full text-gray text-xs" onClick={addCircle}>
+          <button className="bg-yellow-400 px-3 py-5 rounded-full text-gray text-xs" onClick={addCircle}>
             Circle
           </button>
-          <button className="p-3 bg-blue-400 w-20 rounded-[80%_20%_80%_20%] text-gray text-xs" onClick={addEllipse}>
+          <button className="p-3 bg-amber-500 w-20 rounded-[80%_20%_80%_20%] text-gray text-xs" onClick={addEllipse}>
             Ellipse
           </button>
         </div>

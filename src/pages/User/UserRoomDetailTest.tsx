@@ -1,8 +1,8 @@
+import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import Konva from "konva";
 import { Stage, Layer, Image as KonvaImage } from "react-konva";
 import { CircleData, EllipseData, RectangleData, ShapeData } from "../../types/items";
-import { useEffect, useRef, useState } from "react";
 import { generateUniqueId } from "../../utils/generateUniqueId";
 import { getRandomColor } from "../../utils/getRandomColor";
 import API_CONFIG from "../../config/api";
@@ -19,9 +19,11 @@ import { BsTrash3 } from "react-icons/bs";
 
 const initialShapes: ShapeData[] = [];
 
-export default function UserRoomDetail() {
+// 생성만 되는 테스트 페이지
+
+export default function UserRoomDetailTest() {
   const { userId, homeId, roomId } = useParams<{ userId: string; homeId: string; roomId: string }>();
-  console.log("userId:", userId, "homeId:", homeId, "roomId:", roomId);
+
   const [shapes, setShapes] = useState<ShapeData[]>(initialShapes);
   const [selectedId, selectShape] = useState<string | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
@@ -39,55 +41,41 @@ export default function UserRoomDetail() {
   };
 
   const addRect = () => {
-    setShapes((prev) => [
-      ...prev,
-      {
-        id: generateUniqueId().toString(),
-        x: 10,
-        y: 200,
-        width: 100,
-        height: 100,
-        rotation: 0,
-        fill: getRandomColor(),
-        type: "rectangle",
-        itemName: "",
-      },
-    ]);
+    const newRect: RectangleData = {
+      id: generateUniqueId(),
+      itemType: "rectangle",
+      name: "",
+      rectangleData: { x: 100, y: 200, width: 150, height: 100, rotation: 0 },
+      fill: getRandomColor(),
+    };
+
+    setShapes((prev) => [...prev, newRect]);
   };
 
   const addCircle = () => {
-    setShapes((prev) => [
-      ...prev,
-      {
-        id: generateUniqueId(),
-        x: 100,
-        y: 200,
-        radius: 50,
-        fill: getRandomColor(),
-        type: "circle",
-        itemName: "",
-      },
-    ]);
+    const newCircle: CircleData = {
+      id: generateUniqueId(),
+      itemType: "circle",
+      name: "",
+      circleData: { x: 100, y: 200, radius: 50 },
+      fill: getRandomColor(),
+    };
+
+    setShapes((prev) => [...prev, newCircle]);
   };
 
   const addEllipse = () => {
-    setShapes((prev) => [
-      ...prev,
-      {
-        id: generateUniqueId().toString(),
-        x: 200,
-        y: 200,
-        radiusX: 70,
-        radiusY: 50,
-        rotation: 0,
-        fill: getRandomColor(),
-        type: "ellipse",
-        itemName: "",
-      },
-    ]);
+    const newEllipse: EllipseData = {
+      id: generateUniqueId(),
+      itemType: "ellipse",
+      name: "",
+      ellipseData: { x: 200, y: 200, radiusX: 70, radiusY: 50, rotation: 0 },
+      fill: getRandomColor(),
+    };
+
+    setShapes((prev) => [...prev, newEllipse]);
   };
 
-  // * 버튼 클릭 시 aside를 토글하는 핸들러
   const itemListViewToggleHandler = () => {
     setIsItemListVisible((prev) => !prev);
   };
@@ -98,7 +86,7 @@ export default function UserRoomDetail() {
   };
 
   const saveHandler = async () => {
-    const hasEmptyName = shapes.some((shape) => shape.itemName.trim() === "");
+    const hasEmptyName = shapes.some((shape) => shape.name.trim() === "");
 
     if (hasEmptyName) {
       alert("아이템의 이름을 빠짐없이 입력해주세요.");
@@ -107,42 +95,44 @@ export default function UserRoomDetail() {
 
     const savedData = shapes.map((shape) => {
       const baseData = {
-        name: shape.itemName,
-        itemType: shape.type.toUpperCase(),
+        name: shape.name,
+        itemType: shape.itemType.toUpperCase(),
       };
 
-      if (shape.type === "circle") {
+      if (shape.itemType === "circle") {
         return {
           ...baseData,
           circleData: {
-            x: Number(shape.x.toFixed(2)),
-            y: Number(shape.y.toFixed(2)),
-            radius: Number(shape.radius.toFixed(2)),
+            x: Number(shape.circleData.x.toFixed(2)),
+            y: Number(shape.circleData.y.toFixed(2)),
+            radius: Number(shape.circleData.radius.toFixed(2)),
           },
         };
-      } else if (shape.type === "rectangle") {
+      } else if (shape.itemType === "rectangle") {
         return {
           ...baseData,
           rectangleData: {
-            x: Number(shape.x.toFixed(2)),
-            y: Number(shape.y.toFixed(2)),
-            width: Number(shape.width.toFixed(2)),
-            height: Number(shape.height.toFixed(2)),
-            rotation: Number(shape.rotation.toFixed(2)),
+            x: Number(shape.rectangleData.x.toFixed(2)),
+            y: Number(shape.rectangleData.y.toFixed(2)),
+            width: Number(shape.rectangleData.width.toFixed(2)),
+            height: Number(shape.rectangleData.height.toFixed(2)),
+            rotation: Number(shape.rectangleData.rotation.toFixed(2)),
           },
         };
-      } else if (shape.type === "ellipse") {
+      } else if (shape.itemType === "ellipse") {
         return {
           ...baseData,
           ellipseData: {
-            x: Number(shape.x.toFixed(2)),
-            y: Number(shape.y.toFixed(2)),
-            radiusX: Number(shape.radiusX.toFixed(2)),
-            radiusY: Number(shape.radiusY.toFixed(2)),
-            rotation: Number(shape.rotation.toFixed(2)),
+            x: Number(shape.ellipseData.x.toFixed(2)),
+            y: Number(shape.ellipseData.y.toFixed(2)),
+            radiusX: Number(shape.ellipseData.radiusX.toFixed(2)),
+            radiusY: Number(shape.ellipseData.radiusY.toFixed(2)),
+            rotation: Number(shape.ellipseData.rotation.toFixed(2)),
           },
         };
       }
+
+      return baseData;
     });
 
     console.log({ items: savedData });
@@ -192,11 +182,13 @@ export default function UserRoomDetail() {
   useEffect(() => {
     const fetchUserRoom = async () => {
       try {
-        const response = await fetch(`${API_CONFIG.BACK_API}/houses/rooms/${roomId}/items`);
+        const response = await fetch(`${API_CONFIG.BACK_API}/homes/${homeId}/rooms/${roomId}/items`);
         if (!response.ok) {
           throw new Error("Failed to fetch room data");
         }
         const data = await response.json();
+        console.log(" get room data", data);
+
         setImageId(data.room.imageId);
       } catch (error) {
         console.error("Error fetching room data:", error);
@@ -216,7 +208,6 @@ export default function UserRoomDetail() {
       const scaleX = stageWidth / imgWidth;
       const scaleY = stageHeight / imgHeight;
       const scale = Math.min(scaleX, scaleY);
-
       setImageSize({
         width: imgWidth * scale,
         height: imgHeight * scale,
@@ -258,12 +249,12 @@ export default function UserRoomDetail() {
                 >
                   <div className="flex flex-col items-center w-1/5 relative ">
                     <ColorTag fill={shape.fill as string} />
-                    <span>{shape.type === "rectangle" ? "rect" : shape.type}</span>
+                    <span>{shape.itemType === "rectangle" ? "rect" : shape.itemType}</span>
                   </div>
 
                   <input
                     ref={(element) => handleInputRef(shape.id, element)}
-                    value={shape.itemName}
+                    value={shape.name}
                     onChange={(e) => handleNameChange(shape.id, e.target.value)}
                     placeholder="Item title"
                     className="px-2 py-1 bg-transparent border outline-none text-sm border-stone-400"
@@ -276,16 +267,12 @@ export default function UserRoomDetail() {
       )}
 
       <Stage
-        // ReferenceError : window is not defined
         width={window.innerWidth}
         height={window.innerHeight}
-        // width={stageSize.width}
-        // height={stageSize.height}
         onMouseDown={checkedSelect}
         onTouchStart={checkedSelect}
       >
         <Layer>
-          {/* {backgroundImage && <KonvaImage image={backgroundImage} x={0} y={0} />} */}
           {backgroundImage && (
             <KonvaImage
               image={backgroundImage}
@@ -297,56 +284,44 @@ export default function UserRoomDetail() {
           )}
 
           {shapes.map((shape, i) => {
-            if (shape.type === "rectangle") {
+            if (shape.itemType === "rectangle") {
               return (
                 <RectangleShape
                   key={shape.id}
-                  shapeProps={shape}
+                  shapeProps={shape.rectangleData}
                   isSelected={shape.id === selectedId}
                   onSelect={() => selectShape(shape.id)}
                   onChange={(newAttrs) => {
                     const updatedShapes = shapes.slice();
-                    updatedShapes[i] = {
-                      ...newAttrs,
-                      id: shape.id,
-                      type: "rectangle",
-                    } as RectangleData;
+                    updatedShapes[i] = { ...shape, rectangleData: newAttrs };
                     setShapes(updatedShapes);
                   }}
                 />
               );
-            } else if (shape.type === "circle") {
+            } else if (shape.itemType === "circle") {
               return (
                 <CircleShape
                   key={shape.id}
-                  shapeProps={shape}
+                  shapeProps={shape.circleData}
                   isSelected={shape.id === selectedId}
                   onSelect={() => selectShape(shape.id)}
                   onChange={(newAttrs) => {
                     const updatedShapes = shapes.slice();
-                    updatedShapes[i] = {
-                      ...newAttrs,
-                      id: shape.id,
-                      type: "circle",
-                    } as CircleData;
+                    updatedShapes[i] = { ...shape, circleData: newAttrs };
                     setShapes(updatedShapes);
                   }}
                 />
               );
-            } else if (shape.type === "ellipse") {
+            } else if (shape.itemType === "ellipse") {
               return (
                 <EllipseShape
                   key={shape.id}
-                  shapeProps={shape}
+                  shapeProps={shape.ellipseData}
                   isSelected={shape.id === selectedId}
                   onSelect={() => selectShape(shape.id)}
                   onChange={(newAttrs) => {
                     const updatedShapes = shapes.slice();
-                    updatedShapes[i] = {
-                      ...newAttrs,
-                      id: shape.id,
-                      type: "ellipse",
-                    } as EllipseData;
+                    updatedShapes[i] = { ...shape, ellipseData: newAttrs };
                     setShapes(updatedShapes);
                   }}
                 />

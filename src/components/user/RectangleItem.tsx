@@ -1,19 +1,19 @@
-import React, { useEffect, useRef } from "react";
-import { Circle, Transformer } from "react-konva";
+import { Rect, Transformer } from "react-konva";
 import Konva from "konva";
-import { CircleData } from "../types/items";
+import { useEffect, useRef } from "react";
+import { RectangleData } from "../../types/items";
 
-interface CircleProps {
-  // shapeProps: Konva.ShapeConfig;
-  shapeProps: CircleData["circleData"];
+interface RectangleProps {
+  shapeProps: RectangleData["rectangleData"];
   isSelected: boolean;
   onSelect: () => void;
-  // onChange: (newAttrs: Konva.ShapeConfig) => void;
-  onChange: (newAttrs: CircleData["circleData"]) => void;
+  onChange: (newAttrs: RectangleData["rectangleData"]) => void;
+  fill: string;
+  isEditable: boolean;
 }
 
-const CircleShape: React.FC<CircleProps> = ({ shapeProps, isSelected, onSelect, onChange }) => {
-  const shapeRef = useRef<Konva.Circle | null>(null);
+function RectItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable }: RectangleProps) {
+  const shapeRef = useRef<Konva.Rect | null>(null);
   const trRef = useRef<Konva.Transformer | null>(null);
 
   useEffect(() => {
@@ -28,39 +28,43 @@ const CircleShape: React.FC<CircleProps> = ({ shapeProps, isSelected, onSelect, 
 
   return (
     <>
-      <Circle
+      <Rect
+        {...shapeProps}
+        draggable
+        listening={isEditable}
+        fill={fill}
+        opacity={0.6}
+        stroke={"red"}
+        strokeWidth={2}
         onClick={onSelect}
         onTap={onSelect}
         ref={shapeRef}
-        stroke={"skyblue"}
-        strokeWidth={4}
-        {...shapeProps}
-        draggable
-        opacity={0.6}
         onDragEnd={(e) => {
           onChange({
             ...shapeProps,
             x: e.target.x(),
             y: e.target.y(),
+            rotation: e.target.rotation(),
           });
         }}
         onTransformEnd={() => {
           const node = shapeRef.current;
           if (!node) return;
-
           const scaleX = node.scaleX();
           const scaleY = node.scaleY();
+          const newWidth = Math.max(5, node.width() * scaleX);
+          const newHeight = Math.max(5, node.height() * scaleY);
 
           node.scaleX(1);
           node.scaleY(1);
-          // node.zIndex(100);
-          const newRadius = Math.max(5, node.radius() * Math.max(scaleX, scaleY));
 
           onChange({
             ...shapeProps,
             x: node.x(),
             y: node.y(),
-            radius: newRadius,
+            width: newWidth,
+            height: newHeight,
+            rotation: node.rotation(),
           });
         }}
       />
@@ -78,6 +82,6 @@ const CircleShape: React.FC<CircleProps> = ({ shapeProps, isSelected, onSelect, 
       )}
     </>
   );
-};
+}
 
-export default CircleShape;
+export default RectItem;

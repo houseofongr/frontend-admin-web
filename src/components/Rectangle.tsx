@@ -1,12 +1,15 @@
 import React, { useEffect, useRef } from "react";
 import { Rect, Transformer } from "react-konva";
 import Konva from "konva";
+import { RectangleData } from "../types/items";
 
 interface RectangleProps {
-  shapeProps: Konva.ShapeConfig;
+  // shapeProps: Konva.ShapeConfig;
+  shapeProps: RectangleData["rectangleData"];
   isSelected: boolean;
   onSelect: () => void;
-  onChange: (newAttrs: Konva.ShapeConfig) => void;
+  // onChange: (newAttrs: Konva.ShapeConfig) => void;
+  onChange: (newAttrs: RectangleData["rectangleData"]) => void;
 }
 
 const RectangleShape: React.FC<RectangleProps> = ({ shapeProps, isSelected, onSelect, onChange }) => {
@@ -15,11 +18,10 @@ const RectangleShape: React.FC<RectangleProps> = ({ shapeProps, isSelected, onSe
 
   useEffect(() => {
     if (isSelected && trRef.current && shapeRef.current) {
-      // 트랜스포머를 수동으로 연결하기 전에 null 체크
       trRef.current.nodes([shapeRef.current]);
       const layer = trRef.current.getLayer();
       if (layer) {
-        layer.batchDraw(); // getLayer()가 null이 아닌 경우에만 호출
+        layer.batchDraw();
       }
     }
   }, [isSelected]);
@@ -31,6 +33,8 @@ const RectangleShape: React.FC<RectangleProps> = ({ shapeProps, isSelected, onSe
         onTap={onSelect}
         ref={shapeRef}
         {...shapeProps}
+        stroke={"red"}
+        strokeWidth={4}
         draggable
         opacity={0.6}
         onDragEnd={(e) => {
@@ -49,9 +53,9 @@ const RectangleShape: React.FC<RectangleProps> = ({ shapeProps, isSelected, onSe
           const scaleY = node.scaleY();
           const rotation = node.rotation();
 
-          // 크기 조정 후 스케일 초기화
           node.scaleX(1);
           node.scaleY(1);
+          node.zIndex(100);
 
           onChange({
             ...shapeProps,

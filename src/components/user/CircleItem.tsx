@@ -1,18 +1,18 @@
-import React, { useEffect, useRef } from "react";
-import { Circle, Transformer } from "react-konva";
 import Konva from "konva";
-import { CircleData } from "../types/items";
+import { useEffect, useRef } from "react";
+import { Circle, Transformer } from "react-konva";
+import { CircleData } from "../../types/items";
 
 interface CircleProps {
-  // shapeProps: Konva.ShapeConfig;
   shapeProps: CircleData["circleData"];
   isSelected: boolean;
   onSelect: () => void;
-  // onChange: (newAttrs: Konva.ShapeConfig) => void;
   onChange: (newAttrs: CircleData["circleData"]) => void;
+  fill: string;
+  isEditable: boolean;
 }
 
-const CircleShape: React.FC<CircleProps> = ({ shapeProps, isSelected, onSelect, onChange }) => {
+function CircleItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable }: CircleProps) {
   const shapeRef = useRef<Konva.Circle | null>(null);
   const trRef = useRef<Konva.Transformer | null>(null);
 
@@ -29,14 +29,16 @@ const CircleShape: React.FC<CircleProps> = ({ shapeProps, isSelected, onSelect, 
   return (
     <>
       <Circle
+        {...shapeProps}
+        fill={fill}
+        draggable
+        listening={isEditable}
+        opacity={0.6}
+        stroke={"red"}
+        strokeWidth={2}
         onClick={onSelect}
         onTap={onSelect}
         ref={shapeRef}
-        stroke={"skyblue"}
-        strokeWidth={4}
-        {...shapeProps}
-        draggable
-        opacity={0.6}
         onDragEnd={(e) => {
           onChange({
             ...shapeProps,
@@ -53,7 +55,7 @@ const CircleShape: React.FC<CircleProps> = ({ shapeProps, isSelected, onSelect, 
 
           node.scaleX(1);
           node.scaleY(1);
-          // node.zIndex(100);
+
           const newRadius = Math.max(5, node.radius() * Math.max(scaleX, scaleY));
 
           onChange({
@@ -78,6 +80,6 @@ const CircleShape: React.FC<CircleProps> = ({ shapeProps, isSelected, onSelect, 
       )}
     </>
   );
-};
+}
 
-export default CircleShape;
+export default CircleItem;

@@ -1,69 +1,69 @@
-import React, { useEffect, useRef } from "react";
-import { Circle, Transformer } from "react-konva";
+import { Ellipse, Transformer } from "react-konva";
 import Konva from "konva";
-import { CircleData } from "../types/items";
+import { useEffect, useRef } from "react";
+import { EllipseData } from "../../types/items";
 
-interface CircleProps {
-  // shapeProps: Konva.ShapeConfig;
-  shapeProps: CircleData["circleData"];
+interface EllipseProps {
+  shapeProps: EllipseData["ellipseData"];
   isSelected: boolean;
   onSelect: () => void;
-  // onChange: (newAttrs: Konva.ShapeConfig) => void;
-  onChange: (newAttrs: CircleData["circleData"]) => void;
+  onChange: (newAttrs: EllipseData["ellipseData"]) => void;
+  fill: string;
+  isEditable: boolean;
 }
 
-const CircleShape: React.FC<CircleProps> = ({ shapeProps, isSelected, onSelect, onChange }) => {
-  const shapeRef = useRef<Konva.Circle | null>(null);
+function EllipseItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable }: EllipseProps) {
+  const shapeRef = useRef<Konva.Ellipse | null>(null);
   const trRef = useRef<Konva.Transformer | null>(null);
 
   useEffect(() => {
     if (isSelected && trRef.current && shapeRef.current) {
       trRef.current.nodes([shapeRef.current]);
-      const layer = trRef.current.getLayer();
-      if (layer) {
-        layer.batchDraw();
-      }
+      trRef.current.getLayer()?.batchDraw();
     }
   }, [isSelected]);
-
   return (
     <>
-      <Circle
+      <Ellipse
+        {...shapeProps}
+        draggable
+        listening={isEditable}
+        fill={fill}
+        opacity={0.6}
+        stroke={"red"}
+        strokeWidth={2}
         onClick={onSelect}
         onTap={onSelect}
         ref={shapeRef}
-        stroke={"skyblue"}
-        strokeWidth={4}
-        {...shapeProps}
-        draggable
-        opacity={0.6}
         onDragEnd={(e) => {
           onChange({
             ...shapeProps,
             x: e.target.x(),
             y: e.target.y(),
+            rotation: e.target.rotation(),
           });
         }}
         onTransformEnd={() => {
           const node = shapeRef.current;
           if (!node) return;
-
           const scaleX = node.scaleX();
           const scaleY = node.scaleY();
+          const rotation = node.rotation();
 
           node.scaleX(1);
           node.scaleY(1);
-          // node.zIndex(100);
-          const newRadius = Math.max(5, node.radius() * Math.max(scaleX, scaleY));
 
           onChange({
             ...shapeProps,
             x: node.x(),
             y: node.y(),
-            radius: newRadius,
+            radiusX: Math.max(5, node.radiusX() * scaleX),
+            radiusY: Math.max(5, node.radiusY() * scaleY),
+            rotation: rotation,
           });
         }}
       />
+
       {isSelected && (
         <Transformer
           ref={trRef}
@@ -78,6 +78,6 @@ const CircleShape: React.FC<CircleProps> = ({ shapeProps, isSelected, onSelect, 
       )}
     </>
   );
-};
+}
 
-export default CircleShape;
+export default EllipseItem;

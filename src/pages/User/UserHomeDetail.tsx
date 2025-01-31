@@ -60,7 +60,7 @@ export default function UserHomeDetail() {
     }
   }, [homeData]);
 
-  if (!info || !homeData) {
+  if (!homeData || !info || !scale) {
     return (
       <div className="w-full h-full flex-center">
         <SpinnerIcon />
@@ -83,7 +83,7 @@ export default function UserHomeDetail() {
           </p>
         </section>
 
-        <section className="relative w-4/5 h-full flex justify-center border-l-2 border-gray-200">
+        <section className="relative w-4/5 h-full flex justify-center bg-gray-300">
           <div className="relative">
             <img
               alt="user-home-border-image"
