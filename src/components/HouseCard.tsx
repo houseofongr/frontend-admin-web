@@ -1,8 +1,7 @@
-import { FaRegPenToSquare } from "react-icons/fa6";
-
 import CardLabel from "./label/CardLabel";
 import { House } from "../types/house";
 import API_CONFIG from "../config/api";
+import { FaRegPenToSquare } from "react-icons/fa6";
 
 type HouseProps = {
   house: House;

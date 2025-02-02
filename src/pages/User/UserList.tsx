@@ -76,7 +76,7 @@ export default function UserList() {
           {users.length === 0 && <div className="py-10 ">유저가 존재하지 않습니다.</div>}
 
           {users && (
-            <ul className="w-full flex flex-col gap-3 ">
+            <ul className="w-full flex flex-col gap-5 ">
               {users.map((user, index) => {
                 return <UserListItem key={user.id} index={index} user={user} currentPage={currentPage} size={size} />;
               })}

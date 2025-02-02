@@ -1,4 +1,5 @@
 import { EditableRoomData } from "../types/house";
+import CircleButton from "./buttons/CircleButton";
 import ContainerTitle from "./ContainerTitle";
 import InputField from "./InputField";
 import { IoMdCheckmark, IoMdClose } from "react-icons/io";
@@ -15,24 +16,26 @@ type RoomFormProps = {
 
 export default function RoomForm({ rooms, isEdit, onChange, onSubmit, onCancel, toggleEdit }: RoomFormProps) {
   return (
-    <div className="rounded-md p-7 mx-5 border border-[#df754b] ">
-      {isEdit ? (
-        <div className="flex gap-3 justify-end">
-          <div className="hover:text-[#df754b] cursor-pointer">
-            <IoMdCheckmark size={20} onClick={onSubmit} />
-          </div>
+    <div className="rounded-md p-5 mx-5 my-2 border border-[#df754b] ">
+      <div className="flex justify-between items-center mb-5">
+        <ContainerTitle stepText="SECOND" headingText="방 정보" />
 
-          <div className="hover:text-[#df754b] cursor-pointer">
-            <IoMdClose size={20} onClick={onCancel} />
-          </div>
-        </div>
-      ) : (
-        <div className="flex justify-end hover:text-[#df754b] cursor-pointer">
-          <TbHomeEdit size={20} onClick={toggleEdit} />
-        </div>
-      )}
+        {isEdit ? (
+          <div className="flex gap-3 justify-end">
+            <div className="flex justify-end">
+              <CircleButton label={<IoMdCheckmark size={15} color="gray" />} onClick={onSubmit} />
+            </div>
 
-      <ContainerTitle stepText="SECOND" headingText="방 정보" />
+            <div className="flex justify-end">
+              <CircleButton label={<IoMdClose size={15} color="gray" />} onClick={onCancel} />
+            </div>
+          </div>
+        ) : (
+          <div className="flex justify-end">
+            <CircleButton label={<TbHomeEdit size={15} color="gray" />} onClick={toggleEdit} />
+          </div>
+        )}
+      </div>
       {rooms.map((room, index) => (
         <InputField
           key={index}

@@ -47,7 +47,7 @@ export default function HomeCard({ home, isNew, onNavigate, onDelete }: UserHome
         </p>
       </div>
 
-      <div className="text-end">
+      <div className="flex justify-end gap-2">
         <CircleButton label={<BsTrash size={25} color="#352f2f" />} onClick={() => onDelete(home.id)} />
         <CircleButton label={<AiOutlineHome size={25} color="#352f2f" />} onClick={() => onNavigate(home.id)} />
       </div>

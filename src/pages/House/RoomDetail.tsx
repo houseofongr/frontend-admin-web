@@ -18,6 +18,14 @@ export default function RoomDetail() {
     const currentIndex = rooms.findIndex((room) => room.roomId === Number(roomId));
     const nextIndex = (currentIndex + 1) % rooms.length;
     const nextRoom = rooms[nextIndex];
+    console.log("nextRoom", nextIndex, nextRoom);
+    console.log("curIndex", currentIndex);
+
+    if (nextIndex === currentIndex) {
+      // 방이 하나만 존재하는 경우
+      alert("더이상 방이 존재하지 않습니다!");
+    }
+
     if (nextRoom) {
       navigate(`/houses/${houseId}/rooms/${nextRoom.roomId}`);
     }
@@ -28,24 +36,33 @@ export default function RoomDetail() {
     navigate("/houses", { replace: true });
   };
 
-  useEffect(() => {
-    if (rooms.length == 0) {
-      const roomlist = localStorage.getItem("rooms");
-      if (roomlist) {
-        setRooms(JSON.parse(roomlist));
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (rooms.length == 0) {
+  //     const roomlist = localStorage.getItem("rooms");
+  //     if (roomlist) {
+  //       setRooms(JSON.parse(roomlist));
+  //     }
+  //   }
+  // }, []);
 
   useEffect(() => {
     if (!roomId) return;
     if (rooms.length == 0) return;
 
-    const targetRoomData = rooms.find((room) => room.roomId === Number(roomId));
-    if (targetRoomData) {
-      console.log("targetRoomData", targetRoomData);
-      setRoomData(targetRoomData);
-    }
+    const fetchRoomData = async () => {
+      try {
+        const response = await fetch(`${API_CONFIG.BACK_API}/houses/rooms/${roomId}`);
+        if (!response.ok) {
+          throw new Error("Failed to fetch room data");
+        }
+        const data = await response.json();
+        setRoomData(data);
+      } catch (error) {
+        console.error("Error fetching room data:", error);
+      }
+    };
+
+    fetchRoomData();
   }, [roomId, rooms]);
 
   if (!roomData)

@@ -12,6 +12,7 @@ type RenderImagesProps = {
 };
 
 const RenderImages = memo(({ houseData, scale }: RenderImagesProps) => {
+  console.log("houseData", houseData);
   return (
     <section className="relative w-4/5 h-full flex justify-center bg-gray-300">
       <div className="relative">

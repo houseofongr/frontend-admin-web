@@ -30,7 +30,7 @@ function EllipseItem({ shapeProps, isSelected, onSelect, onChange, fill, isEdita
         listening={isEditable}
         fill={fill}
         opacity={0.6}
-        stroke={"red"}
+        stroke={"white"}
         strokeWidth={2}
         onClick={onSelect}
         onTap={onSelect}

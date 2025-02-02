@@ -21,7 +21,9 @@ export default function CardLabel({
     <label
       htmlFor={html}
       className={clsx(
-        "rounded-sm  bg-white",
+        // "rounded-sm  bg-white",
+        "rounded-sm bg-transparent",
+
         { "border  ": hasBorder },
         { "py-1 px-2": hasPadding },
         colorType === "primary" && "text-[#F5946D] border-[#F5946D] ",

@@ -18,7 +18,7 @@ export default function UserListItem({ user, currentPage, size, index }: UserLis
   const listNumber = (currentPage - 1) * size + index + 1;
 
   return (
-    <li key={user.id} className="py-2 flex items-center text-center rounded-md bg-[#fbfafa] border border-gray-200">
+    <li key={user.id} className="py-2 flex items-center text-center rounded-md bg-[#fbfafa] ">
       <span style={{ width: "5%" }}>{listNumber}</span>
       <div className="flex flex-col pl-10 pr-3  items-start" style={{ width: "20%" }}>
         <span>{user.realName}</span>

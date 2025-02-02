@@ -31,13 +31,17 @@ export default function HouseImageInfoForm({ fields, onChange }: HouseImageInfoF
               onChange={onChange}
             />
           ) : (
-            <textarea
-              id={field.id}
-              name={field.name}
-              className="py-1 px-2 w-full rounded outline-none text-sm bg-white"
-              value={field.value}
-              onChange={onChange}
-            />
+            <>
+              <span className="text-xs pl-2 text-amber-900">({field.value.length} / 100)</span>
+              <textarea
+                id={field.id}
+                name={field.name}
+                className="py-1 px-2 w-full rounded outline-none text-sm bg-white h-auto"
+                value={field.value}
+                onChange={onChange}
+                rows={3}
+              />
+            </>
           )}
         </div>
       ))}

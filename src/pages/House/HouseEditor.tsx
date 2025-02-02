@@ -9,32 +9,57 @@ import BorderImageUploader from "../../components/houseEditor/BorderImageUploade
 import RoomImagesUploader from "../../components/houseEditor/RoomImagesUploader";
 import BorderImagePreview from "../../components/houseEditor/BorderImagePreview";
 import DraggableItemWrapper from "../../components/houseEditor/DraggableItemWrapper";
+import AlertMessage, { AlertType } from "../../components/common/AlertMessage";
 
 export default function HouseEditorPage() {
   const { houseImage, borderImage, roomImages } = useImageContext();
   const [scale, setScale] = useState<number>(1);
-
+  const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(null);
+  const [newHouseId, setNewHouseId] = useState<number>();
   const navigate = useNavigate();
 
+  console.log("borderImage", borderImage);
+
+  const showAlert = (text: string, type: AlertType) => {
+    setAlert({ text, type });
+  };
   const saveHandler = async () => {
     if (!houseImage) {
-      alert("하우스 이미지를 업로드하세요.");
+      showAlert("하우스 이미지를 업로드하세요.", "warning");
       return;
     }
     if (!houseImage.title || !houseImage.author || !houseImage.description) {
-      alert("하우스의 모든 정보를 입력하세요 (타이틀, 작가명, 설명).");
+      showAlert("하우스의 모든 정보를 입력하세요. (타이틀, 작가명, 설명)", "warning");
       return;
     }
     if (roomImages.length === 0) {
-      alert("최소 하나의 룸 이미지를 업로드하세요.");
+      showAlert("최소한 하나의 룸 이미지를 업로드하세요.", "warning");
       return;
     }
 
-    const invalidRooms = roomImages.filter((room) => room.title === "");
-    console.log("invaliedRooms", invalidRooms);
-    if (invalidRooms.length > 0) {
-      console.log("here");
-      alert("모든 룸 이미지의 타이틀값을 중복없이 입력하세요.");
+    // const invalidRooms = roomImages.filter((room) => room.title === "");
+    // if (invalidRooms.length > 0) {
+    //   showAlert("모든 룸 타이틀 값을 중복없이 입력하세요.", "warning");
+    //   return;
+    // }
+
+    const titleCounts = roomImages.reduce((acc, room) => {
+      acc[room.title] = (acc[room.title] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    // 중복된 타이틀만 필터링
+    const duplicateTitles = Object.entries(titleCounts)
+      .filter(([_, count]) => count > 1)
+      .map(([title]) => title);
+
+    if (duplicateTitles.length > 0) {
+      showAlert(`다음 룸 타이틀이 중복되었습니다. 중복되는 이름 [ ${duplicateTitles.join(", ")} ]`, "warning");
+      return;
+    }
+
+    if (roomImages.some((room) => room.title === "")) {
+      showAlert("모든 룸 타이틀 값을 입력하세요.", "warning");
       return;
     }
 
@@ -76,21 +101,19 @@ export default function HouseEditorPage() {
       });
       if (response.ok) {
         const result = await response.json();
-        console.log("Save success:", result);
-
         const { houseId } = result;
         if (houseId) {
-          console.log("houseid", houseId);
-          navigate(`/houses/${houseId}`);
+          setNewHouseId(houseId);
+          showAlert(`새로운 ${houseId}번 하우스가 성공적으로 저장되었습니다.`, "success");
+          // navigate(`/houses/${houseId}`);
         }
       } else {
         const error = await response.json();
-        console.error("Save failed:", error);
-        alert("Failed to save data.");
+        showAlert(`새로운 하우스 데이터 저장에 실패하였습니다. error: ${error}`, "fail");
       }
     } catch (error) {
       console.error("Error saving data:", error);
-      alert("An error occurred while saving data.");
+      showAlert(`데이터 저장 중 오류가 발생했습니다. error:${error}`, "fail");
     }
   };
 
@@ -99,6 +122,23 @@ export default function HouseEditorPage() {
 
   return (
     <div className="w-full h-full flex items-center">
+      {alert && (
+        <AlertMessage
+          text={alert.text}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+          okButton={<Button label="확인" onClick={() => setAlert(null)} />}
+        />
+      )}
+
+      {alert?.type === "success" && (
+        <AlertMessage
+          text={alert.text}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+          okButton={<Button label="확인" onClick={() => navigate(`/houses/${newHouseId}`)} />}
+        />
+      )}
       <section className="w-1/5 h-full flex flex-col gap-4  overflow-scroll ">
         <div className="w-full pt-6  px-3 flex justify-between items-center">
           <ArrowBackIcon href="/houses" />

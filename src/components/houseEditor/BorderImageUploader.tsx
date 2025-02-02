@@ -8,6 +8,7 @@ import { useImageContext } from "../../context/ImageContext";
 export default function BorderImageUploader() {
   const { handleFileChange, borderImage } = useImageContext();
   const [fileName, setFileName] = useState<string>("");
+  console.log("borderImage", borderImage);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleFileChange(e, "border");

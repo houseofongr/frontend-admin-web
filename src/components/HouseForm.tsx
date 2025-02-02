@@ -1,9 +1,8 @@
 import InputField from "./InputField";
 import ContainerTitle from "./ContainerTitle";
-import { IoMdClose } from "react-icons/io";
-import { IoMdCheckmark } from "react-icons/io";
 import { EditableHouseData } from "../types/house";
-import { TbHomeEdit } from "react-icons/tb";
+import CircleButton from "./buttons/CircleButton";
+import { IoMdClose, IoMdCheckmark, TbHomeEdit } from "./icons";
 
 type HouseFormProps = {
   houseData: EditableHouseData["house"];
@@ -16,40 +15,42 @@ type HouseFormProps = {
 
 export default function HouseForm({ houseData, isEdit, onChange, onSubmit, onCancel, toggleEdit }: HouseFormProps) {
   return (
-    <div className="rounded-md p-7 mx-5 my-2  border border-[#df754b] ">
-      {isEdit ? (
-        <div className="flex gap-3 justify-end ">
-          <div className="hover:text-[#df754b] cursor-pointer">
-            <IoMdCheckmark size={20} onClick={onSubmit} />
-          </div>
+    <div className="rounded-md p-5 mx-5 my-2 border border-[#df754b]  ">
+      <div className="flex justify-between items-center mb-5">
+        <ContainerTitle stepText="FIRST" headingText="하우스 정보" />
 
-          <div className="hover:text-[#df754b] cursor-pointer">
-            <IoMdClose size={20} onClick={onCancel} />
+        {isEdit ? (
+          <div className="flex gap-3 justify-end ">
+            <div className="flex justify-end">
+              <CircleButton label={<IoMdCheckmark size={15} color="gray" />} onClick={onSubmit} />
+            </div>
+            <div className="flex justify-end">
+              <CircleButton label={<IoMdClose size={15} color="gray" />} onClick={onCancel} />
+            </div>
           </div>
-        </div>
-      ) : (
-        <div className="flex justify-end hover:text-[#df754b] cursor-pointer">
-          <TbHomeEdit size={20} onClick={toggleEdit} />
-        </div>
-      )}
-      <ContainerTitle stepText="FIRST" headingText="하우스 정보" />
+        ) : (
+          <div className="flex justify-end">
+            <CircleButton label={<TbHomeEdit size={15} color="gray" />} onClick={toggleEdit} />
+          </div>
+        )}
+      </div>
 
       <InputField
-        label="House Title"
+        label="HOUSE TITLE"
         id="house-title"
         value={houseData.title}
         readOnly={!isEdit}
         onChange={(e) => onChange("title", e.target.value)}
       />
       <InputField
-        label="Author"
+        label="AUTHOR"
         id="house-author"
         value={houseData.author}
         readOnly={!isEdit}
         onChange={(e) => onChange("author", e.target.value)}
       />
       <InputField
-        label="Description"
+        label="DESCRIPTION"
         id="house-description"
         value={houseData.description}
         readOnly={!isEdit}

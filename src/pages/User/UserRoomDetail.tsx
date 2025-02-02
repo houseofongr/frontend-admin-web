@@ -1,55 +1,102 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 import Konva from "konva";
+import clsx from "clsx";
 import { Stage, Layer, Image as KonvaImage } from "react-konva";
 import API_CONFIG from "../../config/api";
 import RectItem from "../../components/user/RectangleItem";
 import CircleItem from "../../components/user/CircleItem";
 import EllipseItem from "../../components/user/EllipseItem";
 import CircleButton from "../../components/buttons/CircleButton";
-import { FaSave } from "react-icons/fa";
-import { TbLayoutSidebarLeftCollapseFilled, TbLayoutSidebarLeftExpandFilled } from "react-icons/tb";
-import clsx from "clsx";
 import ColorTag from "../../components/itemEditor/ColorTag";
-import { generateUniqueId } from "../../utils/generateUniqueId";
-import { getRandomColor } from "../../utils/getRandomColor";
 import ShapeSelectorTool from "../../components/itemEditor/ShapeSelectorTool";
-import { BsTrash3 } from "react-icons/bs";
-import { FaRegEdit } from "react-icons/fa";
 import { formatShapeData } from "../../utils/formatShapeData";
-import { CircleData, EllipseData, RectangleData, ShapeData } from "../../types/items";
+import { ShapeData } from "../../types/items";
+// import { ITEM_DATA } from "../../mocks/sound-list-data";
 
-export default function UserRoomDetailFinal() {
+import { MdArrowForwardIos } from "react-icons/md";
+import { MdArrowBackIos } from "react-icons/md";
+
+import {
+  FaSave,
+  FaRegEdit,
+  TbLayoutSidebarLeftCollapseFilled,
+  TbLayoutSidebarLeftExpandFilled,
+  BsTrash3,
+  RiPlayListFill,
+  FcAudioFile,
+} from "../../components/icons";
+import CardLabel from "../../components/label/CardLabel";
+import FileUploadButton from "../../components/buttons/FileUploadButton";
+import FileName from "../../components/houseEditor/FileName";
+import { newCircle, newEllipse, newRect } from "../../constants/initialShapeData";
+import { formatDate } from "../../utils/formatDate";
+
+interface SoundSource {
+  id: string;
+  name: string;
+  description: string;
+  createdDate: string;
+  updatedDate: string;
+  audioFileId: number;
+}
+
+interface ItemData {
+  itemName: string;
+  soundSource: SoundSource[];
+}
+
+interface SoundData {
+  file: File;
+  name: string;
+  description: string;
+  isActive: boolean;
+}
+
+export default function UserRoomDetail() {
   const { userId, homeId, roomId } = useParams<{ userId: string; homeId: string; roomId: string }>();
 
+  // 유저 룸 관련 state
+  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
+  const [imageSize, setImageSize] = useState({ width: 0, height: 0, scaleX: 1, scaleY: 1 });
+  // 아이템(shape)관련 state
   const [originData, setOriginData] = useState<ShapeData[]>([]);
   const [shapes, setShapes] = useState<ShapeData[]>([]);
 
-  const [selectedId, selectShapeId] = useState<string | null>(null);
-  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
-  const [imageSize, setImageSize] = useState({ width: 0, height: 0, scaleX: 1, scaleY: 1 });
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [imageId, setImageId] = useState(null);
   const [isItemListVisible, setIsItemListVisible] = useState(true);
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  console.log("이미지 사이즈", imageSize);
+  // 음원 관련 state
+  const [itemSounds, setItemSounds] = useState<ItemData | null>(null);
+  const [newSound, setNewSound] = useState<SoundData | null>(null);
+  const [fileName, setFileName] = useState<string>("");
 
   const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
+  // 아직 저장되지 않은 새로운 도형의 refs
+  // const newInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
+
+  console.log("new sound", newSound);
+  console.log("itemSounds", itemSounds);
+  console.log("selectedId", selectedId);
 
   const checkedSelectShape = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
-      selectShapeId(null);
+      setSelectedId(null);
     }
   };
 
   const toggleEditableShpaes = () => {
     setIsEditable((prev) => !prev);
+    setIsExpanded(false);
   };
 
   const toggleAsideWidth = () => {
     setIsExpanded((prev) => !prev);
+    setItemSounds(null);
   };
 
   // * 버튼 클릭 시 aside를 토글하는 핸들러
@@ -58,46 +105,19 @@ export default function UserRoomDetailFinal() {
   };
 
   const addRect = () => {
-    const newRect: RectangleData = {
-      id: generateUniqueId(),
-      itemType: "rectangle",
-      name: "",
-      rectangleData: { x: 100, y: 200, width: 150, height: 100, rotation: 0 },
-      fill: getRandomColor(),
-    };
-
     setShapes((prev) => [...prev, newRect]);
   };
 
   const addCircle = () => {
-    const newCircle: CircleData = {
-      id: generateUniqueId(),
-      itemType: "circle",
-      name: "",
-      circleData: { x: 100, y: 200, radius: 50 },
-      fill: getRandomColor(),
-    };
-
     setShapes((prev) => [...prev, newCircle]);
   };
 
   const addEllipse = () => {
-    const newEllipse: EllipseData = {
-      id: generateUniqueId(),
-      itemType: "ellipse",
-      name: "",
-      ellipseData: { x: 200, y: 200, radiusX: 70, radiusY: 50, rotation: 0 },
-      fill: getRandomColor(),
-    };
-
     setShapes((prev) => [...prev, newEllipse]);
   };
 
   const deleteShape = async (id: string) => {
-    console.log("itemId", id);
-
     const isExistingItem = originData.some((shape) => shape.id === id);
-    console.log(isExistingItem);
     if (isExistingItem) {
       try {
         const response = await fetch(`${API_CONFIG.BACK_API}/items/${id}`, {
@@ -113,11 +133,10 @@ export default function UserRoomDetailFinal() {
         return;
       }
     }
-
     setShapes((prev) => prev.filter((shape) => shape.id !== id));
   };
 
-  const handleNameChange = (id: string, value: string) => {
+  const handleItemNameChange = (id: string, value: string) => {
     setShapes((prev) => prev.map((shape) => (shape.id === id ? { ...shape, name: value } : shape)));
   };
 
@@ -129,7 +148,91 @@ export default function UserRoomDetailFinal() {
     }
   };
 
-  const saveHandler = async () => {
+  const getItemSounds = async () => {
+    try {
+      const response = await fetch(`${API_CONFIG.BACK_API}/items/${selectedId}/sound-sources`);
+      if (!response.ok) {
+        throw new Error("Failed to fetch room data");
+      }
+      const data = await response.json();
+      // setItemSounds(ITEM_DATA);
+      setItemSounds(data);
+      setIsExpanded(true);
+    } catch (error) {
+      console.error("Error fetching room data:", error);
+    }
+  };
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files) return;
+
+    const newFiles = Array.from(files);
+
+    setFileName(newFiles[0].name);
+    setNewSound({ file: newFiles[0], name: "골골송", description: "2025 설이의 골골송", isActive: true });
+  };
+
+  const deleteSoundSourceHandler = async (soundSourceId: string) => {
+    try {
+      const response = await fetch(`${API_CONFIG.BACK_API}/sound-sources/${soundSourceId}`, {
+        method: "DELETE",
+      });
+
+      if (!response.ok) throw new Error(`Failed to delete item (status: ${response.status})`);
+      alert("아이템이 성공적으로 삭제되었습니다.");
+    } catch (error) {
+      console.error("Error deleting item:", error);
+      alert("아이템 삭제 중 오류가 발생했습니다.");
+      return;
+    }
+  };
+  const saveSoundSourceHandler = async () => {
+    if (!selectedId) {
+      alert("아이템을 선택해주세요.");
+      return;
+    }
+
+    const formData = new FormData();
+
+    if (newSound?.file) {
+      console.log("file 있음!");
+      formData.append("soundFile", newSound.file);
+    }
+
+    const metadata = {
+      name: "올해 나의 다짐 v2",
+      description:
+        "2025년 1월 1일에 세운 나의 다짐은 '하루 첫 시간 루틴을 만들자'이다.2025 1월 1일에 세운 나의 다짐은 '하루 첫 시간 루틴을 만들자'이다.2025 1월 1일에 세운 나의 다짐은 '하루 첫 시간 루틴을 만들자'이다.",
+      isActive: true,
+    };
+    formData.append("metadata", JSON.stringify(metadata));
+
+    // formdata 콘솔 확인
+    for (const [key, value] of formData.entries()) {
+      console.log(key, value);
+    }
+
+    try {
+      //  backapi / items/{itemId}/ sound-sources
+      const response = await fetch(`${API_CONFIG.BACK_API}/items/${selectedId}/sound-sources`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to save items (status: ${response.status})`);
+      }
+      const result = await response.json();
+      console.log("Save success for sound souceId :", result.soundSourceId);
+      alert("음원이 아이템에 성공적으로 저장되었습니다.");
+      console.log();
+    } catch (error) {
+      console.error("Error saving items:", error);
+      alert("음원을 아이템에 저장 중 오류가 발생했습니다.");
+    }
+  };
+
+  const saveItemsHandler = async () => {
     if (shapes.some((shape) => shape.name.trim() === "")) {
       alert("아이템의 이름을 빠짐없이 입력해주세요.");
       return;
@@ -148,6 +251,10 @@ export default function UserRoomDetailFinal() {
     const updatedItems = modifiedItems.map((shape) => formatShapeData(shape, { includeId: true }));
 
     console.log({ createItems: createdItems, updateItems: updatedItems });
+    if (createdItems.length === 0 && updatedItems.length === 0) {
+      alert("변경되거나 생성된 아이템이 존재하지않습니다.");
+      return;
+    }
 
     const apiUrl = `${API_CONFIG.BACK_API}/users/${userId}/homes/${homeId}/rooms/${roomId}/items/v2`;
     try {
@@ -225,33 +332,54 @@ export default function UserRoomDetailFinal() {
   }, [homeId, imageId]);
 
   return (
-    <div className={clsx("relative w-full h-fll", { "bg-gray-500": isEditable })}>
+    <div className={clsx("relative w-full h-fll", { "bg-stone-700": isEditable }, { "bg-neutral-300": !isEditable })}>
       {isEditable && <ShapeSelectorTool addRect={addRect} addCircle={addCircle} addEllipse={addEllipse} />}
 
       {isItemListVisible ? (
         <aside
           className={clsx(
-            "h-full fixed top-0 right-0 z-10 bg-stone-800/90 text-white py-5 px-2 overflow-auto transition-all duration-300",
+            "h-full fixed top-0 right-0 z-10 bg-stone-800/90 text-white overflow-auto transition-all duration-300",
             isExpanded ? "w-2/5" : "w-1/5"
           )}
         >
-          <div className="flex justify-between items-center px-3 border-b pb-5">
-            <CircleButton disabled={shapes.length === 0} label={<FaSave size={20} onClick={saveHandler} />} />
-            <CircleButton label={<FaRegEdit size={20} />} onClick={toggleEditableShpaes} />
-            <CircleButton label={<TbLayoutSidebarLeftExpandFilled size={25} />} onClick={itemListViewToggleHandler} />
+          {/* Todo : 컴포넌트 */}
+          <div className="flex justify-between items-center p-4 bg-black/30">
+            <CircleButton
+              label={<FaRegEdit size={20} />}
+              onClick={toggleEditableShpaes}
+              hasBorder={false}
+              text="EDIT MODE"
+            />
+
+            {isEditable && (
+              <CircleButton
+                disabled={shapes.length === 0}
+                label={<FaSave size={20} onClick={saveItemsHandler} />}
+                hasBorder={false}
+                text="SAVE"
+              />
+            )}
+
+            <CircleButton
+              label={<TbLayoutSidebarLeftExpandFilled size={25} />}
+              onClick={itemListViewToggleHandler}
+              hasBorder={false}
+              text="HIDE"
+            />
           </div>
-          <div className="flex gap-2">
-            <ul className={clsx("flex flex-col gap-2 border", isExpanded ? "w-[50%]" : "w-full")}>
+
+          <div className="flex gap-2 py-2 px-3 ">
+            <ul className={clsx("flex flex-col gap-1", isExpanded ? "w-[50%]" : "w-full")}>
               <h1 className="text-center py-4">아이템 생성 목록</h1>
               {shapes.map((shape) => {
                 return (
                   <li
                     key={shape.id}
                     className={clsx(
-                      "w-[90%] flex items-center gap-2 rounded p-2",
+                      "w-full flex items-center gap-2 rounded p-2",
                       shape.id === selectedId ? "border-stone-400" : "border-transparent"
                     )}
-                    onClick={() => selectShapeId(shape.id)}
+                    onClick={() => setSelectedId(shape.id)}
                   >
                     <div className="flex items-center w-1/5 relative gap-1">
                       <ColorTag fill={shape.fill || "#ffff"} />
@@ -262,35 +390,94 @@ export default function UserRoomDetailFinal() {
                     <input
                       ref={(element) => handleInputRef(shape.id, element)}
                       value={shape.name}
-                      onChange={(e) => handleNameChange(shape.id, e.target.value)}
+                      onChange={(e) => handleItemNameChange(shape.id, e.target.value)}
                       disabled={!isEditable}
                       placeholder="Item title"
-                      className="px-2 py-1 bg-transparent border outline-none text-sm border-stone-400"
+                      className="px-2 py-1 bg-transparent border outline-none text-sm border-stone-400  overflow-hidden line-clamp-2"
                     />
-                    <input id="sound-file" type="file" accept="audio/*" className="hidden" />
-                    <label htmlFor="sound-file">+</label>
+                    {!isEditable && (
+                      <button onClick={getItemSounds}>
+                        {/* 아이템이 가지고 있는 음원 리스트 조회 */}
+                        <RiPlayListFill size={20} />
+                      </button>
+                    )}
                   </li>
                 );
               })}
             </ul>
+
+            {/* 음원 리스트 */}
             {isExpanded && (
-              <div className="flex flex-col border w-[50%]">
+              <div className="flex flex-col w-[50%] ">
                 <h1 className="text-center py-4">음원 파일 목록</h1>
+
+                <div className="flex flex-col w-full ">
+                  {itemSounds && (
+                    <span className="py-4 border-[#F5946D]">'{itemSounds.itemName}' 에 등록된 소리 모음</span>
+                  )}
+
+                  <ul className="">
+                    {itemSounds?.soundSource.length === 0 && <div>음원이 존재하지 않습니다.</div>}
+                    {itemSounds?.soundSource?.map((sound) => (
+                      <li className="flex flex-col p-1">
+                        {/* 수정 불가  */}
+                        <div className="flex items-center ">
+                          <audio controls src={`${API_CONFIG.PRIVATE_AUDIO_LOAD_API}/${sound.audioFileId}`}></audio>
+                        </div>
+                        <button onClick={() => deleteSoundSourceHandler(sound.id)}>삭제</button>
+                        <CardLabel text={`AUDIO ID#${sound.id}`} hasBorder={false} />
+
+                        <div className="flex flex-col gap-1">
+                          <div className="flex">
+                            <FcAudioFile size={40} />
+                            <div>
+                              <p className="text-[14px]">{sound.name}</p>
+                              <p className="text-xs text-gray-400">
+                                {formatDate(sound.createdDate)} / {formatDate(sound.updatedDate)}
+                              </p>
+                            </div>
+                          </div>
+                          <p className="text-xs text-gray-300">{sound.description}</p>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <input id="sound-file" type="file" accept="audio/*" className="hidden" onChange={handleFileUpload} />
+                  <div className="w-full flex text-start pt-4">{fileName && <FileName fileName={fileName} />}</div>
+                  <div className="flex flex-col">
+                    <FileUploadButton htmlFor="sound-file" />
+                    <button className="py-2" onClick={saveSoundSourceHandler}>
+                      등록
+                    </button>
+                  </div>
+                </div>
               </div>
             )}
           </div>
-          {shapes.length > 0 && isEditable && (
-            <div className="text-end">
-              <CircleButton label={">"} onClick={toggleAsideWidth} />
+          {!isEditable && (
+            <div className="relative h-[80%]  flex justify-end items-center ">
+              {isExpanded ? (
+                <div className="fixed top-[500px]  hover:text-orange-400 cursor-pointer">
+                  <MdArrowBackIos onClick={toggleAsideWidth} size={30} />
+                </div>
+              ) : (
+                <div className="fixed top-[500px] hover:text-orange-400 cursor-pointer">
+                  <MdArrowForwardIos onClick={toggleAsideWidth} size={30} />
+                </div>
+              )}
             </div>
           )}
         </aside>
       ) : (
         <div className="absolute right-0 p-5 z-10">
-          <CircleButton label={<TbLayoutSidebarLeftCollapseFilled size={25} />} onClick={itemListViewToggleHandler} />
+          <CircleButton
+            label={<TbLayoutSidebarLeftCollapseFilled size={25} color="white" />}
+            onClick={itemListViewToggleHandler}
+          />
         </div>
       )}
 
+      {/* konva.stage > layer > konva.shapes */}
       <Stage
         width={window.innerWidth}
         height={window.innerHeight}
@@ -317,7 +504,7 @@ export default function UserRoomDetailFinal() {
                   shapeProps={shape.rectangleData}
                   isSelected={shape.id === selectedId}
                   isEditable={isEditable}
-                  onSelect={() => selectShapeId(shape.id)}
+                  onSelect={() => setSelectedId(shape.id)}
                   onChange={(newAttrs) => {
                     const updatedShapes = shapes.slice();
                     updatedShapes[i] = { ...shape, rectangleData: newAttrs };
@@ -333,7 +520,7 @@ export default function UserRoomDetailFinal() {
                   shapeProps={shape.circleData}
                   isSelected={shape.id === selectedId}
                   isEditable={isEditable}
-                  onSelect={() => selectShapeId(shape.id)}
+                  onSelect={() => setSelectedId(shape.id)}
                   onChange={(newAttrs) => {
                     const updatedShapes = shapes.slice();
                     updatedShapes[i] = { ...shape, circleData: newAttrs };
@@ -349,7 +536,7 @@ export default function UserRoomDetailFinal() {
                   shapeProps={shape.ellipseData}
                   isSelected={shape.id === selectedId}
                   isEditable={isEditable}
-                  onSelect={() => selectShapeId(shape.id)}
+                  onSelect={() => setSelectedId(shape.id)}
                   onChange={(newAttrs) => {
                     const updatedShapes = shapes.slice();
                     updatedShapes[i] = { ...shape, ellipseData: newAttrs };

@@ -187,6 +187,7 @@ export default function HouseDetail() {
         if (!response.ok) throw new Error("Failed to fetch house data");
 
         const data = await response.json();
+        console.log("data checking", data);
         setHouseData(data);
         setRooms(data.rooms);
       } catch (error) {

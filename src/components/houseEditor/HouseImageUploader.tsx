@@ -4,10 +4,13 @@ import FileName from "./FileName";
 import ContainerTitle from "../ContainerTitle";
 import HouseImageInfoForm from "./HouseInfoForm";
 import { useImageContext } from "../../context/ImageContext";
+import AlertMessage, { AlertType } from "../common/AlertMessage";
+import Button from "../buttons/Button";
 
 export default function HouseImageUploader() {
   const { houseImage, setHouseImage, handleFileChange } = useImageContext();
   const [fileName, setFileName] = useState<string>("");
+  const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(null);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleFileChange(e, "house");
@@ -23,7 +26,7 @@ export default function HouseImageUploader() {
 
     if (houseImage) {
       if (value.length > maxLength) {
-        alert(`하우스 ${name}의 길이는 ${maxLength}까지 가능합니다.`);
+        setAlert({ text: `하우스 ${name}의 길이는 ${maxLength}까지 가능합니다.`, type: "warning" });
       }
       setHouseImage((prev) => ({
         ...prev!,
@@ -57,6 +60,14 @@ export default function HouseImageUploader() {
   ];
   return (
     <div className="rounded-2xl py-3 px-7 bg-[#F8EFE6] ">
+      {alert && (
+        <AlertMessage
+          text={alert.text}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+          okButton={<Button label="확인" onClick={() => setAlert(null)} />}
+        />
+      )}
       <ContainerTitle stepText="첫번째" headingText="하우스 프로필 이미지" />
 
       <div className="flex flex-col items-center gap-6 ">

@@ -12,7 +12,7 @@ const Navigator = () => {
 
   return (
     <nav className="md:pt-0 md:pb-0 lg:pt-10 lg:pb-3 w-full flex justify-end md:justify-center text-sm">
-      <ul className="flex gap-10 lg:gap-16 sm:pr-4">
+      <ul className="flex gap-10 lg:gap-16 pr-4 md:pr-0">
         {TABS.map(({ label, href }) => {
           const isActive = pathName === href;
           return (
