@@ -61,7 +61,7 @@ export default function RoomImagesUploader() {
             <input
               type="text"
               id={`room-title-${index + 1}`}
-              className="p-2 w-full rounded outline-none text-sm bg-white"
+              className="p-2 w-full rounded text-sm bg-white"
               placeholder={`룸${index + 1} 타이틀 입력하세요`}
               value={room.title}
               onChange={(e) => handleTitleChange(index, e.target.value)}

@@ -7,11 +7,9 @@ import { ShapeData } from "../../types/items";
 import KonvaContainer from "../../components/itemEditor/KonvaContainer";
 import SlideBar from "../../components/itemEditor/SlideBar";
 import { formatShapeData } from "../../utils/formatShapeData";
-import { BsTrash3 } from "react-icons/bs";
 import RoomDetailLayout from "../../components/itemEditor/RoomDetailLayout";
 import ModalAlertMessage, { AlertType } from "../../components/common/ModalAlertMessage";
 import Button from "../../components/common/buttons/Button";
-import CircleButton from "../../components/common/buttons/CircleButton";
 
 type UpdateItemsPayload = {
   createdItems: object[];
@@ -35,7 +33,7 @@ export default function NewUserRoomDetail() {
   const showAlert = (text: string, type: AlertType) => {
     setAlert({ text, type });
   };
-  // 초기 아이템 데이터 로드
+
   const { data, isLoading } = useQuery({
     queryKey: ["userRoom", homeId, roomId, userId],
     queryFn: async ({ queryKey }) => {
@@ -49,10 +47,7 @@ export default function NewUserRoomDetail() {
 
   const deleteShape = async (id: number) => {
     const isExistingItem = originData.some((shape) => shape.id === id);
-    const targetItem = originData.find((shape) => shape.id === id); // 기존 아이템이면 데이터가 있고 없으면 undefined
-    console.log("isExistingItem", isExistingItem);
-
-    console.log("deleteToItemName", targetItem);
+    const targetItem = originData.find((shape) => shape.id === id);
     if (isExistingItem) {
       try {
         const response = await fetch(`${API_CONFIG.BACK_API}/items/${id}`, {
@@ -69,9 +64,9 @@ export default function NewUserRoomDetail() {
       }
     }
     setShapes((prev) => prev.filter((shape) => shape.id !== id));
+    setSelectedId(null);
   };
 
-  // shape items data fetch -  기존의 아이템 update + 새로운 아이템 create
   const updateItemData = async ({ createdItems, updatedItems }: UpdateItemsPayload) => {
     const apiUrl = `${API_CONFIG.BACK_API}/users/${userId}/homes/${homeId}/rooms/${roomId}/items/v2`;
 
@@ -109,8 +104,6 @@ export default function NewUserRoomDetail() {
 
     const createdItems = newItems.map((shape) => formatShapeData(shape));
     const updatedItems = modifiedItems.map((shape) => formatShapeData(shape, { includeId: true }));
-    console.log("new", createdItems);
-    console.log("updated", updatedItems);
 
     if (createdItems.length === 0 && updatedItems.length === 0) {
       showAlert("변경되거나 생성된 아이템이 존재하지않습니다.", "info");
@@ -148,6 +141,7 @@ export default function NewUserRoomDetail() {
         imageId={imageId}
         selectedId={selectedId}
         setSelectedId={setSelectedId}
+        deleteShape={deleteShape}
       />
       {/* 아이템 */}
       <SlideBar
@@ -160,13 +154,7 @@ export default function NewUserRoomDetail() {
         saveItemsHandler={saveItemsHandler}
       />
 
-      {/* 휴지통 */}
-      {selectedId && (
-        <div className="fixed bottom-5 left-5 text-white ">
-          <CircleButton label={<BsTrash3 size={30} onClick={() => deleteShape(selectedId)} />} />
-        </div>
-      )}
-      {/* 모달 alertMessage */}
+      {/* 모달 메세지 */}
       {alert && (
         <ModalAlertMessage
           text={alert.text}
@@ -175,7 +163,6 @@ export default function NewUserRoomDetail() {
           okButton={<Button label="확인" onClick={() => setAlert(null)} />}
         />
       )}
-      {/* </div> */}
     </RoomDetailLayout>
   );
 }

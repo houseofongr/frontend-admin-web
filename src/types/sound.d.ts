@@ -1,10 +1,11 @@
 export interface SoundSource {
-  id: string;
+  id: number;
   name: string;
   description: string;
   createdDate: string;
   updatedDate: string;
   audioFileId: number;
+  isActive: boolean;
 }
 
 export interface ItemSoundsData {
@@ -12,9 +13,12 @@ export interface ItemSoundsData {
   soundSource: SoundSource[];
 }
 
-export interface SoundData {
-  file: File;
+export interface SoundMetadata {
   name: string;
   description: string;
   isActive: boolean;
+}
+
+export interface SoundData extends SoundMetadata {
+  file: File;
 }

@@ -145,7 +145,7 @@ export default function UserRoomDetail() {
     setNewSound({ file: newFiles[0], name: "골골송", description: "2025 설이의 골골송", isActive: true });
   };
 
-  const deleteSoundSourceHandler = async (soundSourceId: string) => {
+  const deleteSoundSourceHandler = async (soundSourceId: number) => {
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/sound-sources/${soundSourceId}`, {
         method: "DELETE",
@@ -365,7 +365,7 @@ export default function UserRoomDetail() {
                       onChange={(e) => handleItemNameChange(shape.id, e.target.value)}
                       disabled={!isEditable}
                       placeholder="Item title"
-                      className="px-2 py-1 bg-transparent border outline-none text-sm border-stone-400  overflow-hidden line-clamp-2"
+                      className="px-2 py-1 bg-transparent border  text-sm border-stone-400  overflow-hidden line-clamp-2"
                     />
                     {!isEditable && (
                       <button onClick={getItemSounds}>

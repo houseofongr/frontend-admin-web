@@ -15,11 +15,11 @@ export default function HouseCard({ house }: HouseProps) {
           <CardLabel text={`AOO HOUSE NO.${house.id}`} hasBorder={false} hasPadding={false} />
 
           <div className="py-2">
-            <p className="text-[13px] md:text-base text-ellipsis overflow-hidden line-clamp-2">{house.title}</p>
+            <p className="text-[13px] md:text-base text-ellipsis line-clamp-2">{house.title}</p>
             <p className="font-thin text-sm text-stone-500">Designed by {house.author}</p>
           </div>
 
-          <p className="text-[13px] font-light md:text-[15px] mb-2 overflow-hidden line-clamp-2">{house.description}</p>
+          <p className="text-[13px] font-light md:text-[15px] mb-2 line-clamp-2">{house.description}</p>
         </div>
 
         <div className="text-[12px] font-light text-stone-600">

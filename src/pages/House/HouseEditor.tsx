@@ -35,6 +35,11 @@ export default function HouseEditorPage() {
       return;
     }
 
+    if (roomImages.some((room) => room.title === "")) {
+      showAlert("모든 룸 타이틀 값을 입력하세요.", "warning");
+      return;
+    }
+
     const titleCounts = roomImages.reduce((acc, room) => {
       acc[room.title] = (acc[room.title] || 0) + 1;
       return acc;
@@ -47,11 +52,6 @@ export default function HouseEditorPage() {
 
     if (duplicateTitles.length > 0) {
       showAlert(`다음 룸 타이틀이 중복되었습니다. 중복되는 이름 [ ${duplicateTitles.join(", ")} ]`, "warning");
-      return;
-    }
-
-    if (roomImages.some((room) => room.title === "")) {
-      showAlert("모든 룸 타이틀 값을 입력하세요.", "warning");
       return;
     }
 
@@ -86,11 +86,16 @@ export default function HouseEditorPage() {
 
     formData.append("metadata", JSON.stringify(metadata));
 
+    // for (const [key, value] of formData.entries()) {
+    //   console.log(key, value);
+    // }
+
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/houses`, {
         method: "POST",
         body: formData,
       });
+
       if (response.ok) {
         const result = await response.json();
         const { houseId } = result;

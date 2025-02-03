@@ -26,7 +26,7 @@ export default function HouseImageInfoForm({ fields, onChange }: HouseImageInfoF
               type="text"
               id={field.id}
               name={field.name}
-              className="p-2 w-full rounded outline-none text-sm bg-white "
+              className="p-2 w-full rounded text-sm bg-white "
               value={field.value}
               onChange={onChange}
             />
@@ -36,7 +36,7 @@ export default function HouseImageInfoForm({ fields, onChange }: HouseImageInfoF
               <textarea
                 id={field.id}
                 name={field.name}
-                className="py-1 px-2 w-full rounded outline-none text-sm bg-white h-auto"
+                className="py-1 px-2 w-full rounded text-sm bg-white h-auto"
                 value={field.value}
                 onChange={onChange}
                 rows={3}

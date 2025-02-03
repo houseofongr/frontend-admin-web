@@ -35,9 +35,9 @@ export default function LoginPage() {
       });
     }
   };
-  const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+
+  const onChangeHandler = useCallback((e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    console.log(name, value);
     setFormData((prevData) => ({
       ...prevData,
       [name]: value,
@@ -67,11 +67,18 @@ export default function LoginPage() {
             transition={{ duration: 0.7 }}
             className="absolute z-10 flex-center flex-col gap-2"
           >
-            <CustomInput label="아이디" name="username" value={formData.username} onChange={onChangeHandler} />
+            <CustomInput
+              label="아이디"
+              name="username"
+              value={formData.username}
+              elType="input"
+              onChange={onChangeHandler}
+            />
             <CustomInput
               label="패스워드"
               name="password"
               type="password"
+              elType="input"
               value={formData.password}
               onChange={onChangeHandler}
             />

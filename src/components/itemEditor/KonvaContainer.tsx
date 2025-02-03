@@ -9,6 +9,8 @@ import EllipseItem from "./EllipseItem";
 import SpinnerIcon from "../icons/SpinnerIcon";
 import ShapeSelectorTool from "./ShapeSelectorTool";
 import { RectangleShape, CircleShape, EllipseShape } from "../../constants/initialShapeData";
+import CircleButton from "../common/buttons/CircleButton";
+import { BsTrash3 } from "react-icons/bs";
 
 type KonvaContainerProps = {
   shapes: ShapeData[];
@@ -17,6 +19,7 @@ type KonvaContainerProps = {
   selectedId: number | null;
   setSelectedId: (id: number | null) => void;
   setShapes: Dispatch<SetStateAction<ShapeData[]>>;
+  deleteShape: (id: number) => void;
 };
 
 export default function KonvaContainer({
@@ -26,6 +29,7 @@ export default function KonvaContainer({
   selectedId,
   setSelectedId,
   setShapes,
+  deleteShape,
 }: KonvaContainerProps) {
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0, scaleX: 1, scaleY: 1 });
@@ -48,10 +52,6 @@ export default function KonvaContainer({
   const addEllipse = () => {
     setShapes((prev) => [...prev, new EllipseShape()]);
   };
-
-  useEffect(() => {
-    console.log("shpaex", shapes);
-  }, [shapes]);
 
   useEffect(() => {
     if (!imageId) return;
@@ -154,6 +154,12 @@ export default function KonvaContainer({
           })}
         </Layer>
       </Stage>
+      {/* 휴지통 */}
+      {selectedId && (
+        <div className="fixed bottom-5 left-5 text-white ">
+          <CircleButton label={<BsTrash3 size={30} onClick={() => deleteShape(selectedId)} />} />
+        </div>
+      )}
     </>
   );
 }

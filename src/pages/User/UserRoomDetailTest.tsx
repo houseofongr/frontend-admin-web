@@ -257,7 +257,7 @@ export default function UserRoomDetailTest() {
                     value={shape.name}
                     onChange={(e) => handleNameChange(shape.id, e.target.value)}
                     placeholder="Item title"
-                    className="px-2 py-1 bg-transparent border outline-none text-sm border-stone-400"
+                    className="px-2 py-1 bg-transparent border text-sm border-stone-400"
                   />
                 </li>
               );

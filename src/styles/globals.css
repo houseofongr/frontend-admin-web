@@ -114,6 +114,11 @@ h3 {
   @apply flex justify-center items-center;
 }
 
+input,
+textarea {
+  outline-style: none;
+}
+
 /* 기존 input의 디자인 삭제 */
 input::-webkit-slider-thumb {
   -webkit-appearance: none;
