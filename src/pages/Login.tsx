@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import Header from "../components/layout/Header";
 import InitHouseImage from "../components/InitHouseImage";
 import CustomInput from "../components/CustomInput";
-import Button from "../components/buttons/Button";
 import Footer from "../components/layout/Footer";
+import Button from "../components/common/buttons/Button";
 
 export default function LoginPage() {
   const [isAnimationComplete, setIsAnimationComplete] = useState<boolean>(false);

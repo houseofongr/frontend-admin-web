@@ -13,7 +13,7 @@ type AlertMessageProps = {
   onClose: () => void;
 };
 
-export default function AlertMessage({ text, type, icon, okButton, cancelButton, onClose }: AlertMessageProps) {
+export default function ModalAlertMessage({ text, type, icon, okButton, cancelButton, onClose }: AlertMessageProps) {
   // 타입별 기본 아이콘 매핑
   const iconMapping = {
     success: <FaCircleCheck size={24} className="text-green-500" />,

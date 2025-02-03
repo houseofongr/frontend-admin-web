@@ -7,7 +7,6 @@ import { generateUniqueId } from "../../utils/generateUniqueId";
 import { getRandomColor } from "../../utils/getRandomColor";
 import API_CONFIG from "../../config/api";
 import ShapeSelectorTool from "../../components/itemEditor/ShapeSelectorTool";
-import CircleButton from "../../components/buttons/CircleButton";
 import { TbLayoutSidebarLeftExpandFilled, TbLayoutSidebarLeftCollapseFilled } from "react-icons/tb";
 import { FaSave } from "react-icons/fa";
 import clsx from "clsx";
@@ -16,6 +15,7 @@ import EllipseShape from "../../components/Ellipse";
 import RectangleShape from "../../components/Rectangle";
 import CircleShape from "../../components/Circle";
 import { BsTrash3 } from "react-icons/bs";
+import CircleButton from "../../components/common/buttons/CircleButton";
 
 const initialShapes: ShapeData[] = [];
 
@@ -25,13 +25,13 @@ export default function UserRoomDetailTest() {
   const { userId, homeId, roomId } = useParams<{ userId: string; homeId: string; roomId: string }>();
 
   const [shapes, setShapes] = useState<ShapeData[]>(initialShapes);
-  const [selectedId, selectShape] = useState<string | null>(null);
+  const [selectedId, selectShape] = useState<number | null>(null);
   const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0, scaleX: 1, scaleY: 1 });
   const [imageId, setImageId] = useState(null);
   const [isItemListVisible, setIsItemListVisible] = useState(true);
 
-  const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
+  const inputRefs = useRef<Map<number, HTMLInputElement>>(new Map());
 
   const checkedSelect = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
     const clickedOnEmpty = e.target === e.target.getStage();
@@ -80,7 +80,7 @@ export default function UserRoomDetailTest() {
     setIsItemListVisible((prev) => !prev);
   };
 
-  const deleteShape = (id: string) => {
+  const deleteShape = (id: number) => {
     setShapes((prev) => prev.filter((shape) => shape.id !== id));
     selectShape(null);
   };
@@ -160,11 +160,11 @@ export default function UserRoomDetailTest() {
     }
   };
 
-  const handleNameChange = (id: string, value: string) => {
+  const handleNameChange = (id: number, value: string) => {
     setShapes((prev) => prev.map((shape) => (shape.id === id ? { ...shape, itemName: value } : shape)));
   };
 
-  const handleInputRef = (id: string, element: HTMLInputElement | null) => {
+  const handleInputRef = (id: number, element: HTMLInputElement | null) => {
     if (element) {
       inputRefs.current.set(id, element);
     } else {

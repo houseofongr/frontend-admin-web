@@ -5,10 +5,10 @@ import { useEffect, useState } from "react";
 import API_CONFIG from "../../config/api";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
 import ArrowBackIcon from "../../components/icons/ArrowBackIcon";
-import Button from "../../components/buttons/Button";
 import HouseForm from "../../components/HouseForm";
 import RoomForm from "../../components/RoomForm";
 import RenderImages from "../../components/RenderImages";
+import Button from "../../components/common/buttons/Button";
 
 export type HouseData = {
   house: HouseDetailInfo;
@@ -207,11 +207,7 @@ export default function HouseDetail() {
   }, [houseData?.rooms, setRooms]);
 
   if (loading) {
-    return (
-      <div className="w-full h-full flex-center">
-        <SpinnerIcon />
-      </div>
-    );
+    return <SpinnerIcon />;
   }
   return (
     <div className="w-full h-full flex items-center">

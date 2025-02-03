@@ -5,10 +5,10 @@ import { BaseRoom } from "../../types/house";
 import API_CONFIG from "../../config/api";
 import CardLabel from "../../components/label/CardLabel";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
-import Button from "../../components/buttons/Button";
+import Button from "../../components/common/buttons/Button";
 
 export default function RoomDetail() {
-  const { rooms, setRooms } = useRoomContext();
+  const { rooms } = useRoomContext();
   const { houseId, roomId } = useParams<{ houseId: string; roomId: string }>();
 
   const navigate = useNavigate();
@@ -65,12 +65,7 @@ export default function RoomDetail() {
     fetchRoomData();
   }, [roomId, rooms]);
 
-  if (!roomData)
-    return (
-      <div className="w-full h-full flex-center">
-        <SpinnerIcon />
-      </div>
-    );
+  if (!roomData) return <SpinnerIcon />;
 
   return (
     <div className="relative w-full h-screen flex flex-col bg-gray-100">

@@ -61,11 +61,7 @@ export default function UserHomeDetail() {
   }, [homeData]);
 
   if (!homeData || !info || !scale) {
-    return (
-      <div className="w-full h-full flex-center">
-        <SpinnerIcon />
-      </div>
-    );
+    return <SpinnerIcon />;
   }
 
   if (homeData && scale) {
@@ -91,6 +87,7 @@ export default function UserHomeDetail() {
               height={window.innerHeight}
               src={`${API_CONFIG.PRIVATE_IMAGE_LOAD_API}/${homeData.house.borderImageId}`}
             />
+
             {homeData.rooms.map((room) => (
               <Link key={room.imageId} to={`/users/${userId}/${info.homeId}/${room.roomId}`}>
                 <img

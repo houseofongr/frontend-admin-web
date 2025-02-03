@@ -1,14 +1,13 @@
 import React, { useState } from "react";
-import FileUploadButton from "../buttons/FileUploadButton";
 import FileName from "./FileName";
 import ContainerTitle from "../ContainerTitle";
 import { IoAlertCircle } from "react-icons/io5";
 import { useImageContext } from "../../context/ImageContext";
+import FileUploadButton from "../common/buttons/FileUploadButton";
 
 export default function BorderImageUploader() {
   const { handleFileChange, borderImage } = useImageContext();
   const [fileName, setFileName] = useState<string>("");
-  console.log("borderImage", borderImage);
 
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     handleFileChange(e, "border");

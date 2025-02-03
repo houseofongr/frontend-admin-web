@@ -1,9 +1,9 @@
 import React from "react";
 import ContainerTitle from "../ContainerTitle";
-import FileUploadButton from "../buttons/FileUploadButton";
 import FileName from "./FileName";
 import { IoAlertCircle } from "react-icons/io5";
 import { useImageContext } from "../../context/ImageContext";
+import FileUploadButton from "../common/buttons/FileUploadButton";
 
 export default function RoomImagesUploader() {
   const { borderImage, roomImages, updateRoomZIndex, handleFileChange, updateRoomTitle } = useImageContext();

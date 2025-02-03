@@ -4,19 +4,13 @@ import Konva from "konva";
 import clsx from "clsx";
 import { Stage, Layer, Image as KonvaImage } from "react-konva";
 import API_CONFIG from "../../config/api";
-import RectItem from "../../components/user/RectangleItem";
-import CircleItem from "../../components/user/CircleItem";
-import EllipseItem from "../../components/user/EllipseItem";
-import CircleButton from "../../components/buttons/CircleButton";
+import RectItem from "../../components/itemEditor/RectangleItem";
+import CircleItem from "../../components/itemEditor/CircleItem";
+import EllipseItem from "../../components/itemEditor/EllipseItem";
 import ColorTag from "../../components/itemEditor/ColorTag";
 import ShapeSelectorTool from "../../components/itemEditor/ShapeSelectorTool";
 import { formatShapeData } from "../../utils/formatShapeData";
 import { ShapeData } from "../../types/items";
-// import { ITEM_DATA } from "../../mocks/sound-list-data";
-
-import { MdArrowForwardIos } from "react-icons/md";
-import { MdArrowBackIos } from "react-icons/md";
-
 import {
   FaSave,
   FaRegEdit,
@@ -25,33 +19,17 @@ import {
   BsTrash3,
   RiPlayListFill,
   FcAudioFile,
+  MdArrowForwardIos,
+  MdArrowBackIos,
 } from "../../components/icons";
 import CardLabel from "../../components/label/CardLabel";
-import FileUploadButton from "../../components/buttons/FileUploadButton";
+
 import FileName from "../../components/houseEditor/FileName";
-import { newCircle, newEllipse, newRect } from "../../constants/initialShapeData";
 import { formatDate } from "../../utils/formatDate";
-
-interface SoundSource {
-  id: string;
-  name: string;
-  description: string;
-  createdDate: string;
-  updatedDate: string;
-  audioFileId: number;
-}
-
-interface ItemData {
-  itemName: string;
-  soundSource: SoundSource[];
-}
-
-interface SoundData {
-  file: File;
-  name: string;
-  description: string;
-  isActive: boolean;
-}
+import { RectangleShape, CircleShape, EllipseShape } from "../../constants/initialShapeData";
+import { ItemSoundsData, SoundData } from "../../types/sound";
+import CircleButton from "../../components/common/buttons/CircleButton";
+import FileUploadButton from "../../components/common/buttons/FileUploadButton";
 
 export default function UserRoomDetail() {
   const { userId, homeId, roomId } = useParams<{ userId: string; homeId: string; roomId: string }>();
@@ -63,24 +41,18 @@ export default function UserRoomDetail() {
   const [originData, setOriginData] = useState<ShapeData[]>([]);
   const [shapes, setShapes] = useState<ShapeData[]>([]);
 
-  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
   const [imageId, setImageId] = useState(null);
   const [isItemListVisible, setIsItemListVisible] = useState(true);
   const [isEditable, setIsEditable] = useState<boolean>(false);
   const [isExpanded, setIsExpanded] = useState(false);
 
   // 음원 관련 state
-  const [itemSounds, setItemSounds] = useState<ItemData | null>(null);
+  const [itemSounds, setItemSounds] = useState<ItemSoundsData | null>(null);
   const [newSound, setNewSound] = useState<SoundData | null>(null);
   const [fileName, setFileName] = useState<string>("");
 
-  const inputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
-  // 아직 저장되지 않은 새로운 도형의 refs
-  // const newInputRefs = useRef<Map<string, HTMLInputElement>>(new Map());
-
-  console.log("new sound", newSound);
-  console.log("itemSounds", itemSounds);
-  console.log("selectedId", selectedId);
+  const inputRefs = useRef<Map<number, HTMLInputElement>>(new Map());
 
   const checkedSelectShape = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
     const clickedOnEmpty = e.target === e.target.getStage();
@@ -105,18 +77,18 @@ export default function UserRoomDetail() {
   };
 
   const addRect = () => {
-    setShapes((prev) => [...prev, newRect]);
+    setShapes((prev) => [...prev, new RectangleShape()]);
   };
 
   const addCircle = () => {
-    setShapes((prev) => [...prev, newCircle]);
+    setShapes((prev) => [...prev, new CircleShape()]);
   };
 
   const addEllipse = () => {
-    setShapes((prev) => [...prev, newEllipse]);
+    setShapes((prev) => [...prev, new EllipseShape()]);
   };
 
-  const deleteShape = async (id: string) => {
+  const deleteShape = async (id: number) => {
     const isExistingItem = originData.some((shape) => shape.id === id);
     if (isExistingItem) {
       try {
@@ -136,11 +108,11 @@ export default function UserRoomDetail() {
     setShapes((prev) => prev.filter((shape) => shape.id !== id));
   };
 
-  const handleItemNameChange = (id: string, value: string) => {
+  const handleItemNameChange = (id: number, value: string) => {
     setShapes((prev) => prev.map((shape) => (shape.id === id ? { ...shape, name: value } : shape)));
   };
 
-  const handleInputRef = (id: string, element: HTMLInputElement | null) => {
+  const handleInputRef = (id: number, element: HTMLInputElement | null) => {
     if (element) {
       inputRefs.current.set(id, element);
     } else {
@@ -162,6 +134,7 @@ export default function UserRoomDetail() {
       console.error("Error fetching room data:", error);
     }
   };
+
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files) return;
@@ -298,7 +271,7 @@ export default function UserRoomDetail() {
           throw new Error("Failed to fetch room data");
         }
         const data = await response.json();
-        console.log(" get room data", data);
+        console.log(" get room data", typeof data);
 
         setOriginData(data.items); // 비교용 원본 데이터 상태
         setShapes(data.items); // 페이지에 보여줄 상태
@@ -342,7 +315,6 @@ export default function UserRoomDetail() {
             isExpanded ? "w-2/5" : "w-1/5"
           )}
         >
-          {/* Todo : 컴포넌트 */}
           <div className="flex justify-between items-center p-4 bg-black/30">
             <CircleButton
               label={<FaRegEdit size={20} />}

@@ -1,5 +1,7 @@
+import { Shape } from "react-konva";
+
 export interface BaseShapeData {
-  id: string;
+  id: number;
   itemType: "rectangle" | "circle" | "ellipse";
   name: string;
   fill?: string;

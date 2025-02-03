@@ -1,10 +1,10 @@
 import SNSLabel from "../label/SNSLabel";
-import CircleButton from "../buttons/CircleButton";
 import { TbHomePlus } from "react-icons/tb";
 import { IoMdPhonePortrait } from "react-icons/io";
 import { useNavigate } from "react-router-dom";
 import { User } from "../../types/user";
 import { formatDate } from "../../utils/formatDate";
+import CircleButton from "../common/buttons/CircleButton";
 
 interface UserListItemProps {
   user: User;
@@ -18,7 +18,7 @@ export default function UserListItem({ user, currentPage, size, index }: UserLis
   const listNumber = (currentPage - 1) * size + index + 1;
 
   return (
-    <li key={user.id} className="py-2 flex items-center text-center rounded-md bg-[#fbfafa] ">
+    <li key={user.id} className="py-2 flex items-center text-center rounded-md bg-[#fbfafa] shadow ">
       <span style={{ width: "5%" }}>{listNumber}</span>
       <div className="flex flex-col pl-10 pr-3  items-start" style={{ width: "20%" }}>
         <span>{user.realName}</span>

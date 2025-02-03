@@ -1,12 +1,15 @@
-import React from "react";
+import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import Header from "./Header";
 import Footer from "./Footer";
-import { useLocation } from "react-router-dom";
 
 const HIDE_LAYOUT_PATHS = ["/houses/house-editor"]; // 헤더/푸터를 숨길 고정 경로
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation();
+  const [queryClient] = useState(() => new QueryClient());
+
   const currentPath = location.pathname;
 
   // 유저 홈 디테일 페이지 및 유저 룸 디테일 페이지 감지
@@ -29,7 +32,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <div>
       {!shouldHideLayout && <Header />}
-      <main className="w-full h-screen overflow-auto pb-5">{children}</main>
+      <QueryClientProvider client={queryClient}>
+        <main className="w-full h-screen overflow-auto pb-5">{children}</main>
+      </QueryClientProvider>
+
       {!shouldHideLayout && <Footer />}
     </div>
   );

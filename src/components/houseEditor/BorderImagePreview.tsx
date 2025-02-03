@@ -20,11 +20,7 @@ const BorderImagePreview: React.FC<BorderImagePreviewProps> = React.memo(({ imag
 
   return (
     <div className="aspect-square h-full ">
-      {isLoading && (
-        <div className="absolute inset-0 flex-center z-10">
-          <SpinnerIcon />
-        </div>
-      )}
+      {isLoading && <SpinnerIcon />}
       {imageUrl && (
         <img src={imageUrl} alt="Border Preview" width={5000} height={5000} onLoad={(img) => handleImageLoad(img)} />
       )}

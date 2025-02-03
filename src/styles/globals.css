@@ -81,6 +81,7 @@ html,
 body {
   height: 100vh;
   color: #434a40;
+  box-sizing: border-box;
 }
 
 /* 스크롤바 숨기면서 스크롤링 기능은 허용 */

@@ -4,9 +4,9 @@ import API_CONFIG from "../../config/api";
 import SearchComponent from "../../components/SearchComponent";
 import { houseSearchOptions } from "../../constants/searchOptions";
 import { Link } from "react-router-dom";
-import Button from "../../components/buttons/Button";
 import GridHouseList from "../../components/GridHouseList";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
+import Button from "../../components/common/buttons/Button";
 
 export default function HouseList() {
   const [houses, setHouses] = useState<House[]>([]);
@@ -59,12 +59,7 @@ export default function HouseList() {
     fetchHouses();
   }, [currentPage]);
 
-  if (!filteredHouses)
-    return (
-      <div>
-        <SpinnerIcon />
-      </div>
-    );
+  if (!filteredHouses) return <SpinnerIcon />;
   return (
     <div className="mt-[25%] md:mt-[25%] lg:mt-[15%] mx-20">
       {/* 타이틀 + 검색 컴포넌트 */}

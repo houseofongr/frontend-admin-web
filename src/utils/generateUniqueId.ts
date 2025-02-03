@@ -1,3 +1,3 @@
 export const generateUniqueId = () => {
-  return Date.now().toString();
+  return Date.now();
 };

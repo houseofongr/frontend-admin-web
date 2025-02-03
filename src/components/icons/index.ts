@@ -7,3 +7,4 @@ export { RiPlayListFill } from "react-icons/ri";
 export { FcAudioFile } from "react-icons/fc";
 
 export { IoMdClose, IoMdCheckmark } from "react-icons/io";
+export { MdArrowForwardIos, MdArrowBackIos } from "react-icons/md";

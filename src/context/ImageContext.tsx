@@ -15,9 +15,9 @@ export interface HouseData extends ImageData {
 export interface RoomImageData extends ImageData {
   id: number;
   file: File;
-  x?: number;
-  y?: number;
-  z?: number;
+  x: number;
+  y: number;
+  z: number;
 }
 
 interface ImageContextProps {

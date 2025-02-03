@@ -3,13 +3,13 @@ import { useImageContext } from "../../context/ImageContext";
 import { useNavigate } from "react-router-dom";
 import API_CONFIG from "../../config/api";
 import ArrowBackIcon from "../../components/icons/ArrowBackIcon";
-import Button from "../../components/buttons/Button";
 import HouseImageUploader from "../../components/houseEditor/HouseImageUploader";
 import BorderImageUploader from "../../components/houseEditor/BorderImageUploader";
 import RoomImagesUploader from "../../components/houseEditor/RoomImagesUploader";
 import BorderImagePreview from "../../components/houseEditor/BorderImagePreview";
 import DraggableItemWrapper from "../../components/houseEditor/DraggableItemWrapper";
-import AlertMessage, { AlertType } from "../../components/common/AlertMessage";
+import ModalAlertMessage, { AlertType } from "../../components/common/ModalAlertMessage";
+import Button from "../../components/common/buttons/Button";
 
 export default function HouseEditorPage() {
   const { houseImage, borderImage, roomImages } = useImageContext();
@@ -17,8 +17,6 @@ export default function HouseEditorPage() {
   const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(null);
   const [newHouseId, setNewHouseId] = useState<number>();
   const navigate = useNavigate();
-
-  console.log("borderImage", borderImage);
 
   const showAlert = (text: string, type: AlertType) => {
     setAlert({ text, type });
@@ -37,18 +35,12 @@ export default function HouseEditorPage() {
       return;
     }
 
-    // const invalidRooms = roomImages.filter((room) => room.title === "");
-    // if (invalidRooms.length > 0) {
-    //   showAlert("모든 룸 타이틀 값을 중복없이 입력하세요.", "warning");
-    //   return;
-    // }
-
     const titleCounts = roomImages.reduce((acc, room) => {
       acc[room.title] = (acc[room.title] || 0) + 1;
       return acc;
     }, {} as Record<string, number>);
 
-    // 중복된 타이틀만 필터링
+    // 중복된 타이틀 필터링
     const duplicateTitles = Object.entries(titleCounts)
       .filter(([_, count]) => count > 1)
       .map(([title]) => title);
@@ -67,9 +59,9 @@ export default function HouseEditorPage() {
 
     const metadata = {
       house: {
-        title: houseImage?.title,
-        author: houseImage?.author,
-        description: houseImage?.description,
+        title: houseImage.title,
+        author: houseImage.author,
+        description: houseImage.description,
         width: houseImage?.width,
         height: houseImage?.height,
         houseForm: "houseImage",
@@ -123,7 +115,7 @@ export default function HouseEditorPage() {
   return (
     <div className="w-full h-full flex items-center">
       {alert && (
-        <AlertMessage
+        <ModalAlertMessage
           text={alert.text}
           type={alert.type}
           onClose={() => setAlert(null)}
@@ -132,7 +124,7 @@ export default function HouseEditorPage() {
       )}
 
       {alert?.type === "success" && (
-        <AlertMessage
+        <ModalAlertMessage
           text={alert.text}
           type={alert.type}
           onClose={() => setAlert(null)}

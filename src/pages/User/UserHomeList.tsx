@@ -3,10 +3,11 @@ import { BaseHouse } from "../../types/house";
 import { useEffect, useState } from "react";
 import HouseTemplates, { AdminHouse } from "../../components/user/HouseTemplates";
 import API_CONFIG from "../../config/api";
-import Button from "../../components/buttons/Button";
 import Modal from "../../components/Modal";
 import HomeCard from "../../components/user/HomeCard";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
+import ModalAlertMessage from "../../components/common/ModalAlertMessage";
+import Button from "../../components/common/buttons/Button";
 
 interface UserHome {
   id: number;
@@ -141,12 +142,7 @@ export default function UserHomeList() {
     }
   }, [userId]);
 
-  if (!userHomes)
-    return (
-      <div className="w-full h-full flex-center">
-        <SpinnerIcon />
-      </div>
-    );
+  if (!userHomes) return <SpinnerIcon />;
   else {
     return (
       <div className="w-full flex flex-col items-center">
@@ -154,7 +150,7 @@ export default function UserHomeList() {
           <div className="w-[60%]">
             <div className="flex justify-between items-center py-4">
               <h3 className="text-lg font-bold">
-                {userHomes[0].user.nickname} 님의 집 ({`${userHomes.length}`}){" "}
+                {/* {userHomes[0]?.user?.nickname} 님의 집 ({`${userHomes.length}`}){" "} */}
               </h3>
               <Button label="+ ADD" onClick={getAdminHouseList} />
             </div>
@@ -183,15 +179,21 @@ export default function UserHomeList() {
           )}
 
           {homeToDelete && (
-            <Modal onClose={closeModal}>
-              <div className="p-6 text-center">
-                <p className="mb-4">유저의 홈 ID# {homeToDelete}을 삭제하시겠습니까?</p>
-                <div className="flex justify-center gap-4">
-                  <Button label="확인" onClick={() => homeDeleteHandler(homeToDelete)} />
-                  <Button label="취소" onClick={closeModal} />
-                </div>
-              </div>
-            </Modal>
+            <ModalAlertMessage
+              text={`유저의 홈 ID# ${homeToDelete}을 삭제하시겠습니까? 등록된 아이템과 음원이 있다면 모두 삭제됩니다.`}
+              type="warning"
+              okButton={<Button label="확인" onClick={() => homeDeleteHandler(homeToDelete)} />}
+              onClose={closeModal}
+            />
+            // <Modal onClose={closeModal}>
+            //   <div className="p-6 text-center">
+            //     <p className="mb-4">유저의 홈 ID# {homeToDelete}을 삭제하시겠습니까?</p>
+            //     <div className="flex justify-center gap-4">
+            //       <Button label="확인" onClick={() => homeDeleteHandler(homeToDelete)} />
+            //       <Button label="취소" onClick={closeModal} />
+            //     </div>
+            //   </div>
+            // </Modal>
           )}
         </section>
       </div>

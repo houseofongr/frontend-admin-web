@@ -1,5 +1,5 @@
 import clsx from "clsx";
-import CircleIcon from "../icons/CircleIcon";
+import CircleIcon from "../../icons/CircleIcon";
 
 type FileUploadButtonProp = {
   htmlFor: string;

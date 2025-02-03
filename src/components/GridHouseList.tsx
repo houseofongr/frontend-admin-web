@@ -13,12 +13,7 @@ type Props = {
 };
 
 export default function GridHouseList({ houses, currentPage, onPageChange, totalPages, totalItems }: Props) {
-  if (houses.length === 0 || totalItems === 0)
-    return (
-      <div className="w-full h-full flex-center mt-[10%]">
-        <SpinnerIcon />
-      </div>
-    );
+  if (houses.length === 0 || totalItems === 0) return <SpinnerIcon />;
   return (
     <div>
       <ul className="mx-5 md:mx-20 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">

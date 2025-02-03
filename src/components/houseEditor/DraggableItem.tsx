@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import Draggable, { DraggableEvent, DraggableData } from "react-draggable";
 
 interface DraggableItemProps {
@@ -33,13 +33,6 @@ const DraggableItem = React.memo(
         onPositionChange(index, Number(data.x.toFixed(2)), Number(data.y.toFixed(2)));
       }
     };
-
-    useEffect(() => {
-      if (nodeRef.current) {
-        console.log("image width:", window.getComputedStyle(nodeRef.current).width);
-        console.log("image height:", window.getComputedStyle(nodeRef.current).height);
-      }
-    }, []);
 
     return (
       // right : (5000 - 방이미지 원본 너비) * 스케일
