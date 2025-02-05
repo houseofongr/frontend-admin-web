@@ -85,13 +85,18 @@ body {
 }
 
 /* 스크롤바 숨기면서 스크롤링 기능은 허용 */
-html {
+html,
+section,
+div {
   -ms-overflow-style: none; /* for Internet Explorer, Edge */
   scrollbar-width: none; /* for Firefox */
   overflow-y: scroll;
 }
 
 html::-webkit-scrollbar {
+  display: none; /* for Chrome, Safari, and Opera */
+}
+section::-webkit-scrollbar {
   display: none; /* for Chrome, Safari, and Opera */
 }
 

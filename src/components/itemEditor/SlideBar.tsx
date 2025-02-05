@@ -38,10 +38,6 @@ export default function SlideBar({
 }: SlideBarProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isSlidePanelVisible, setIsSlidePanelVisible] = useState(true);
-  // 음원 관련 state
-
-  // const [itemSounds, setItemSounds] = useState<ItemSoundsData | null>(null);
-
   const [targetItemId, setTargetItemId] = useState<number | null>(null);
 
   const inputRefs = useRef<Map<number, HTMLInputElement>>(new Map());
@@ -168,7 +164,6 @@ export default function SlideBar({
               })}
             </ul>
             {/* right section - 음원 목록 + 음원 추가 양식*/}
-
             {isExpanded && data && <SlideRightSection sounds={data} itemId={targetItemId} />}
             {isExpanded && !data && <NoDataNotice />}
           </div>
@@ -193,6 +188,7 @@ export default function SlideBar({
           <CircleButton
             label={<TbLayoutSidebarLeftCollapseFilled size={25} color="white" />}
             onClick={toggleSlidePanel}
+            text="OPEN"
           />
         </div>
       )}

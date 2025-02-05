@@ -38,7 +38,6 @@ export default function UserHomeList() {
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/users/${userId}/homes`);
       const data = await response.json();
-
       setUserHomes(data.homes);
     } catch (error) {
       console.error("Failed to fetch user homes:", error);
@@ -180,20 +179,12 @@ export default function UserHomeList() {
 
           {homeToDelete && (
             <ModalAlertMessage
-              text={`유저의 홈 ID# ${homeToDelete}을 삭제하시겠습니까? 등록된 아이템과 음원이 있다면 모두 삭제됩니다.`}
+              text={`${userHomes[0].user.nickname}의 홈 ID# ${homeToDelete}을 홈 목록에서 삭제하시겠습니까? 등록된 아이템과 음원이 있다면 모두 삭제됩니다.`}
               type="warning"
               okButton={<Button label="확인" onClick={() => homeDeleteHandler(homeToDelete)} />}
+              cancelButton={<Button label="취소" onClick={closeModal} />}
               onClose={closeModal}
             />
-            // <Modal onClose={closeModal}>
-            //   <div className="p-6 text-center">
-            //     <p className="mb-4">유저의 홈 ID# {homeToDelete}을 삭제하시겠습니까?</p>
-            //     <div className="flex justify-center gap-4">
-            //       <Button label="확인" onClick={() => homeDeleteHandler(homeToDelete)} />
-            //       <Button label="취소" onClick={closeModal} />
-            //     </div>
-            //   </div>
-            // </Modal>
           )}
         </section>
       </div>

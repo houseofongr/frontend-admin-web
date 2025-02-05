@@ -34,7 +34,7 @@ function RectItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable
         listening={isEditable}
         fill={fill}
         opacity={0.6}
-        stroke={"white"}
+        stroke={"red"}
         strokeWidth={2}
         onClick={onSelect}
         onTap={onSelect}

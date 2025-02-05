@@ -9,23 +9,24 @@ type SoundItemProps = {
 };
 export default function SoundItem({ sound, onClick }: SoundItemProps) {
   return (
-    <li className="flex flex-col p-2  border-black cursor-pointer" onClick={onClick}>
-      <div className="flex justify-between">
-        <CardLabel text={`AUDIO ID#${sound.id}`} hasBorder={false} />
+    <li className="group/item flex flex-col  cursor-pointer py-3" onClick={onClick}>
+      <div className="pl-1">
+        <CardLabel text={`AUDIO ID#${sound.id}`} hasBorder={false} hasPadding={false} />
       </div>
 
-      <div className="flex flex-col gap-1">
-        <div className="flex">
-          <FcAudioFile size={40} />
-          <div>
-            <p className="text-[14px]">{sound.name}</p>
-            <div className="text-xs text-gray-400">
-              {formatDate(sound.createdDate)} / {formatDate(sound.updatedDate)}
+      <div className="group/edit">
+        <div className="group-hover/edit:bg-gray-300/20">
+          <div className="flex ">
+            <FcAudioFile size={40} />
+            <div>
+              <p className="text-[14px]">{sound.name}</p>
+              <div className="text-xs text-gray-400">
+                {formatDate(sound.createdDate)} / {formatDate(sound.updatedDate)}
+              </div>
             </div>
           </div>
+          <p className="text-xs pl-1 text-gray-300 line-clamp-2">{sound.description}</p>
         </div>
-
-        <p className="text-xs text-gray-300 line-clamp-2">{sound.description}</p>
       </div>
     </li>
   );

@@ -7,7 +7,9 @@ type CicleIconProps = {
 
 export default function CircleIcon({ icon, text }: CicleIconProps) {
   return (
-    <div className={`flex-center gap-2 border-4 bg-white border-[#F5946D] text-[#552816]  px-8  py-2 rounded-full `}>
+    <div
+      className={`flex-center gap-2 border-4 bg-white border-[#F5946D] text-[#552816]  px-8  py-2 rounded-full cursor-pointer`}
+    >
       <div>{icon}</div>
       {text && <span className="font-light">{text}</span>}
     </div>
