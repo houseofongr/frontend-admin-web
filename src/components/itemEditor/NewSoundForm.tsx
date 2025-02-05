@@ -8,6 +8,8 @@ import Button from "../common/buttons/Button";
 import { SoundMetadata, SoundSource } from "../../types/sound";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSound, deleteSound, updateSound } from "../../service /soundService";
+import { MdCancel } from "react-icons/md";
+import { bytesToKB } from "../../utils/formatFileSize";
 
 type SoundFormProps = {
   itemId: number;
@@ -22,8 +24,10 @@ const initialData = {
 };
 
 export default function NewSoundForm({ itemId, soundOriginData, soundId }: SoundFormProps) {
+  console.log("itemID", itemId);
   const [soundMetaData, setSoundMetaData] = useState<SoundMetadata>(initialData);
   const [file, setFile] = useState<File | null>(null);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
@@ -44,7 +48,7 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
       queryClient.invalidateQueries({
         queryKey: ["itemSounds", itemId],
       });
-      setSoundMetaData(initialData); // 데이터 초기화
+      setSoundMetaData(initialData);
     },
     onError: (error) => {
       console.error("Error updating sound source:", error);
@@ -57,15 +61,22 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
       queryClient.invalidateQueries({
         queryKey: ["itemSounds", itemId],
       });
-      setSoundMetaData(initialData); // 데이터 초기화
+      setSoundMetaData(initialData);
     },
     onError: (error) => {
       console.error("Error deleting sound source:", error);
     },
   });
-
-  const updateSoundDataHandler = () => {
+  const handleUpdateSoundData = () => {
     updateMutation.mutate();
+    setIsEdit(false);
+  };
+
+  const handleDeleteSoundData = () => {
+    if (soundId) {
+      deleteMutation.mutate();
+    }
+    setIsEdit(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -89,6 +100,10 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
       console.error("No file selected");
       return;
     }
+    if (soundMetaData.description.length === 0 || soundMetaData.name.length === 0) {
+      alert("form을 완성시켜주세요.");
+      return;
+    }
 
     const formData = new FormData();
     formData.append("metadata", JSON.stringify(soundMetaData));
@@ -98,12 +113,7 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
     // 폼 데이터랑 파일값 초기화..
     setSoundMetaData(initialData);
     setFile(null);
-  };
-
-  const handleDeleteSound = () => {
-    if (soundId) {
-      deleteMutation.mutate();
-    }
+    setIsEdit(false); // new form 상태
   };
 
   useEffect(() => {
@@ -113,16 +123,13 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
         description: soundOriginData.description,
         isActive: soundOriginData.isActive,
       });
+      setIsEdit(true);
     }
   }, [soundId, itemId]);
 
   return (
-    <div className="flex flex-col h-full w-[50%] px-5 ">
-      <div className="flex justify-between items-center">
-        <div className="text-center py-4 ">FORM</div>
-
-        {file && <Button label="SAVE" size="small" onClick={saveSoundDataHandler} />}
-      </div>
+    <div className="flex flex-col h-full w-[50%] ">
+      <div className="text-center py-4">{isEdit ? `소리 정보` : "새로운 소리"}</div>
 
       <form className="flex flex-col gap-1 px-3">
         <div className="flex flex-col ">
@@ -137,7 +144,7 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
           </div>
           <CustomInput name="description" value={soundMetaData.description} elType="textarea" onChange={handleChange} />
         </div>
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-1 pb-3">
           <button type="button" onClick={toggleIsActive} className="focus:outline-none cursor-pointer w-[30px]">
             {soundMetaData.isActive ? (
               <BiToggleLeft size={25} color="#F5946D" />
@@ -148,25 +155,34 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
           <span className="text-sm">{soundMetaData.isActive ? "Active" : "Inactive"}</span>
         </div>
 
-        {soundOriginData ? (
-          <div className="mt-4 flex gap-4">
-            <Button label="DELETE" size="small" onClick={handleDeleteSound} />
-            <Button label="UPDATE" size="small" onClick={updateSoundDataHandler} />
+        {isEdit ? (
+          <div className="mt-4 flex justify-evenly gap-4">
+            <Button label="UPDATE" onClick={handleUpdateSoundData} />
+            <Button label="DELETE" onClick={handleDeleteSoundData} />
+            <Button
+              label="NEW"
+              onClick={() => {
+                setIsEdit(false);
+                setSoundMetaData(initialData);
+                setFile(null);
+              }}
+            />
           </div>
         ) : (
-          <>
+          <div>
             <input id="sound-file" type="file" accept="audio/*" className="hidden" onChange={handleFileUpload} />
             <FileUploadButton htmlFor="sound-file" />
             {file && (
-              <div className="w-full flex justify-between pt-4 text-xs">
+              <div className="w-full flex justify-between items-center py-4">
                 <FileName fileName={file.name} />
-                <span>size: {file.size} bytes</span>
+                <span className="text-xs"> {bytesToKB(file.size)} </span>
                 <button className="cursor-pointer" onClick={() => setFile(null)}>
-                  X
+                  <MdCancel />
                 </button>
               </div>
             )}
-          </>
+            <div className="flex-center">{file && <Button label="SUBMIT" onClick={saveSoundDataHandler} />}</div>
+          </div>
         )}
       </form>
     </div>
