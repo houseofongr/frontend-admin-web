@@ -47,7 +47,7 @@ export default function LoginPage() {
   return (
     <div className="h-screen flex justify-center items-center">
       <Header />
-      <div className=" flex justify-center items-center relative">
+      <div className="flex justify-center items-center relative border h-full w-full">
         <motion.div
           initial={{ y: 0 }}
           animate={{ y: -100 }}
