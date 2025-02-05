@@ -19,8 +19,6 @@ type HouseTemplateProps = {
   registHomeToUsertHandler: (houseId: number) => void;
 };
 function HouseTemplates({ adminHouses, registHomeToUsertHandler }: HouseTemplateProps) {
-  const [expandedHouseId, setExpandedHouseId] = useState<number | null>(null);
-
   return (
     <div className="mx-5">
       <h2 className="text-lg py-3">하우스 템플릿</h2>
@@ -28,11 +26,11 @@ function HouseTemplates({ adminHouses, registHomeToUsertHandler }: HouseTemplate
         // 할당할 집이 없으면
         <div className="h-[150px] flex-center">해당 유저는 이미 모든 하우스를 가지고 있습니다.</div>
       ) : (
-        <ul className="gap-7 grid grid-cols-2 ">
+        <ul className="gap-7 grid grid-cols-2" role="list">
           {adminHouses.map((house) => (
             <li
               key={house.id}
-              className="relative w-full border border-gray-200 rounded-md p-3 justify-between shadow-md cursor-pointer hover:border-[#F5946D]"
+              className="group/item relative w-full border border-gray-200 rounded-md p-3 justify-between shadow-md cursor-pointer hover:border-[#F5946D]"
               onClick={() => {
                 registHomeToUsertHandler(house.id);
               }}
@@ -49,40 +47,23 @@ function HouseTemplates({ adminHouses, registHomeToUsertHandler }: HouseTemplate
                 </div>
                 <div className="flex items-start gap-1 ">
                   <div className="flex-shrink-0 pt-[14px]">
-                    <BsFillInfoCircleFill
-                      color="gray"
-                      size={13}
-                      className="cursor-pointer"
-                      // * todo  : show detail box handler
-                      // onClick={() => {
-                      //   showDetailBox(house.id);
-                      // }}
-                    />
+                    <BsFillInfoCircleFill color="gray" size={13} className="cursor-pointer" />
                   </div>
                   <p className="break-words mt-2">{house.title}</p>
                 </div>
 
-                <div>
-                  {expandedHouseId === house.id && (
-                    <div className="absolute top-[5%] left-[10%] text-sm mt-2 w-[75%] bg-black/80 p-4 rounded-md text-white z-10 pb-5">
-                      <div className="flex justify-end">
-                        <div className=" cursor-pointer ">
-                          <IoMdClose onClick={() => setExpandedHouseId(null)} />
-                        </div>
-                      </div>
-                      <div className="text-[#F5946D]">Description </div>
-                      <p className="break-words ">{house.description}</p>
-                      <div>
-                        <span className="text-[#F5946D] pr-1">Author </span> <span> {house.author}</span>
-                      </div>
-                      <div>
-                        <span className="text-[#F5946D] pr-1">Created </span> {house.createdDate}
-                      </div>
-                      <div>
-                        <span className="text-[#F5946D] pr-1">Updated </span> {house.updatedDate}
-                      </div>
-                    </div>
-                  )}
+                <div className="absolute top-[5%] left-[10%] text-sm mt-2 w-[75%] bg-black/80 p-4 rounded-md text-white z-10 pb-5 opacity-0 group-hover/item:opacity-100 transition-opacity duration-300">
+                  <div className="text-[#F5946D]">Description </div>
+                  <p className="break-words">{house.description}</p>
+                  <div>
+                    <span className="text-[#F5946D] pr-1">Author </span> <span> {house.author}</span>
+                  </div>
+                  <div>
+                    <span className="text-[#F5946D] pr-1">Created </span> {house.createdDate}
+                  </div>
+                  <div>
+                    <span className="text-[#F5946D] pr-1">Updated </span> {house.updatedDate}
+                  </div>
                 </div>
               </div>
             </li>
