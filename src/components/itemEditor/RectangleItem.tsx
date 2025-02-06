@@ -42,8 +42,6 @@ function RectItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable
         onDragEnd={(e) => {
           onChange({
             ...shapeProps,
-            // x: (room.x! / scale).toFixed(2),
-            // y: (room.y! / scale).toFixed(2),
             x: e.target.x(),
             y: e.target.y(),
             rotation: e.target.rotation(),

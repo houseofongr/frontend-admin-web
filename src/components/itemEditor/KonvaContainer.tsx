@@ -1,8 +1,7 @@
 import { Stage, Layer, Image as KonvaImage } from "react-konva";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction } from "react";
 import { ShapeData } from "../../types/items";
 import Konva from "konva";
-import API_CONFIG from "../../config/api";
 import RectItem from "./RectangleItem";
 import CircleItem from "./CircleItem";
 import EllipseItem from "./EllipseItem";
@@ -11,29 +10,30 @@ import ShapeSelectorTool from "./ShapeSelectorTool";
 import { RectangleShape, CircleShape, EllipseShape } from "../../constants/initialShapeData";
 import CircleButton from "../common/buttons/CircleButton";
 import { BsTrash3 } from "react-icons/bs";
+import { ImageSize } from "../../utils/formatShapeData";
 
 type KonvaContainerProps = {
   shapes: ShapeData[];
   isEditable: boolean;
-  imageId: number | null;
+  imageId?: number | null;
   selectedId: number | null;
   setSelectedId: (id: number | null) => void;
   setShapes: Dispatch<SetStateAction<ShapeData[]>>;
   deleteShape: (id: number) => void;
+  backgroundImage: HTMLImageElement | null;
+  imageSize: ImageSize;
 };
 
 export default function KonvaContainer({
   shapes,
   isEditable,
-  imageId,
   selectedId,
   setSelectedId,
   setShapes,
   deleteShape,
+  backgroundImage,
+  imageSize,
 }: KonvaContainerProps) {
-  const [backgroundImage, setBackgroundImage] = useState<HTMLImageElement | null>(null);
-  const [imageSize, setImageSize] = useState({ width: 0, height: 0, scaleX: 1, scaleY: 1 });
-
   const checkedSelectShape = (e: Konva.KonvaEventObject<MouseEvent | TouchEvent>) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     if (clickedOnEmpty) {
@@ -53,32 +53,6 @@ export default function KonvaContainer({
     setShapes((prev) => [...prev, new EllipseShape()]);
   };
 
-  useEffect(() => {
-    if (!imageId) return;
-    const image = new window.Image();
-
-    image.src = `${API_CONFIG.PRIVATE_IMAGE_LOAD_API}/${imageId}`;
-    image.onload = () => {
-      const stageWidth = window.innerWidth;
-      const stageHeight = window.innerHeight;
-
-      const imgWidth = image.width;
-      const imgHeight = image.height;
-
-      const scaleX = stageWidth / imgWidth;
-      const scaleY = stageHeight / imgHeight;
-      const scale = Math.min(scaleX, scaleY);
-
-      setImageSize({
-        width: imgWidth * scale,
-        height: imgHeight * scale,
-        scaleX: scale,
-        scaleY: scale,
-      });
-      setBackgroundImage(image);
-    };
-  }, [imageId]);
-
   if (!backgroundImage) return <SpinnerIcon />;
   return (
     <>
@@ -93,10 +67,10 @@ export default function KonvaContainer({
           {backgroundImage && (
             <KonvaImage
               image={backgroundImage}
-              x={(window.innerWidth - imageSize.width) / 2}
-              y={(window.innerHeight - imageSize.height) / 2}
-              width={imageSize.width}
-              height={imageSize.height}
+              x={(window.innerWidth - imageSize.width * imageSize.scale) / 2}
+              y={(window.innerHeight - imageSize.height * imageSize.scale) / 2}
+              width={imageSize.width * imageSize.scale}
+              height={imageSize.height * imageSize.scale}
             />
           )}
 

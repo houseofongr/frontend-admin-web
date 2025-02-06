@@ -47,6 +47,7 @@ function CircleItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditab
           });
         }}
         onTransformEnd={() => {
+          //radius transform
           const node = shapeRef.current;
           if (!node) return;
 
