@@ -1,3 +1,4 @@
+import clsx from "clsx";
 import React, { ReactNode } from "react";
 import { IoMdClose } from "react-icons/io";
 
@@ -5,13 +6,17 @@ interface ModalProps {
   onClose: () => void;
   children: ReactNode;
   width: number;
+  bgColor: "white" | "neutral";
 }
 
-const Modal: React.FC<ModalProps> = ({ onClose, children, width }) => {
+const Modal: React.FC<ModalProps> = ({ onClose, children, width, bgColor }) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div
-        className={`rounded-lg shadow-lg w-[${width}%] p-4 bg-white relative overflow-hidden `}
+        className={clsx("rounded-lg shadow-lg p-4 relative overflow-hidden", `w-[${width}%]`, {
+          "bg-white": bgColor === "white",
+          "bg-neutral-200": bgColor === "neutral",
+        })}
         onClick={(e) => e.stopPropagation()}
       >
         <button onClick={onClose} className="absolute top-5 right-10 text-gray-500 hover:text-gray-700">

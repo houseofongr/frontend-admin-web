@@ -45,7 +45,7 @@ export default function ItemSoundList({ sounds, onSoundSelect }: SoundListProps)
         ))}
       </ul>
       {openPreview && currentSound !== null && (
-        <Modal onClose={modalHandler} width={60}>
+        <Modal onClose={modalHandler} width={60} bgColor="neutral">
           <PreviewContent data={sounds.soundSource.find((sound) => sound.id === currentSound)!} />
         </Modal>
       )}
