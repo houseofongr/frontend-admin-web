@@ -4,7 +4,7 @@ import { useState } from "react";
 import Modal from "../Modal";
 import PreviewContent from "./PreviewContent";
 import { PiMonitorPlay } from "react-icons/pi";
-import { ITEM_SOUND_LIST } from "../../mocks/sound-list-data";
+// import { ITEM_SOUND_LIST } from "../../mocks/sound-list-data";
 
 type SoundListProps = {
   sounds: ItemSoundsData;

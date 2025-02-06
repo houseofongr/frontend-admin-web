@@ -50,8 +50,6 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
       queryClient.invalidateQueries({
         queryKey: ["itemSounds", itemId],
       });
-      // setSoundMetaData(initialData);
-      resetForm();
     },
     onError: (error) => {
       console.error("Error updating sound source:", error);
@@ -98,8 +96,6 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
 
   const handleDeleteSoundData = () => {
     if (soundId) deleteMutation.mutate();
-
-    // setIsEdit(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {

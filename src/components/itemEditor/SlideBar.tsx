@@ -153,7 +153,6 @@ export default function SlideBar({
                       />
                     </div>
 
-                    {/* edit mode x */}
                     {!isEditable && (
                       <button onClick={() => getItemSounds(shape.id)} className="cursor-pointer">
                         <RiPlayListFill size={17} />
@@ -188,7 +187,6 @@ export default function SlideBar({
           <CircleButton
             label={<TbLayoutSidebarLeftCollapseFilled size={25} color="white" />}
             onClick={toggleSlidePanel}
-            text="OPEN"
           />
         </div>
       )}
