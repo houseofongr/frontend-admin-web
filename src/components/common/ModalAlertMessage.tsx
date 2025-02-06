@@ -35,7 +35,7 @@ export default function ModalAlertMessage({ text, type, icon, okButton, cancelBu
         className="bg-white rounded-lg shadow-lg w-[30%] py-7 px-7 relative overflow-hidden"
         onClick={(e) => e.stopPropagation()}
       >
-        <button onClick={onClose} className="absolute top-5 right-5 text-gray-500 hover:text-gray-700 cursor-pointer">
+        <button onClick={onClose} className="absolute top-5 right-5 text-gray-500 hover:text-gray-700">
           <IoMdClose size={20} />
         </button>
         {/* 헤더 */}

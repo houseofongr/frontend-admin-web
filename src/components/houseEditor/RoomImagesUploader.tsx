@@ -4,6 +4,7 @@ import FileName from "./FileName";
 import { IoAlertCircle } from "react-icons/io5";
 import { useImageContext } from "../../context/ImageContext";
 import FileUploadButton from "../common/buttons/FileUploadButton";
+import { ROOM_NAME_MAX_LENGTH } from "../../constants/formDataMaxLength";
 
 export default function RoomImagesUploader() {
   const { borderImage, roomImages, updateRoomZIndex, handleFileChange, updateRoomTitle } = useImageContext();
@@ -13,9 +14,8 @@ export default function RoomImagesUploader() {
   };
 
   const handleTitleChange = (index: number, newTitle: string) => {
-    const maxLength = 40;
-    if (newTitle.length > maxLength) {
-      alert(`하우스 룸 타이틀은 최대 ${maxLength}자까지 입력 가능합니다.`);
+    if (newTitle.length > ROOM_NAME_MAX_LENGTH) {
+      alert(`하우스 룸 타이틀은 최대 ${ROOM_NAME_MAX_LENGTH}자까지 입력 가능합니다.`);
       return;
     }
     updateRoomTitle(index, newTitle);

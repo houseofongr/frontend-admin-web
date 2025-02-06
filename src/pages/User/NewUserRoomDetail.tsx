@@ -7,7 +7,7 @@ import { ShapeData } from "../../types/items";
 import KonvaContainer from "../../components/itemEditor/KonvaContainer";
 import SlideBar from "../../components/itemEditor/SlideBar";
 import { formatShapeData } from "../../utils/formatShapeData";
-import RoomDetailLayout from "../../components/itemEditor/RoomDetailLayout";
+import RoomDetailLayout from "../../components/layout/RoomDetailLayout";
 import ModalAlertMessage, { AlertType } from "../../components/common/ModalAlertMessage";
 import Button from "../../components/common/buttons/Button";
 
@@ -143,7 +143,7 @@ export default function NewUserRoomDetail() {
         setSelectedId={setSelectedId}
         deleteShape={deleteShape}
       />
-      {/* 아이템 */}
+      {/* 아이템 목록 + 아이템의 음원 목록 + 음원 추가 양식*/}
       <SlideBar
         shapes={shapes}
         setShapes={setShapes}

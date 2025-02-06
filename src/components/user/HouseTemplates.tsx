@@ -1,6 +1,4 @@
-import { useState } from "react";
 import { BsFillInfoCircleFill } from "react-icons/bs";
-import { IoMdClose } from "react-icons/io";
 import CardLabel from "../label/CardLabel";
 import API_CONFIG from "../../config/api";
 

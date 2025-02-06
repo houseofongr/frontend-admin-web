@@ -19,6 +19,6 @@ export interface SoundMetadata {
   isActive: boolean;
 }
 
-export interface SoundData extends SoundMetadata {
+export interface SoundAllData extends SoundMetadata {
   file: File;
 }

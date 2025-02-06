@@ -36,15 +36,6 @@ export default function RoomDetail() {
     navigate("/houses", { replace: true });
   };
 
-  // useEffect(() => {
-  //   if (rooms.length == 0) {
-  //     const roomlist = localStorage.getItem("rooms");
-  //     if (roomlist) {
-  //       setRooms(JSON.parse(roomlist));
-  //     }
-  //   }
-  // }, []);
-
   useEffect(() => {
     if (!roomId) return;
     if (rooms.length == 0) return;

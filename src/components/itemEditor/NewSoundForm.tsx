@@ -10,6 +10,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSound, deleteSound, updateSound } from "../../service /soundService";
 import { MdCancel } from "react-icons/md";
 import { bytesToKB } from "../../utils/formatFileSize";
+import { AUDIO_DESCRIPTION_MAX_LENGTH, AUDIO_NAME_MAX_LENGTH } from "../../constants/formDataMaxLength";
 
 type SoundFormProps = {
   itemId: number;
@@ -36,6 +37,7 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
       queryClient.invalidateQueries({
         queryKey: ["itemSounds", itemId],
       });
+      resetForm();
     },
     onError: (error) => {
       console.error("Error creating sound source:", error);
@@ -48,7 +50,8 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
       queryClient.invalidateQueries({
         queryKey: ["itemSounds", itemId],
       });
-      setSoundMetaData(initialData);
+      // setSoundMetaData(initialData);
+      resetForm();
     },
     onError: (error) => {
       console.error("Error updating sound source:", error);
@@ -61,22 +64,42 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
       queryClient.invalidateQueries({
         queryKey: ["itemSounds", itemId],
       });
-      setSoundMetaData(initialData);
+      // setSoundMetaData(initialData);
+      resetForm();
     },
     onError: (error) => {
       console.error("Error deleting sound source:", error);
     },
   });
+
+  const validateSoundData = () => {
+    if (!soundMetaData.name || !soundMetaData.description) {
+      alert("form을 완성시켜주세요.");
+      return false;
+    }
+
+    if (
+      soundMetaData.name.length > AUDIO_NAME_MAX_LENGTH ||
+      soundMetaData.description.length > AUDIO_DESCRIPTION_MAX_LENGTH
+    ) {
+      alert(
+        `소리 정보의 입력 최대값은 NAME: ${AUDIO_NAME_MAX_LENGTH}자, DESCRIPTION: ${AUDIO_DESCRIPTION_MAX_LENGTH}자입니다.`
+      );
+      return false;
+    }
+
+    return true;
+  };
+
   const handleUpdateSoundData = () => {
+    if (!validateSoundData) return;
     updateMutation.mutate();
-    setIsEdit(false);
   };
 
   const handleDeleteSoundData = () => {
-    if (soundId) {
-      deleteMutation.mutate();
-    }
-    setIsEdit(false);
+    if (soundId) deleteMutation.mutate();
+
+    // setIsEdit(false);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -96,24 +119,19 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
   };
 
   const saveSoundDataHandler = () => {
-    if (!file) {
-      console.error("No file selected");
-      return;
-    }
-    if (soundMetaData.description.length === 0 || soundMetaData.name.length === 0) {
-      alert("form을 완성시켜주세요.");
-      return;
-    }
+    if (!file || !validateSoundData()) return;
 
     const formData = new FormData();
     formData.append("metadata", JSON.stringify(soundMetaData));
     formData.append("soundFile", file);
 
     createMutation.mutate(formData);
-    // 폼 데이터랑 파일값 초기화..
+  };
+
+  const resetForm = () => {
     setSoundMetaData(initialData);
     setFile(null);
-    setIsEdit(false); // new form 상태
+    setIsEdit(false);
   };
 
   useEffect(() => {
@@ -140,7 +158,8 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
         </div>
         <div className="flex flex-col w-full">
           <div>
-            <CardLabel text={"DESCRIOTION"} hasBorder={false} hasPadding={false} />
+            <CardLabel text={"DESCRIOTION"} hasBorder={false} hasPadding={false} />{" "}
+            <span className="text-[10px] pl-2 text-neutral-600">{soundMetaData.description.length} / 255</span>
           </div>
           <CustomInput name="description" value={soundMetaData.description} elType="textarea" onChange={handleChange} />
         </div>
@@ -157,8 +176,8 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
 
         {isEdit ? (
           <div className="mt-4 flex justify-evenly gap-4">
-            <Button label="UPDATE" onClick={handleUpdateSoundData} />
-            <Button label="DELETE" onClick={handleDeleteSoundData} />
+            <Button label="UPDATE" onClick={handleUpdateSoundData} type="button" />
+            <Button label="DELETE" onClick={handleDeleteSoundData} type="button" />
             <Button
               label="NEW"
               onClick={() => {
@@ -176,7 +195,7 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
               <div className="w-full flex justify-between items-center py-4">
                 <FileName fileName={file.name} />
                 <span className="text-xs"> {bytesToKB(file.size)} </span>
-                <button className="cursor-pointer" onClick={() => setFile(null)}>
+                <button type="button" onClick={() => setFile(null)}>
                   <MdCancel />
                 </button>
               </div>

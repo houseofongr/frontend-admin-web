@@ -27,10 +27,12 @@ import CardLabel from "../../components/label/CardLabel";
 import FileName from "../../components/houseEditor/FileName";
 import { formatDate } from "../../utils/formatDate";
 import { RectangleShape, CircleShape, EllipseShape } from "../../constants/initialShapeData";
-import { ItemSoundsData, SoundData } from "../../types/sound";
+import { ItemSoundsData, SoundAllData } from "../../types/sound";
 import CircleButton from "../../components/common/buttons/CircleButton";
 import FileUploadButton from "../../components/common/buttons/FileUploadButton";
 
+// 리팩토링 전 코드 : UserRoomDetail
+// 리팩토링 후 코드 : NewUserRoomDetail
 export default function UserRoomDetail() {
   const { userId, homeId, roomId } = useParams<{ userId: string; homeId: string; roomId: string }>();
 
@@ -49,7 +51,7 @@ export default function UserRoomDetail() {
 
   // 음원 관련 state
   const [itemSounds, setItemSounds] = useState<ItemSoundsData | null>(null);
-  const [newSound, setNewSound] = useState<SoundData | null>(null);
+  const [newSound, setNewSound] = useState<SoundAllData | null>(null);
   const [fileName, setFileName] = useState<string>("");
 
   const inputRefs = useRef<Map<number, HTMLInputElement>>(new Map());

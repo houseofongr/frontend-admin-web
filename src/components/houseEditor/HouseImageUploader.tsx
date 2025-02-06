@@ -6,6 +6,7 @@ import AlertMessage, { AlertType } from "../common/ModalAlertMessage";
 import FileUploadButton from "../common/buttons/FileUploadButton";
 import Button from "../common/buttons/Button";
 import FileName from "./FileName";
+import { HOUSE_NAME_MAX_LENGTH } from "../../constants/formDataMaxLength";
 
 export default function HouseImageUploader() {
   const { houseImage, setHouseImage, handleFileChange } = useImageContext();
@@ -22,11 +23,10 @@ export default function HouseImageUploader() {
 
   const handleHouseInfoChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    const maxLength = 100;
 
     if (houseImage) {
-      if (value.length > maxLength) {
-        setAlert({ text: `하우스 ${name}의 길이는 ${maxLength}까지 가능합니다.`, type: "warning" });
+      if (value.length > HOUSE_NAME_MAX_LENGTH) {
+        setAlert({ text: `하우스 ${name}의 길이는 ${HOUSE_NAME_MAX_LENGTH}까지 가능합니다.`, type: "warning" });
       }
       setHouseImage((prev) => ({
         ...prev!,

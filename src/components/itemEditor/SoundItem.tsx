@@ -9,7 +9,7 @@ type SoundItemProps = {
 };
 export default function SoundItem({ sound, onClick }: SoundItemProps) {
   return (
-    <li className="group/item flex flex-col  cursor-pointer py-3" onClick={onClick}>
+    <li className="group/item flex flex-col  cursor-pointer py-3 px-1 w-full" onClick={onClick}>
       <div className="pl-1">
         <CardLabel text={`AUDIO ID#${sound.id}`} hasBorder={false} hasPadding={false} />
       </div>

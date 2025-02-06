@@ -3,6 +3,18 @@
 @import "tailwindcss/utilities"; */
 @import "tailwindcss";
 
+/* @font-face {
+  font-family: "GabiaNull-Regular";
+  src: url("../assets/GabiaNull.ttf") format("ttf");
+  font-weight: normal;
+  font-style: normal;
+} */
+
+/* @font-face {
+  font-family: "RubikScribble";
+  src: local("RubikScribble-Regular"), url("./assets/fonts/Rubik_Scribble/RubikScribble-Regular.ttf");
+} */
+/* 
 @font-face {
   font-family: "GabiaNull-Regular";
   src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/2409-2@1.0/GabiaNull-Regular.woff2") format("woff2");
@@ -75,7 +87,7 @@
   src: url("https://cdn.jsdelivr.net/gh/fonts-archive/AppleSDGothicNeo/AppleSDGothicNeo-ExtraBold.woff2")
       format("woff2"),
     url("https://cdn.jsdelivr.net/gh/fonts-archive/AppleSDGothicNeo/AppleSDGothicNeo-ExtraBold.ttf") format("truetype");
-}
+} */
 
 html,
 body {
@@ -105,13 +117,13 @@ button,
 div,
 p,
 span {
-  font-family: "Apple SD Gothic Neo";
+  /* font-family: "Apple SD Gothic Neo"; */
 }
 
 h1,
 h2,
 h3 {
-  font-family: "GabiaNull-Regular";
+  /* font-family: "GabiaNull-Regular"; */
 }
 
 /* 자주 쓰는 스타일 조합 정의  */
@@ -139,4 +151,8 @@ ul,
 li {
   margin: 0;
   /* padding: 0; */
+}
+
+button {
+  cursor: pointer;
 }
