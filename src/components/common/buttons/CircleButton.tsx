@@ -16,8 +16,9 @@ export default function CircleButton({ label, onClick, disabled, hasBorder = tru
         onClick={onClick}
         className={clsx(
           "p-2  rounded-full text-sm ",
+          // "hover:border-[#F5946D] hover:border-2",
           { "border-2 border-gray-300  hover:border-[#F5946D]": hasBorder },
-          { "hover:text-[#F5946D]": !hasBorder },
+          { "hover:border-[#F5946D] border-2 border-transparent": !hasBorder },
           "disabled:cursor-not-allowed disabled:border-stone-300 "
         )}
       >

@@ -11,8 +11,8 @@ import RoomDetail from "./pages/House/RoomDetail";
 import UserList from "./pages/User/UserList";
 import UserHomeList from "./pages/User/UserHomeList";
 import UserHomeDetail from "./pages/User/UserHomeDetail";
-import SoundSource from "./pages/SoundSource";
 import NewUserRoomDetail from "./pages/User/NewUserRoomDetail";
+import SoundSources from "./pages/SoundSources";
 
 function App() {
   return (
@@ -54,11 +54,10 @@ function App() {
           <Route path="/users/:userId" element={<UserHomeList />} />
           <Route path="/users/:userId/:homeId" element={<UserHomeDetail />} />
 
-          {/* <Route path="/users/:userId/:homeId/:roomId" element={<UserRoomDetail />} /> */}
           <Route path="/users/:userId/:homeId/:roomId" element={<NewUserRoomDetail />} />
 
           {/* 음원 */}
-          <Route path="/sound-source" element={<SoundSource />} />
+          <Route path="/sound-sources" element={<SoundSources />} />
         </Routes>
       </RootLayout>
     </BrowserRouter>

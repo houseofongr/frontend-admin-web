@@ -32,7 +32,7 @@ export default function HouseImageInfoForm({ fields, onChange }: HouseImageInfoF
             />
           ) : (
             <>
-              <span className="text-xs pl-2 text-amber-900">({field.value.length} / 100)</span>
+              <span className="text-xs pl-2 text-orange-400/40">({field.value.length} / 100)</span>
               <textarea
                 id={field.id}
                 name={field.name}

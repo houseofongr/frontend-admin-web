@@ -1,7 +1,7 @@
 import { Link, useLocation } from "react-router-dom";
 
 const TABS = [
-  { label: "음원", href: "/soundsource" },
+  { label: "음원", href: "/sound-sources" },
   { label: "사용자", href: "/users" },
   { label: "하우스", href: "/houses" },
 ];
