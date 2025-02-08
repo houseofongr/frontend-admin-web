@@ -59,12 +59,12 @@ export default function RoomDetail() {
   if (!roomData) return <SpinnerIcon />;
 
   return (
-    <div className="relative w-full h-screen flex flex-col bg-gray-100">
-      <div className="w-full px-10 py-3 flex justify-between items-center  border-b-2 bg-stone-800">
-        <div className="py-1 ">
+    <div className="relative w-full h-screen flex flex-col bg-stone-800">
+      <div className="w-full px-10 py-3 flex justify-between items-center   border-white absolute">
+        <div>
           <CardLabel size="large" hasPadding hasBorder text={`ROOM ID# ${roomId}`} />
-          <p className="pt-2 text-white"> Room Name: {roomData.name}</p>
-          <p className="text-white">
+          <p className="pt-2 text-gray-200 "> Room Name: {roomData.name}</p>
+          <p className="text-gray-200">
             Room Dimensions: W {roomData.width} x H {roomData.height}
           </p>
         </div>
@@ -75,11 +75,11 @@ export default function RoomDetail() {
         </div>
       </div>
 
-      <div className="relative w-full h-full flex-center ">
+      <div className="w-full h-full flex-center bg-stone-800 ">
         <img
           src={`${API_CONFIG.PRIVATE_IMAGE_LOAD_API}/${roomData.imageId}`}
           alt={roomData.name}
-          className="max-w-full max-h-ful object-contain"
+          className="max-w-full max-h-full "
         />
       </div>
     </div>
