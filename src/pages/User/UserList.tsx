@@ -40,7 +40,7 @@ export default function UserList() {
 
   return (
     <div className="flex-center mt-[25%] md:mt-[25%] lg:mt-[15%]">
-      <div className="w-[60%]">
+      <div className="w-[65%]">
         <div className="flex items-center flex-col md:flex-row justify-between">
           <h1 className="font-bold text-base lg:text-lg">
             아・오・옹의 유저 {totalItems !== 0 && `|  ${totalItems} 명`}
@@ -51,7 +51,6 @@ export default function UserList() {
         <div className="flex items-center flex-col py-4">
           <GridHeader headerTitles={userListHeaderTitles} />
           {users.length === 0 && <div className="py-10 ">유저가 존재하지 않습니다.</div>}
-
           {users && (
             <ul className="w-full flex flex-col gap-5 ">
               {users.map((user, index) => {

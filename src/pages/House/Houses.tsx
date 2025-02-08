@@ -68,7 +68,7 @@ export default function HouseList() {
         <div className="flex justify-center items-center gap-5">
           <SearchComponent onSearch={searchHandler} options={houseSearchOptions} />
           <Link to={"/houses/house-editor"}>
-            <Button label="+ NEW" />
+            <Button label="NEW" />
           </Link>
         </div>
       </div>

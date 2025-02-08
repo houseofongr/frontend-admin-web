@@ -38,6 +38,7 @@ export default function UserHomeList() {
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/users/${userId}/homes`);
       const data = await response.json();
+
       setUserHomes(data.homes);
     } catch (error) {
       console.error("Failed to fetch user homes:", error);
@@ -149,9 +150,15 @@ export default function UserHomeList() {
           <div className="w-[60%]">
             <div className="flex justify-between items-center py-4">
               <h3 className="text-lg font-bold">
-                {/* {userHomes[0]?.user?.nickname} 님의 집 ({`${userHomes.length}`}){" "} */}
+                {userHomes.length > 0 ? (
+                  <>
+                    {userHomes[0]?.user?.nickname} 님의 집 ({`${userHomes.length}`})
+                  </>
+                ) : (
+                  ""
+                )}
               </h3>
-              <Button label="+ ADD" onClick={getAdminHouseList} />
+              <Button label="ADD" onClick={getAdminHouseList} />
             </div>
 
             {userHomes.length === 0 ? (
