@@ -6,7 +6,7 @@ import { TbPlayerStopFilled } from "react-icons/tb"; // 정지
 import { MdReplay10 } from "react-icons/md"; // 10초 전
 import { MdForward10 } from "react-icons/md"; // 10초 후
 
-import { BsFillVolumeMuteFill } from "react-icons/bs"; // 음소거
+// import { BsFillVolumeMuteFill } from "react-icons/bs"; // 음소거
 
 import { VscMute } from "react-icons/vsc"; // mute
 import { VscUnmute } from "react-icons/vsc"; // unmute
@@ -48,7 +48,7 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
       progressColor: "#ea3131", // bg light version
       // progressColor: "#F5946D", // bg dark version
 
-      cursorColor: "black",
+      cursorColor: "#ea3131",
 
       height: 180,
 
@@ -164,7 +164,7 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
       </div>
       {/* 진행 바 */}
 
-      <div className="w-full  p-5 mt-2 rounded-3xl bg-neutral-100">
+      <div className="w-full p-5  mt-10 rounded-3xl bg-neutral-100">
         <div className="w-full flex flex-col items-center gap-2 pt-4 ">
           <input
             type="range"
@@ -216,15 +216,10 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
           </div>
         </div>
       </div>
-
-      {/* 컨트롤 버튼들 */}
-
-      {/* 볼륨 조절 */}
     </div>
   );
 };
 
-// 시간을 포맷하는 헬퍼 함수
 const formatTime = (time: number) => {
   const minutes = Math.floor(time / 60);
   const seconds = Math.floor(time % 60)

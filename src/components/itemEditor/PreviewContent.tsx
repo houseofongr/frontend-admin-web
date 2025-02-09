@@ -19,15 +19,16 @@ export default function PreviewContent({ data }: NotepadContentProps) {
         {/* todo : 텍스트 길이 대응 */}
         <div className="relative mt-30 pl-10 pr-3 text-gray-700">
           <div className="h-full flex flex-col pl-4 pr-12">
-            <span className="block text-xl pt-10 mb-3 text-center">{name}</span>
-
-            <div className=" leading-tight break-words ">{description}</div>
-            <span className="block text-end mr-21` ">작성일 {updatedDate}</span>
-            {/* <img src="/images/player.png" /> */}
             {/* 상상폰트 적용시  */}
-            {/* <span className="block text-5xl  pt-10 mb-4 ">{name}</span>
-            <div className=" leading-tight break-words text-3xl">{description}</div>
-            <span className="block  text-xl text-end ">작성일 {updatedDate}</span> */}
+            <span className="block text-4xl  pt-10 mb-4" style={{ fontFamily: "SangSangShinb7" }}>
+              {name}
+            </span>
+            <div className=" leading-tight break-words text-2xl" style={{ fontFamily: "SangSangShinb7" }}>
+              {description}
+            </div>
+            <span className="block text-lg text-end mr-15" style={{ fontFamily: "SangSangShinb7" }}>
+              {updatedDate}
+            </span>
           </div>
         </div>
       </div>
