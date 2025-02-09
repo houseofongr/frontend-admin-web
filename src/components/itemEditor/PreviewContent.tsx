@@ -23,8 +23,9 @@ export default function PreviewContent({ data }: NotepadContentProps) {
 
             <div className=" leading-tight break-words ">{description}</div>
             <span className="block text-end mr-21` ">작성일 {updatedDate}</span>
+            {/* <img src="/images/player.png" /> */}
             {/* 상상폰트 적용시  */}
-            {/* <span className="block  text-5xl  pt-10 mb-4 ">{name}</span>
+            {/* <span className="block text-5xl  pt-10 mb-4 ">{name}</span>
             <div className=" leading-tight break-words text-3xl">{description}</div>
             <span className="block  text-xl text-end ">작성일 {updatedDate}</span> */}
           </div>
