@@ -60,8 +60,8 @@ export default function RoomDetail() {
 
   return (
     <div className="relative w-full h-screen flex flex-col bg-stone-800">
-      <div className="w-full px-10 py-3 flex justify-between items-center   border-white absolute">
-        <div>
+      <div className="w-full px-10 py-5 flex justify-between items-center absolute">
+        <div className="pt-2">
           <CardLabel size="large" hasPadding hasBorder text={`ROOM ID# ${roomId}`} />
           <p className="pt-2 text-gray-200 "> Room Name: {roomData.name}</p>
           <p className="text-gray-200">
