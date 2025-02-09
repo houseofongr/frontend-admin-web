@@ -29,7 +29,6 @@ export default function UserHomeDetail() {
       try {
         const response = await fetch(`${API_CONFIG.BACK_API}/homes/${params.homeId}`);
         const { homeId, homeName, createdDate, updatedDate, house, rooms } = await response.json();
-
         setInfo({ homeId, homeName, createdDate, updatedDate });
         setHomeData({ house, rooms });
 
@@ -79,7 +78,7 @@ export default function UserHomeDetail() {
           </p>
         </section>
 
-        <section className="relative w-4/5 h-full flex justify-center bg-gray-300">
+        <section className="relative w-4/5 h-full flex justify-center bg-stone-800">
           <div className="relative">
             <img
               alt="user-home-border-image"
