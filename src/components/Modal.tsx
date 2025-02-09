@@ -5,15 +5,14 @@ import { IoMdClose } from "react-icons/io";
 interface ModalProps {
   onClose: () => void;
   children: ReactNode;
-  width: number;
   bgColor: "white" | "neutral";
 }
 
-const Modal: React.FC<ModalProps> = ({ onClose, children, width, bgColor }) => {
+const Modal: React.FC<ModalProps> = ({ onClose, children, bgColor }) => {
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onClick={onClose}>
       <div
-        className={clsx("rounded-lg shadow-lg p-4 relative overflow-hidden", `w-[${width}%]`, {
+        className={clsx("rounded-lg shadow-lg p-4 relative overflow-hidden w-[60%]", {
           "bg-white": bgColor === "white",
           "bg-neutral-200": bgColor === "neutral",
         })}

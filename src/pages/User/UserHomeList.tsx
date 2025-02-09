@@ -179,7 +179,7 @@ export default function UserHomeList() {
           </div>
 
           {isOpenModal && adminHouses && (
-            <Modal onClose={closeModal} width={50} bgColor="white">
+            <Modal onClose={closeModal} bgColor="white">
               <HouseTemplates adminHouses={adminHouses} registHomeToUsertHandler={registHomeToUsertHandler} />
             </Modal>
           )}
