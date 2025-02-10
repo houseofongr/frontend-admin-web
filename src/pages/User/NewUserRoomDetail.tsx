@@ -17,11 +17,7 @@ type UpdateItemsPayload = {
 };
 
 export default function NewUserRoomDetail() {
-  // params
   const { userId, homeId, roomId } = useParams<{ userId: string; homeId: string; roomId: string }>();
-  //  konva
-  // const [imageId, setImageId] = useState(null);
-  //  global
   const [originData, setOriginData] = useState<ShapeData[]>([]);
   const [shapes, setShapes] = useState<ShapeData[]>([]);
   const [selectedId, setSelectedId] = useState<number | null>(null);
@@ -138,11 +134,9 @@ export default function NewUserRoomDetail() {
 
       const imgWidth = image.width;
       const imgHeight = image.height;
-      console.log("img,", imgWidth, imgHeight);
 
       const scaleX = stageWidth / imgWidth;
       const scaleY = stageHeight / imgHeight;
-      console.log(scaleX, scaleY);
 
       const scale = Math.min(scaleX, scaleY);
       const scaleAxis = scaleX > scaleY ? "Y" : "X";
@@ -190,10 +184,6 @@ export default function NewUserRoomDetail() {
     };
   }, [data]);
 
-  // useEffect(() => {
-  //   console.log("backgroundImage", backgroundImage);
-  // }, [backgroundImage]);
-
   if (!data && isLoading) return <SpinnerIcon />;
   return (
     <RoomDetailLayout isEditable={isEditable}>
@@ -202,7 +192,6 @@ export default function NewUserRoomDetail() {
         shapes={shapes}
         setShapes={setShapes}
         isEditable={isEditable}
-        // imageId={imageId}
         selectedId={selectedId}
         setSelectedId={setSelectedId}
         deleteShape={deleteShape}

@@ -9,23 +9,6 @@ import SpinnerIcon from "../components/icons/SpinnerIcon";
 import SoundListItem from "../components/SoundListItem";
 import { SoundListItem as SoundData } from "../types/sound";
 
-// interface SoundData {
-//   name: string;
-//   description: string;
-//   createdDate: string;
-//   updatedDate: string;
-//   isActive: boolean;
-//   audioFileId: number;
-//   userNickname: string;
-//   userId: number;
-//   homeName: string;
-//   roomName: string;
-//   itemName: string;
-//   homeId: number;
-//   roomId: number;
-//   itemId: number;
-// }
-
 export default function SoundSources() {
   const [sounds, setSounds] = useState<SoundData[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -58,7 +41,7 @@ export default function SoundSources() {
       <div className="w-[65%]">
         <div className="flex items-center flex-col md:flex-row justify-between">
           <h1 className="font-bold text-base lg:text-lg">
-            아・오・옹의 소리 {totalItems !== 0 && `|  ${totalItems} 개`}
+            아・오・옹의 소리 {totalItems !== 0 && ` ・ ${totalItems} 개`}
           </h1>
           <SearchComponent onSearch={() => {}} options={soundSouceSearchOptions} />
         </div>

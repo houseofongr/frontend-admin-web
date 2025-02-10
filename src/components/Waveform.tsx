@@ -1,34 +1,19 @@
 import React, { useRef, useEffect, useState } from "react";
 import WaveSurfer from "wavesurfer.js";
-import { TbPlayerPlayFilled } from "react-icons/tb"; // 재생
-import { TbPlayerPauseFilled } from "react-icons/tb"; // 일시정지
-import { TbPlayerStopFilled } from "react-icons/tb"; // 정지
-import { MdReplay10 } from "react-icons/md"; // 10초 전
-import { MdForward10 } from "react-icons/md"; // 10초 후
+import { TbPlayerPlayFilled } from "react-icons/tb";
+import { TbPlayerPauseFilled } from "react-icons/tb";
+import { TbPlayerStopFilled } from "react-icons/tb";
+import { MdReplay10 } from "react-icons/md";
+import { MdForward10 } from "react-icons/md";
+import { VscMute } from "react-icons/vsc";
+import { VscUnmute } from "react-icons/vsc";
 
-// import { BsFillVolumeMuteFill } from "react-icons/bs"; // 음소거
-
-import { VscMute } from "react-icons/vsc"; // mute
-import { VscUnmute } from "react-icons/vsc"; // unmute
-
-// 추후 인증 구현후
-// interface CustomWaveServeroptions extends WaveformProps {
-//   crossOrigin?: string;
-// }
-
-// 인증 헤더를 토한 요청
-// fetch(audioUrl, {
-//   method: "GET",
-//   credentials: "include",
-//   headers: {
-//     Authorization: `Bearer ${yourAuthToken}`,
-//   },
-// });
 interface WaveformProps {
   audioUrl: string;
+  audioTitle: string;
 }
 
-const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
+const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) => {
   const waveformRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [waveSurfer, setWaveSurfer] = useState<WaveSurfer | null>(null);
@@ -44,13 +29,13 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
     console.log("wavesurfer", waveSurfer);
     const waveSurferInstance = WaveSurfer.create({
       container: waveformRef.current,
+      // waveColor: "#f0f0f0",
       waveColor: "gray",
-      progressColor: "#ea3131", // bg light version
+      progressColor: "#ff6347", // bg light version
       // progressColor: "#F5946D", // bg dark version
+      cursorColor: "#F5946D",
 
-      cursorColor: "#ea3131",
-
-      height: 180,
+      height: 150,
 
       // barHeight: 20,
       // responsive: true,
@@ -93,7 +78,6 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
       setDuration(audio.duration || 0);
     };
 
-    // 초기화 및 이벤트 등록
     audio.addEventListener("timeupdate", updateProgress);
     audio.addEventListener("loadedmetadata", updateProgress);
 
@@ -109,6 +93,7 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
       audioRef.current.currentTime = newTime;
     }
   };
+
   const handlePlayPause = () => {
     if (!audioRef.current) return;
     if (audioRef.current.paused) {
@@ -122,7 +107,7 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
   const handleStop = () => {
     if (audioRef.current) {
       audioRef.current.pause();
-      audioRef.current.currentTime = 0; // 재생 위치 초기화
+      audioRef.current.currentTime = 0;
       setIsPlaying(false);
     }
   };
@@ -131,7 +116,6 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
     if (audioRef.current) {
       let newTime = audioRef.current.currentTime + seconds;
 
-      // 범위 초과 방지
       if (newTime < 0) newTime = 0;
       if (newTime > audioRef.current.duration) newTime = audioRef.current.duration;
 
@@ -140,31 +124,47 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
   };
 
   const toggleMute = () => {
-    if (audioRef.current) {
-      audioRef.current.muted = !audioRef.current.muted;
-      setIsMuted(audioRef.current.muted);
+    if (!audioRef.current) return;
+
+    if (isMuted) {
+      audioRef.current.volume = 0.5;
+      setVolume(0.5);
+      setIsMuted(false);
+    } else {
+      audioRef.current.volume = 0;
+      setVolume(0);
+      setIsMuted(true);
     }
   };
 
   const handleVolumeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const newVolume = parseFloat(event.target.value);
-    console.log("newVolume", newVolume);
     if (audioRef.current) {
       audioRef.current.volume = newVolume;
     }
+
     setVolume(newVolume);
+    if (newVolume === 0) {
+      setIsMuted(true);
+    } else {
+      setIsMuted(false);
+    }
   };
 
   return (
-    <div className="w-full flex flex-col ">
-      <div ref={waveformRef} />
-
-      <div className="w-full flex justify-center">
+    <div className="w-full flex flex-col p-8  rounded-4xl  bg-[#f0f0f0] bg-gray-gradient">
+      {/* <div className="w-full flex flex-col px-5 "> */}
+      {/* 파형/오디오 */}
+      <div ref={waveformRef} className=" bg-white rounded" />
+      <div className="mb-8">
         <audio ref={audioRef} controls src={audioUrl} className="hidden" />
       </div>
-      {/* 진행 바 */}
 
-      <div className="w-full p-5  mt-10 rounded-3xl bg-neutral-100">
+      {/* [#f3f3f3] */}
+      {/* <div className="w-full py-5 px-8  rounded-3xl  bg-white "> */}
+      {/* 컨트롤러 */}
+      <div className="w-full py-5 px-4 rounded-3xl bg-white border border-gray-50 ">
+        <div className="text-center  text-neutral-900">{audioTitle}</div>
         <div className="w-full flex flex-col items-center gap-2 pt-4 ">
           <input
             type="range"
@@ -173,14 +173,14 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
             step="0.1"
             value={currentTime}
             onChange={handleSeek}
-            className="w-full h-1.5 bg-white rounded-lg appearance-none cursor-pointer accent-[#F5946D]"
+            className="w-full h-1.5 bg-[#f3f3f3] rounded-lg appearance-none cursor-pointer"
           />
           <div className="w-full flex justify-between">
             <span className="text-xs text-gray-500">{formatTime(currentTime)}</span>
             <span className="text-xs text-gray-500">{formatTime(duration)}</span>
           </div>
         </div>
-        <div className="w-full flex-center gap-4">
+        <div className="w-full flex justify-center pl-18 gap-4">
           {/* 뒤로 10초 */}
           <button onClick={() => handleSkip(-10)}>
             <MdReplay10 size={25} />
@@ -198,21 +198,22 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl }) => {
             <MdForward10 size={25} />
           </button>
           {/* 음소거 */}
-          <button onClick={toggleMute} className="p-2 ">
-            {isMuted ? <VscMute size={25} /> : <VscUnmute size={25} />}
-          </button>
+          <div className=" flex justify-end items-center">
+            <button onClick={toggleMute} className="p-2 ">
+              {isMuted ? <VscMute size={18} /> : <VscUnmute size={18} />}
+            </button>
 
-          <div className="w-[20%] flex flex-col items-center gap-2 py-1">
-            <span></span>
-            <input
-              type="range"
-              min="0"
-              max="1"
-              step="0.01"
-              value={volume}
-              onChange={handleVolumeChange}
-              className="w-full h-1.5 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-purple-500"
-            />
+            <div className=" w-[35%] flex flex-col items-center gap-2 py-1">
+              <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={handleVolumeChange}
+                className="w-full h-1.5 bg-gray-300 rounded-lg appearance-none cursor-pointer "
+              />
+            </div>
           </div>
         </div>
       </div>

@@ -28,7 +28,7 @@ function HouseTemplates({ adminHouses, registHomeToUsertHandler }: HouseTemplate
           {adminHouses.map((house) => (
             <li
               key={house.id}
-              className="group/item relative w-full border border-gray-200 rounded-md p-3 justify-between shadow-md cursor-pointer hover:border-[#F5946D]"
+              className="group/item relative max-w-[300px] min-w-[300px] border border-gray-200 rounded-md p-3 justify-between shadow-md cursor-pointer hover:border-[#F5946D]"
               onClick={() => {
                 registHomeToUsertHandler(house.id);
               }}

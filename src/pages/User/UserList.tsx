@@ -34,8 +34,6 @@ export default function UserList() {
     fetchUsers();
   }, [currentPage]);
 
-  // isLoading 일때 스피너아이콘
-  // !users 일때 유저가 존재하지 않습니다.
   if (!users) return <SpinnerIcon />;
 
   return (
@@ -43,7 +41,7 @@ export default function UserList() {
       <div className="w-[65%]">
         <div className="flex items-center flex-col md:flex-row justify-between">
           <h1 className="font-bold text-base lg:text-lg">
-            아・오・옹의 유저 {totalItems !== 0 && `|  ${totalItems} 명`}
+            아・오・옹의 유저 {totalItems !== 0 && ` ・  ${totalItems} 명`}
           </h1>
           <SearchComponent onSearch={() => {}} options={userSearchOptions} />
         </div>

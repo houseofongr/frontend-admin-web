@@ -1,3 +1,4 @@
+import API_CONFIG from "../../config/api";
 import { SoundSource } from "../../types/sound";
 import WaveformWithAudio from "../Waveform";
 
@@ -6,27 +7,26 @@ type NotepadContentProps = {
 };
 
 export default function PreviewContent({ data }: NotepadContentProps) {
-  const { name, description, updatedDate } = data;
+  const { name, description, audioFileId, updatedDate } = data;
 
   return (
-    <div className="flex text-black  border-black h-[540px]">
+    <div className="flex text-black  border-black h-[560px]">
       {/* left */}
       <div className="w-1/2 relative">
         <div
-          className="absolute top-[20%]  bg-cover bg-center"
-          style={{ backgroundImage: 'url("/images/notepad/notepad_v2.png")', width: 500, height: 320 }}
+          className="absolute top-[14%] bg-cover bg-center "
+          style={{ backgroundImage: 'url("/images/notepad/notepad_v3.png")', width: 500, height: 380 }}
         />
         {/* todo : 텍스트 길이 대응 */}
-        <div className="relative mt-30 pl-10 pr-3 text-gray-700">
-          <div className="h-full flex flex-col pl-4 pr-12">
-            {/* 상상폰트 적용시  */}
-            <span className="block text-4xl  pt-10 mb-4" style={{ fontFamily: "SangSangShinb7" }}>
+        <div className="relative mt-30 pl-15 text-gray-700">
+          <div className="h-full flex flex-col pr-15">
+            <div className="block text-4xl pt-10 mb-1 text-start" style={{ fontFamily: "SangSangShinb7" }}>
               {name}
-            </span>
-            <div className=" leading-tight break-words text-2xl" style={{ fontFamily: "SangSangShinb7" }}>
+            </div>
+            <div className=" leading-tight break-words text-2xl " style={{ fontFamily: "SangSangShinb7" }}>
               {description}
             </div>
-            <span className="block text-lg text-end mr-15" style={{ fontFamily: "SangSangShinb7" }}>
+            <span className="block text-2xl text-end mr-10" style={{ fontFamily: "SangSangShinb7" }}>
               {updatedDate}
             </span>
           </div>
@@ -35,12 +35,9 @@ export default function PreviewContent({ data }: NotepadContentProps) {
       {/* right - 웨이브폼 */}
       <div className="w-1/2 flex-center p-10  ">
         {/* type = sound */}
-        <WaveformWithAudio audioUrl={"/audio/HOO_02.mp3"} />
-        {/* <audio controls src={`${API_CONFIG.PRIVATE_AUDIO_LOAD_API}/${sound.audioFileId}`}></audio> */}
+        <WaveformWithAudio audioUrl={`${API_CONFIG.PRIVATE_AUDIO_LOAD_API}/${audioFileId}`} audioTitle={name} />
         {/* type = video */}
         {/* <video controls width="800" src={"/video/cat.mp4"} /> */}
-        {/* <video controls width="800" src={"/video/IMG_0992.mov"} /> */}
-        {/* <video controls width="800" src={"/video/IMG_6070.mov"} /> */}
       </div>
     </div>
   );

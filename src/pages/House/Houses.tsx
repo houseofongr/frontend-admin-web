@@ -64,7 +64,9 @@ export default function HouseList() {
     <div className="mt-[25%] md:mt-[25%] lg:mt-[15%] mx-20">
       {/* 타이틀 + 검색 컴포넌트 */}
       <div className="flex items-center flex-col md:flex-row justify-between pb-10 ">
-        <h1 className="font-bold text-base md:text-lg ">아・오・옹의 하우스</h1>
+        <h1 className="font-bold text-base md:text-lg ">
+          아・오・옹의 하우스 {totalItems !== 0 && ` ・ ${totalItems} 개`}
+        </h1>
         <div className="flex justify-center items-center gap-5">
           <SearchComponent onSearch={searchHandler} options={houseSearchOptions} />
           <Link to={"/houses/house-editor"}>

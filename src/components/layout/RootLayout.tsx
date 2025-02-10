@@ -33,7 +33,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <div>
       {!shouldHideLayout && <Header />}
       <QueryClientProvider client={queryClient}>
-        <main className="w-full h-screen overflow-auto pb-5">{children}</main>
+        <main className="w-full h-screen overflow-auto">{children}</main>
       </QueryClientProvider>
 
       {!shouldHideLayout && <Footer />}
