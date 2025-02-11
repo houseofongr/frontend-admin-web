@@ -97,7 +97,7 @@ export default function FirstVerificationLogin() {
   }, []);
 
   return (
-    <div className="flex-center relative border h-full w-full">
+    <div className="flex-center relative h-full w-full">
       <motion.div
         initial={{ y: 0 }}
         animate={{ y: -100 }}
