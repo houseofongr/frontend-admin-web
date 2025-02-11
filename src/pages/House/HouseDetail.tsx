@@ -9,6 +9,7 @@ import HouseForm from "../../components/HouseForm";
 import RoomForm from "../../components/RoomForm";
 import RenderImages from "../../components/RenderImages";
 import Button from "../../components/common/buttons/Button";
+import { MAX_HOUSE_HEIGHT_SIZE } from "../../constants/formDataMaxLength";
 
 export type HouseData = {
   house: HouseDetailInfo;
@@ -169,7 +170,7 @@ export default function HouseDetail() {
         });
         const broswerHeight = window.innerHeight;
 
-        setScale(broswerHeight / 5000);
+        setScale(broswerHeight / MAX_HOUSE_HEIGHT_SIZE);
       } catch (err) {
         console.log(err);
       } finally {

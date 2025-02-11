@@ -45,7 +45,6 @@ export default function HouseEditorPage() {
       return acc;
     }, {} as Record<string, number>);
 
-    // 중복된 타이틀 필터링
     const duplicateTitles = Object.entries(titleCounts)
       .filter(([_, count]) => count > 1)
       .map(([title]) => title);
@@ -86,6 +85,7 @@ export default function HouseEditorPage() {
 
     formData.append("metadata", JSON.stringify(metadata));
 
+    // formdata 체크
     // for (const [key, value] of formData.entries()) {
     //   console.log(key, value);
     // }
@@ -136,10 +136,10 @@ export default function HouseEditorPage() {
           okButton={<Button label="확인" onClick={() => navigate(`/houses/${newHouseId}`)} />}
         />
       )}
-      <section className="w-1/5 h-full flex flex-col gap-4  overflow-scroll ">
-        <div className="w-full pt-6  px-3 flex justify-between items-center">
+      <section className="w-1/5 h-full flex flex-col gap-4 overflow-scroll">
+        <div className="w-full pt-6 px-3 flex justify-between items-center">
           <ArrowBackIcon href="/houses" />
-          <h1 className="">뉴 하우스</h1>
+          <h1>뉴 하우스</h1>
           <Button label="저장" onClick={saveHandler} />
         </div>
         <div className="flex flex-col gap-5 m-3">
@@ -149,7 +149,7 @@ export default function HouseEditorPage() {
         </div>
       </section>
 
-      <section className="relative w-4/5 h-full flex justify-center bg-black/10 ">
+      <section className="relative w-4/5 h-full flex justify-center bg-stone-800">
         <div className="relative">
           {borderImage && <BorderImagePreview setScale={setScale} imageUrl={borderImageURL} />}
           {roomImages.length > 0 &&

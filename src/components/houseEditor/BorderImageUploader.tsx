@@ -18,7 +18,7 @@ export default function BorderImageUploader() {
   };
 
   return (
-    <div className="rounded-2xl py-3 px-7 bg-[#F8EFE6] ">
+    <div className="rounded-2xl py-3 px-7 bg-[#F8EFE6] border border-neutral-200 min-h-fit">
       <ContainerTitle stepText="두번째" headingText="하우스의 테두리 이미지" />
       <div className="flex flex-col items-center gap-1">
         <input type="file" id="border-img" className="hidden" accept="image/*" onChange={handleFileUpload} />

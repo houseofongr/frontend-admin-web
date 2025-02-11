@@ -59,7 +59,7 @@ export default function HouseImageUploader() {
     },
   ];
   return (
-    <div className="rounded-2xl py-3 px-7 bg-[#F8EFE6] ">
+    <>
       {alert && (
         <AlertMessage
           text={alert.text}
@@ -68,15 +68,17 @@ export default function HouseImageUploader() {
           okButton={<Button label="확인" onClick={() => setAlert(null)} />}
         />
       )}
-      <ContainerTitle stepText="첫번째" headingText="하우스 프로필 이미지" />
+      <div className="rounded-2xl py-3 px-7 bg-[#F8EFE6] border border-neutral-200 min-h-fit ">
+        <ContainerTitle stepText="첫번째" headingText="하우스 프로필 이미지" />
 
-      <div className="flex flex-col items-center gap-6 ">
-        <input type="file" id="house-img" className="hidden" accept="image/*" onChange={handleFileUpload} />
-        <FileUploadButton htmlFor="house-img" />
-        <div className="w-full flex text-start">{fileName && <FileName fileName={fileName} />}</div>
+        <div className="flex flex-col items-center gap-6 ">
+          <input type="file" id="house-img" className="hidden" accept="image/*" onChange={handleFileUpload} />
+          <FileUploadButton htmlFor="house-img" />
+          <div className="w-full flex text-start">{fileName && <FileName fileName={fileName} />}</div>
+        </div>
+
+        {houseImage && <HouseImageInfoForm fields={fields} onChange={handleHouseInfoChange} />}
       </div>
-
-      {houseImage && <HouseImageInfoForm fields={fields} onChange={handleHouseInfoChange} />}
-    </div>
+    </>
   );
 }
