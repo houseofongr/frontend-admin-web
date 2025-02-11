@@ -24,7 +24,6 @@ function App() {
           <Route path="/login" element={<FirstVerificationLogin />} />
           <Route path="/login/2nd" element={<SecondVerificationLogin />} />
 
-          {/* 관리자 하우스 관련 페이지 */}
           <Route path="/houses" element={<HouseList />} />
           <Route
             path="/houses/house-editor"
@@ -51,14 +50,12 @@ function App() {
             }
           />
 
-          {/* 유저 홈 관련 페이지 */}
           <Route path="/users" element={<UserList />} />
           <Route path="/users/:userId" element={<UserHomeList />} />
           <Route path="/users/:userId/:homeId" element={<UserHomeDetail />} />
 
           <Route path="/users/:userId/:homeId/:roomId" element={<NewUserRoomDetail />} />
 
-          {/* 음원 */}
           <Route path="/sound-sources" element={<SoundSources />} />
         </Routes>
       </RootLayout>
