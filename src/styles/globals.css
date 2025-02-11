@@ -149,6 +149,10 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+}
+
 .bg-gray-gradient {
   /* background: radial-gradient(circle, #eeeeee 60%, #d8d8d8 90%);
   border-radius: 1rem; */

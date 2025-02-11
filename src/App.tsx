@@ -3,7 +3,6 @@ import { ImageProvider } from "./context/ImageContext";
 import { RoomProvider } from "./context/RoomsContext";
 import RootLayout from "./components/layout/RootLayout";
 import Home from "./pages/Home";
-import LoginPage from "./pages/Login";
 import HouseList from "./pages/House/Houses";
 import HouseEditorPage from "./pages/House/HouseEditor";
 import HouseDetail from "./pages/House/HouseDetail";
@@ -13,6 +12,8 @@ import UserHomeList from "./pages/User/UserHomeList";
 import UserHomeDetail from "./pages/User/UserHomeDetail";
 import NewUserRoomDetail from "./pages/User/NewUserRoomDetail";
 import SoundSources from "./pages/SoundSources";
+import FirstVerificationLogin from "./pages/Login/FirstVerificationLogin";
+import SecondVerificationLogin from "./pages/Login/SecondVerificationLogin";
 
 function App() {
   return (
@@ -20,7 +21,8 @@ function App() {
       <RootLayout>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<LoginPage />} />
+          <Route path="/login" element={<FirstVerificationLogin />} />
+          <Route path="/login/2nd" element={<SecondVerificationLogin />} />
 
           {/* 관리자 하우스 관련 페이지 */}
           <Route path="/houses" element={<HouseList />} />

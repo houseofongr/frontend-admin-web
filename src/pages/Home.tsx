@@ -7,6 +7,7 @@ export default function Home() {
     <div className="w-full h-screen flex-center">
       <main className="flex-col flex-center ">
         <InitText />
+        {/* todo : 하우스 이미지 클릭 시 로그인 여부에 따라 페이지 이동 분기 처리 필요 */}
         <Link to="/login">
           <InitHouseImage />
         </Link>

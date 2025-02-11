@@ -11,7 +11,7 @@ export default function CustomInput({ label, name, value, onChange, type = "text
   const isInputElement = elType === "input";
   return (
     <div className="flex flex-col">
-      {label && <label className="text-xs">{label}</label>}
+      {label && <label className="text-xs pb-1">{label}</label>}
       {isInputElement ? (
         <input
           onChange={onChange}
