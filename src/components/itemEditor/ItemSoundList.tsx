@@ -35,9 +35,9 @@ export default function ItemSoundList({ sounds, onSoundSelect }: SoundListProps)
       <ul role="list">
         <div className="pb-2">'{sounds.itemName}' 에 기록되고 있는 소리 모음</div>
         {sounds?.soundSource.map((sound) => (
-          <div key={sound.id} className="flex justify-between">
+          <div key={sound.id} className="flex">
             <SoundItem sound={sound} onClick={() => onSoundSelect(sound.id!)} />
-            <button onClick={() => previewHandler(sound.id!)} className="hover:text-[#F5946D] ">
+            <button onClick={() => previewHandler(sound.id!)} className="hover:text-[#F5946D] w-[10%]  ">
               <PiMonitorPlay size={20} />
             </button>
           </div>

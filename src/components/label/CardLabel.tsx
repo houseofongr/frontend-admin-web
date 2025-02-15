@@ -21,7 +21,6 @@ export default function CardLabel({
     <label
       htmlFor={html}
       className={clsx(
-        // "rounded-sm  bg-white",
         "rounded-sm bg-transparent",
 
         { "border  ": hasBorder },

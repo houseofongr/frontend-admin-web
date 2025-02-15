@@ -15,13 +15,13 @@ const Modal: React.FC<ModalProps> = ({ onClose, children, bgColor }) => {
       <div
         className={clsx("rounded-lg shadow-lg p-4 relative overflow-hidden max-w-[1100px] ", {
           "bg-white": bgColor === "white",
-          "bg-[#2C3333]": bgColor === "dark",
+          "bg-stone-800/90": bgColor === "dark",
         })}
         onClick={(e) => e.stopPropagation()}
       >
         <button
           onClick={onClose}
-          className={clsx("absolute top-5 right-10  ", {
+          className={clsx("absolute top-10 right-10  ", {
             "text-gray-500": bgColor === "white",
             "text-white": bgColor === "dark",
           })}

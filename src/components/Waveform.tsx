@@ -148,13 +148,13 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) =>
   return (
     <div className="flex flex-col px-5 max-w-[450px]">
       {/* 파형/오디오 */}
-      <div ref={waveformRef} className=" bg-[#2C3333] rounded" />
+      <div ref={waveformRef} className=" bg-stone-800/90 " />
       <div className="mb-8">
         <audio ref={audioRef} controls src={audioUrl} className="hidden" />
       </div>
 
       {/* 컨트롤러 */}
-      <div className="w-full py-5 px-4 rounded-3xl bg-[#2C3333]">
+      <div className="w-full py-5 px-4  bg-stone-800/90">
         <div className="text-center  text-neutral-200">{audioTitle}</div>
         <div className="w-full flex flex-col items-center gap-2 pt-4 ">
           <input
@@ -164,7 +164,7 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) =>
             step="0.1"
             value={currentTime}
             onChange={handleSeek}
-            className="w-full h-1.5 bg-[#f3f3f3] rounded-lg appearance-none cursor-pointer"
+            className="w-full h-1.5 bg-[#f3f3f3] appearance-none cursor-pointer"
           />
           <div className="w-full flex justify-between">
             <span className="text-xs text-gray-500">{formatTime(currentTime)}</span>

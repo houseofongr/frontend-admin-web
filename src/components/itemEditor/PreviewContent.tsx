@@ -10,25 +10,39 @@ export default function PreviewContent({ data }: NotepadContentProps) {
   const { name, description, audioFileId, updatedDate } = data;
 
   return (
-    <div className="flex text-black px-10 min-h-[500px] min-w-[1000px]  ">
-      <div className="w-1/2 relative ">
+    <div className="flex text-black px-7 min-h-[600px] min-w-[1000px]  ">
+      <div className="fixed mt-2 flex  gap-2 items-end">
+        <img
+          className=""
+          src="/images/logo/logo_for-dark-bg.png"
+          alt="아카이브 오브 옹알 로그"
+          width={30}
+          height={30}
+        />
+        <span className="text-xs text-gray-300">아카이브 오브 옹알</span>
+      </div>
+
+      <div className="w-1/2 relative flex-center ">
         {/* 포스트잇 섹션 */}
         <div
-          className="absolute bg-cover bg-center left-5 "
-          style={{ backgroundImage: 'url("/images/notepad/notepad_v6.png")', width: 425, height: 480 }}
+          className="absolute bg-cover bg-center"
+          style={{ backgroundImage: 'url("/images/notepad/v2/notepad_5.png")', width: 465, height: 460 }}
         />
 
-        <div className="relative mt-35 pl-15   text-gray-700">
-          <div className="h-full flex flex-col pr-15">
-            <h2 className="text-4xl  mb-1 text-start" style={{ fontFamily: "SangSangShinb7" }}>
-              {name}
+        <div className="relative flex items-center px-15 pt-5 text-gray-700 w-full h-[400px] ">
+          <div className="gap-3 flex flex-col ">
+            <h2 className="text-4xl " style={{ fontFamily: "SangSangShinb7" }}>
+              제목 : {name}
             </h2>
-            <p className="leading-tight break-words text-2xl " style={{ fontFamily: "SangSangShinb7" }}>
+            <p
+              className="leading-tight break-words text-2xl w-full min-h-[140px] "
+              style={{ fontFamily: "SangSangShinb7" }}
+            >
               {description}
             </p>
-            <span className="text-2xl text-end" style={{ fontFamily: "SangSangShinb7" }}>
+            <p className="text-2xl text-end " style={{ fontFamily: "SangSangShinb7" }}>
               {updatedDate}
-            </span>
+            </p>
           </div>
         </div>
       </div>

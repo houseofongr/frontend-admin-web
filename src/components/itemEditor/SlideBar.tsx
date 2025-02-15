@@ -138,9 +138,9 @@ export default function SlideBar({
                         disabled={!isEditable}
                         placeholder="Item title"
                         className={clsx(
-                          "px-2 py-1 bg-transparent border text-sm  overflow-hidden line-clamp-2 rounded-xs",
+                          "px-2 py-1  border text-sm  overflow-hidden line-clamp-2 rounded-xs",
                           !isEditable && "border-transparent",
-                          isEditable && shape.id === selectedId ? "border-[#F5946D] " : "border-gray-400"
+                          isEditable && shape.id === selectedId ? "border-[#F5946D] " : "border-[#ffff]"
                         )}
                       />
                     </div>
