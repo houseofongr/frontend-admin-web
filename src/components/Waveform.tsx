@@ -147,16 +147,16 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) =>
   };
 
   return (
-    <div className="w-full flex flex-col p-8  min-w-[450px] ml-10 ">
+    <div className="flex flex-col px-5 max-w-[450px]">
       {/* 파형/오디오 */}
-      <div ref={waveformRef} className=" bg-white rounded" />
+      <div ref={waveformRef} className=" bg-[#2C3333] rounded" />
       <div className="mb-8">
         <audio ref={audioRef} controls src={audioUrl} className="hidden" />
       </div>
 
       {/* 컨트롤러 */}
-      <div className="w-full py-5 px-4 rounded-3xl bg-white ">
-        <div className="text-center  text-neutral-900">{audioTitle}</div>
+      <div className="w-full py-5 px-4 rounded-3xl bg-[#2C3333]">
+        <div className="text-center  text-neutral-200">{audioTitle}</div>
         <div className="w-full flex flex-col items-center gap-2 pt-4 ">
           <input
             type="range"
@@ -175,24 +175,28 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) =>
         <div className="w-full flex justify-center pl-18 gap-4">
           {/* 뒤로 10초 */}
           <button onClick={() => handleSkip(-10)}>
-            <MdReplay10 size={25} />
+            <MdReplay10 size={25} color="#f3f3f3" />
           </button>
           {/* 재생/일시정지 */}
           <button onClick={handlePlayPause}>
-            {isPlaying ? <TbPlayerPauseFilled size={25} /> : <TbPlayerPlayFilled size={25} />}
+            {isPlaying ? (
+              <TbPlayerPauseFilled size={25} color="#f3f3f3" />
+            ) : (
+              <TbPlayerPlayFilled size={25} color="#f3f3f3" />
+            )}
           </button>
           {/* 정지 */}
           <button onClick={handleStop} className="p-2 ">
-            <TbPlayerStopFilled size={25} />
+            <TbPlayerStopFilled size={25} color="#f3f3f3" />
           </button>
           {/* 앞으로 10초 */}
           <button onClick={() => handleSkip(10)}>
-            <MdForward10 size={25} />
+            <MdForward10 size={25} color="#f3f3f3" />
           </button>
           {/* 음소거 */}
           <div className=" flex justify-end items-center">
             <button onClick={toggleMute} className="p-2 ">
-              {isMuted ? <VscMute size={18} /> : <VscUnmute size={18} />}
+              {isMuted ? <VscMute size={18} color="#f3f3f3" /> : <VscUnmute size={18} color="#f3f3f3" />}
             </button>
 
             <div className=" w-[35%] flex flex-col items-center gap-2 py-1">

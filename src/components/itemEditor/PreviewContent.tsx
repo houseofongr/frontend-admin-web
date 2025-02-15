@@ -10,16 +10,17 @@ export default function PreviewContent({ data }: NotepadContentProps) {
   const { name, description, audioFileId, updatedDate } = data;
 
   return (
-    <div className="flex text-black  h-[560px] ">
-      <div className="w-1/2 relative">
+    <div className="flex text-black px-10 min-h-[500px]  ">
+      <div className="w-1/2 relative ">
+        {/* 포스트잇 섹션 */}
         <div
-          className="absolute top-5 left-10 bg-cover bg-center"
-          style={{ backgroundImage: 'url("/images/notepad/notepad_v6.png")', width: 440, height: 500 }}
+          className="absolute bg-cover bg-center left-5 "
+          style={{ backgroundImage: 'url("/images/notepad/notepad_v6.png")', width: 425, height: 480 }}
         />
 
-        <div className="relative mt-30 pl-20 pr-15 text-gray-700">
+        <div className="relative mt-35 pl-15   text-gray-700">
           <div className="h-full flex flex-col pr-15">
-            <h2 className="text-4xl pt-10 mb-1 text-start" style={{ fontFamily: "SangSangShinb7" }}>
+            <h2 className="text-4xl  mb-1 text-start" style={{ fontFamily: "SangSangShinb7" }}>
               {name}
             </h2>
             <p className="leading-tight break-words text-2xl " style={{ fontFamily: "SangSangShinb7" }}>
@@ -32,7 +33,8 @@ export default function PreviewContent({ data }: NotepadContentProps) {
         </div>
       </div>
 
-      <div className="w-1/2 flex-center p-10  ">
+      {/* 파형 섹션 */}
+      <div className="w-1/2 flex-center  ">
         {/* type = sound */}
         <WaveformWithAudio audioUrl={`${API_CONFIG.PRIVATE_AUDIO_LOAD_API}/${audioFileId}`} audioTitle={name} />
         {/* type = video */}
