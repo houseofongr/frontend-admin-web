@@ -13,7 +13,8 @@ export const soundListHeaderTitles = [
   { name: "홈", width: "20%" },
   { name: "룸", width: "10%" },
   { name: "아이템", width: "15%" },
-  { name: "소리", width: "25%" },
+  { name: "소리", width: "20%" },
   { name: "릴리즈", width: "5%" },
   { name: "다운로드", width: "10%" },
+  { name: "이동", width: "5%" },
 ];

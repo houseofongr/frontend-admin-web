@@ -1,3 +1,5 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { soundListHeaderTitles } from "../constants/listHeader";
 import { BsDownload } from "react-icons/bs";
 import { SoundListItem as SoundItem } from "../types/sound";
@@ -5,6 +7,7 @@ import CircleButton from "./common/buttons/CircleButton";
 import API_CONFIG from "../config/api";
 import { BiToggleLeft, BiToggleRight } from "react-icons/bi";
 import { IoIosArrowForward } from "react-icons/io";
+import { FaDoorClosed, FaDoorOpen, FaDownload } from "react-icons/fa";
 
 type SoundListItemProps = {
   sound: SoundItem;
@@ -15,9 +18,9 @@ type SoundListItemProps = {
 
 export default function SoundListItem({ sound, currentPage, size, index }: SoundListItemProps) {
   const {
-    // userId,
-    // homeId,
-    // roomId,
+    userId,
+    homeId,
+    roomId,
     audioFileId,
     userNickname,
     homeName,
@@ -29,6 +32,9 @@ export default function SoundListItem({ sound, currentPage, size, index }: Sound
     isActive,
   } = sound;
   const listNumber = (currentPage - 1) * size + index + 1;
+
+  const [isHovered, setIsHovered] = useState(false);
+  const navigate = useNavigate();
 
   return (
     <li key={audioFileId} className="relative py-2 flex items-center text-center rounded-md bg-[#fbfafa] shadow ">
@@ -65,11 +71,30 @@ export default function SoundListItem({ sound, currentPage, size, index }: Sound
         >
           <CircleButton
             hasBorder={false}
-            label={<BsDownload size={20} color="#352f2f" className="hover:text-white" />}
+            label={<FaDownload size={18} color="#5f5c5d" className="hover:text-white" />}
             onClick={() => {}}
           />
         </a>
       </div>
+
+      <button type="button" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+        <CircleButton
+          hasBorder={false}
+          label={
+            isHovered ? (
+              <FaDoorOpen
+                size={20}
+                color="#5f5c5d"
+                className="hover:text-white"
+                onClick={() => navigate(`/users/${userId}/${homeId}/${roomId}`)}
+              />
+            ) : (
+              <FaDoorClosed size={20} color="#5f5c5d" className="hover:text-white" />
+            )
+          }
+          onClick={() => {}}
+        />
+      </button>
     </li>
   );
 }
