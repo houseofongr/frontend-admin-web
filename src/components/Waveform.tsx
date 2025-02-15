@@ -23,7 +23,6 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) =>
   const [volume, setVolume] = useState(1);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  console.log("isplaying", isPlaying);
   useEffect(() => {
     if (!waveformRef.current || !audioRef.current) return;
     console.log("wavesurfer", waveSurfer);

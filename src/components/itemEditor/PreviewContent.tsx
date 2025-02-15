@@ -10,7 +10,7 @@ export default function PreviewContent({ data }: NotepadContentProps) {
   const { name, description, audioFileId, updatedDate } = data;
 
   return (
-    <div className="flex text-black px-10 min-h-[500px]  ">
+    <div className="flex text-black px-10 min-h-[500px] min-w-[1000px]  ">
       <div className="w-1/2 relative ">
         {/* 포스트잇 섹션 */}
         <div
