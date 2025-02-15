@@ -29,17 +29,12 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) =>
     console.log("wavesurfer", waveSurfer);
     const waveSurferInstance = WaveSurfer.create({
       container: waveformRef.current,
-      // waveColor: "#f0f0f0",
       waveColor: "gray",
       progressColor: "#ff6347", // bg light version
       // progressColor: "#F5946D", // bg dark version
       cursorColor: "#F5946D",
-
       height: 150,
-
       // barHeight: 20,
-      // responsive: true,
-      // audioRate: 10, //빨리감기
       barWidth: 0.5,
       cursorWidth: 1,
       barGap: 0.5,
@@ -152,18 +147,15 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) =>
   };
 
   return (
-    <div className="w-full flex flex-col p-8  rounded-4xl  bg-[#f0f0f0] bg-gray-gradient">
-      {/* <div className="w-full flex flex-col px-5 "> */}
+    <div className="w-full flex flex-col p-8  min-w-[450px] ml-10 ">
       {/* 파형/오디오 */}
       <div ref={waveformRef} className=" bg-white rounded" />
       <div className="mb-8">
         <audio ref={audioRef} controls src={audioUrl} className="hidden" />
       </div>
 
-      {/* [#f3f3f3] */}
-      {/* <div className="w-full py-5 px-8  rounded-3xl  bg-white "> */}
       {/* 컨트롤러 */}
-      <div className="w-full py-5 px-4 rounded-3xl bg-white border border-gray-50 ">
+      <div className="w-full py-5 px-4 rounded-3xl bg-white ">
         <div className="text-center  text-neutral-900">{audioTitle}</div>
         <div className="w-full flex flex-col items-center gap-2 pt-4 ">
           <input

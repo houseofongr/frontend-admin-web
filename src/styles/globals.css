@@ -152,9 +152,3 @@ button {
 button:disabled {
   cursor: not-allowed;
 }
-
-.bg-gray-gradient {
-  /* background: radial-gradient(circle, #eeeeee 60%, #d8d8d8 90%);
-  border-radius: 1rem; */
-  box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.3), 3px 4px 5px rgba(0, 0, 0, 0.3);
-}

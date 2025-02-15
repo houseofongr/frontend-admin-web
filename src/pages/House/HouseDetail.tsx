@@ -169,7 +169,6 @@ export default function HouseDetail() {
           rooms: roomsEditableData,
         });
         const broswerHeight = window.innerHeight;
-
         setScale(broswerHeight / MAX_HOUSE_HEIGHT_SIZE);
       } catch (err) {
         console.log(err);

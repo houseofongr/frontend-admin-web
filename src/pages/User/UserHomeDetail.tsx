@@ -32,7 +32,7 @@ export default function UserHomeDetail() {
         setInfo({ homeId, homeName, createdDate, updatedDate });
         setHomeData({ house, rooms });
 
-        // 화면 높이를 기준으로 스케일 설정
+        // 화면 높이를 기준으로 스케일 설정  - 노트북,데스크탑의 경우만 고려
         setScale(window.innerHeight / 5000);
       } catch (error) {
         console.error("Failed to fetch user homes:", error);

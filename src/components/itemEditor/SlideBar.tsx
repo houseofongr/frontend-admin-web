@@ -77,7 +77,6 @@ export default function SlideBar({
   };
 
   const getItemSounds = (itemId: number) => {
-    console.log("itemId clicked:", itemId);
     setIsExpanded(true);
     setTargetItemId(itemId);
   };
@@ -88,12 +87,6 @@ export default function SlideBar({
       input?.focus();
     }
   }, [selectedId]);
-
-  // useEffect(() => {
-  //   if (data) {
-  //     console.log("itemSounds data", data);
-  //   }
-  // }, [data]);
 
   return (
     <>
@@ -125,7 +118,6 @@ export default function SlideBar({
             />
           </div>
 
-          {/* left section  - shape item list - 컴포넌트로 x*/}
           <div className="flex px-4 gap-4 mr-5">
             <ul className={clsx("flex flex-col gap-1 ", isExpanded ? "w-[40%]" : "w-full")}>
               <div className="text-center py-4">아이템 생성 목록</div>
