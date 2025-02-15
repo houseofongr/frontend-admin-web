@@ -1,13 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { soundListHeaderTitles } from "../constants/listHeader";
-import { BsDownload } from "react-icons/bs";
 import { SoundListItem as SoundItem } from "../types/sound";
 import CircleButton from "./common/buttons/CircleButton";
 import API_CONFIG from "../config/api";
 import { BiToggleLeft, BiToggleRight } from "react-icons/bi";
 import { IoIosArrowForward } from "react-icons/io";
-import { FaDoorClosed, FaDoorOpen, FaDownload } from "react-icons/fa";
+import { FaDoorClosed, FaDoorOpen, FaCloudDownloadAlt } from "react-icons/fa";
 
 type SoundListItemProps = {
   sound: SoundItem;
@@ -71,7 +70,7 @@ export default function SoundListItem({ sound, currentPage, size, index }: Sound
         >
           <CircleButton
             hasBorder={false}
-            label={<FaDownload size={18} color="#5f5c5d" className="hover:text-white" />}
+            label={<FaCloudDownloadAlt size={18} color="#5f5c5d" className="hover:text-white" />}
             onClick={() => {}}
           />
         </a>
