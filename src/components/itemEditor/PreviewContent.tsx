@@ -1,5 +1,6 @@
 import API_CONFIG from "../../config/api";
 import { SoundSource } from "../../types/sound";
+import { formatDate } from "../../utils/formatDate";
 import WaveformWithAudio from "../Waveform";
 
 type NotepadContentProps = {
@@ -10,7 +11,7 @@ export default function PreviewContent({ data }: NotepadContentProps) {
   const { name, description, audioFileId, updatedDate } = data;
 
   return (
-    <div className="flex text-black px-7 min-h-[600px] min-w-[1000px]  ">
+    <div className="flex flex-col md:flex-row gap-5 text-black px-7 min-h-[600px] min-w-[1000px]  ">
       <div className="fixed mt-2 flex  gap-2 items-end">
         <img
           className=""
@@ -29,7 +30,7 @@ export default function PreviewContent({ data }: NotepadContentProps) {
           style={{ backgroundImage: 'url("/images/notepad/v2/notepad_5.png")', width: 465, height: 460 }}
         />
 
-        <div className="relative flex items-center px-15 pt-5 text-gray-700 w-full h-[400px] ">
+        <div className="relative  flex items-center px-13 pt-5 text-gray-700 w-full h-[400px] ">
           <div className="gap-3 flex flex-col ">
             <h2 className="text-4xl " style={{ fontFamily: "SangSangShinb7" }}>
               제목 : {name}
@@ -40,8 +41,8 @@ export default function PreviewContent({ data }: NotepadContentProps) {
             >
               {description}
             </p>
-            <p className="text-2xl text-end " style={{ fontFamily: "SangSangShinb7" }}>
-              {updatedDate}
+            <p className="text-2xl text-end pr-2 w-[350px] " style={{ fontFamily: "SangSangShinb7" }}>
+              {formatDate(updatedDate)}
             </p>
           </div>
         </div>
