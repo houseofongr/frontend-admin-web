@@ -1,7 +1,7 @@
 import { formatDate } from "../../utils/formatDate";
-import { FcAudioFile } from "react-icons/fc";
 import CardLabel from "../label/CardLabel";
 import { SoundSource } from "../../types/sound";
+import { MdAudiotrack } from "react-icons/md";
 
 type SoundItemProps = {
   sound: SoundSource;
@@ -17,7 +17,10 @@ export default function SoundItem({ sound, onClick }: SoundItemProps) {
       <div className="group/edit">
         <div className="group-hover/edit:bg-gray-300/20">
           <div className="flex ">
-            <FcAudioFile size={40} />
+            <div className="px-1 pt-2">
+              <MdAudiotrack size={20} color="" />
+            </div>
+
             <div>
               <p className="text-[14px]">{sound.name}</p>
               <div className="text-xs text-gray-400">
