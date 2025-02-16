@@ -10,6 +10,7 @@ import RoomForm from "../../components/RoomForm";
 import RenderImages from "../../components/RenderImages";
 import Button from "../../components/common/buttons/Button";
 import { MAX_HOUSE_HEIGHT_SIZE } from "../../constants/formDataMaxLength";
+import ModalAlertMessage, { AlertType } from "../../components/common/ModalAlertMessage";
 
 export type HouseData = {
   house: HouseDetailInfo;
@@ -26,6 +27,11 @@ export default function HouseDetail() {
   const [scale, setScale] = useState<number | null>(null);
   const [isEditHouseInfo, setIsEditHouseInfo] = useState<boolean>(false);
   const [isEditRoomInfo, setIsEditRoomInfo] = useState<boolean>(false);
+  const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(null);
+
+  const showAlert = (text: string, type: AlertType) => {
+    setAlert({ text, type });
+  };
 
   const navigate = useNavigate();
 
@@ -39,21 +45,39 @@ export default function HouseDetail() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update house data");
+        let errorMessage = "하우스를 삭제하는데 실패하였습니다.";
+
+        try {
+          const errorData = await response.json();
+          errorMessage = `[ERROR CODE# ${errorData.code}]  ${errorData.message} ` || errorMessage;
+        } catch (jsonError) {
+          console.error("JSON 파싱 오류:", jsonError);
+        }
+
+        showAlert(errorMessage, "fail");
+        return;
       }
 
       const result = await response.json();
-      //  * todo :house delete 성공 모달창으로 보여주기
-      console.log("House deleted successfully:", result.message);
-      alert(result.message);
+      showAlert(`${result.message}`, "success");
       navigate("/houses");
     } catch (error) {
-      console.error("Error updating house data:", error);
+      console.error("네트워크 또는 서버 오류:", error);
+      showAlert(`하우스 삭제하는 중 오류가 발생하였습니다. ${error}`, "fail");
     }
   };
 
   const houseDataSubmitHandler = async () => {
-    if (!houseData) return;
+    if (!houseData || !editableData) return;
+
+    const isTitleChanged = editableData.house.title !== houseData.house.title;
+    const isAuthorChanged = editableData.house.author !== houseData.house.author;
+    const isDescriptionChanged = editableData.house.description !== houseData.house.description;
+
+    if (!isTitleChanged && !isAuthorChanged && !isDescriptionChanged) {
+      showAlert("변경된 값이 없습니다.", "warning");
+      return;
+    }
 
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/houses/${houseId}`, {
@@ -69,16 +93,25 @@ export default function HouseDetail() {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to update house data");
+        let errorMessage = "하우스 데이터를 업데이트하는데 실패했습니다.";
+
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          console.error("JSON 파싱 오류:", jsonError);
+        }
+
+        showAlert(errorMessage, "fail");
+        return;
       }
-      // * todo :house update 성공 모달창으로 보여주기
-      const result = await response.json();
-      console.log("House data updated successfully:", result);
+      const { message } = await response.json();
+      showAlert(`${message}`, "success");
 
       setIsEditHouseInfo(false);
       setHouseData((prev) => (prev ? { ...prev, house: { ...prev.house, ...editableData?.house } } : null));
     } catch (error) {
-      console.error("Error updating house data:", error);
+      showAlert(`하우스 데이터를 업데이트 하는 중 에러가 발생하였습니다. error : ${error}`, "fail");
     }
   };
 
@@ -93,8 +126,7 @@ export default function HouseDetail() {
       }));
 
     if (changedRooms.length === 0) {
-      // * todo : 모달창
-      alert("변경된 방 이름이 없습니다.");
+      showAlert(`변경된 방 이름이 존재하지 않습니다.`, "warning");
       return;
     }
 
@@ -107,13 +139,24 @@ export default function HouseDetail() {
         body: JSON.stringify(changedRooms),
       });
 
+      const status = response.status;
       if (!response.ok) {
-        throw new Error("Failed to update room data");
+        let errorMessage = "룸 데이터를 업데이트하는데 실패했습니다.";
+
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          console.error("JSON 파싱 오류:", jsonError);
+        }
+
+        showAlert(errorMessage, "fail");
+        return;
       }
 
-      const result = await response.json();
-      // * todo : 모달창
-      console.log("Room data updated successfully:", result);
+      if (status === 200) {
+        showAlert("룸 정보 업데이트가 완료되었습니다.", "success");
+      }
 
       setIsEditRoomInfo(false);
       setHouseData((prev) => {
@@ -125,7 +168,7 @@ export default function HouseDetail() {
         return { ...prev, rooms: updatedRooms };
       });
     } catch (error) {
-      console.error("Error updating room data:", error);
+      showAlert(`룸 데이터를 업데이트 하는데 에러가 발생하였습니다. error : ${error}`, "fail");
     }
   };
 
@@ -147,9 +190,6 @@ export default function HouseDetail() {
       try {
         const response = await fetch(`${API_CONFIG.BACK_API}/houses/${houseId}`);
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch house data");
-        }
         const data = await response.json();
         const roomsEditableData = data.rooms.map((room: Room) => ({
           imageId: room.imageId,
@@ -184,14 +224,12 @@ export default function HouseDetail() {
     const fetchHouseData = async () => {
       try {
         const response = await fetch(`${API_CONFIG.BACK_API}/houses/${houseId}`);
-        if (!response.ok) throw new Error("Failed to fetch house data");
-
         const data = await response.json();
-        console.log("data checking", data);
+
         setHouseData(data);
         setRooms(data.rooms);
       } catch (error) {
-        console.error(error);
+        showAlert(`하우스 데이터 조회하는데 실패하였습니다.. error : ${error}`, "fail");
       } finally {
         setLoading(false);
       }
@@ -211,6 +249,14 @@ export default function HouseDetail() {
   }
   return (
     <div className="w-full h-full flex items-center">
+      {alert && (
+        <ModalAlertMessage
+          text={alert.text}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+          okButton={<Button label="확인" onClick={() => setAlert(null)} />}
+        />
+      )}
       <section className="w-1/5 h-full flex flex-col gap-4 overflow-scroll">
         <div className="w-full pt-6  px-3 flex justify-between items-center">
           <ArrowBackIcon href="/houses" />

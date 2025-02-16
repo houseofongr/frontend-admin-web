@@ -6,6 +6,7 @@ import API_CONFIG from "../../config/api";
 import CardLabel from "../../components/label/CardLabel";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
 import Button from "../../components/common/buttons/Button";
+import ModalAlertMessage, { AlertType } from "../../components/common/ModalAlertMessage";
 
 export default function RoomDetail() {
   const { rooms } = useRoomContext();
@@ -13,17 +14,19 @@ export default function RoomDetail() {
 
   const navigate = useNavigate();
   const [roomData, setRoomData] = useState<BaseRoom | null>(null);
+  const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(null);
 
+  const showAlert = (text: string, type: AlertType) => {
+    setAlert({ text, type });
+  };
   const navigateOtherRoomDetailPage = () => {
     const currentIndex = rooms.findIndex((room) => room.roomId === Number(roomId));
     const nextIndex = (currentIndex + 1) % rooms.length;
     const nextRoom = rooms[nextIndex];
-    console.log("nextRoom", nextIndex, nextRoom);
-    console.log("curIndex", currentIndex);
 
     if (nextIndex === currentIndex) {
-      // 방이 하나만 존재하는 경우
-      alert("더이상 방이 존재하지 않습니다!");
+      // 방이 하나일때
+      showAlert("더이상 방이 존재하지 않습니다!", "info");
     }
 
     if (nextRoom) {
@@ -32,7 +35,6 @@ export default function RoomDetail() {
   };
 
   const navigateHouseListPage = () => {
-    // 뒤로 가기 불가능
     navigate("/houses", { replace: true });
   };
 
@@ -82,6 +84,15 @@ export default function RoomDetail() {
           className="max-w-full max-h-full "
         />
       </div>
+
+      {alert && (
+        <ModalAlertMessage
+          text={alert.text}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+          okButton={<Button label="확인" onClick={() => setAlert(null)} />}
+        />
+      )}
     </div>
   );
 }

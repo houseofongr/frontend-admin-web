@@ -25,7 +25,6 @@ const initialData = {
 };
 
 export default function NewSoundForm({ itemId, soundOriginData, soundId }: SoundFormProps) {
-  console.log("itemID", itemId);
   const [soundMetaData, setSoundMetaData] = useState<SoundMetadata>(initialData);
   const [file, setFile] = useState<File | null>(null);
   const [isEdit, setIsEdit] = useState<boolean>(false);

@@ -20,7 +20,6 @@ export default function SoundSources() {
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/sound-sources?page=${currentPage}&size=${size}`);
       const { soundSources, pagination } = await response.json();
-      console.log("sounds", soundSources);
 
       setSounds(soundSources);
       setTotalPages(pagination.totalPages);

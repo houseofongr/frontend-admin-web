@@ -96,21 +96,27 @@ export default function HouseEditorPage() {
         body: formData,
       });
 
-      if (response.ok) {
-        const result = await response.json();
-        const { houseId } = result;
-        if (houseId) {
-          setNewHouseId(houseId);
-          showAlert(`새로운 ${houseId}번 하우스가 성공적으로 저장되었습니다.`, "success");
-          // navigate(`/houses/${houseId}`);
+      if (!response.ok) {
+        let errorMessage = "새로운 하우스 데이터를 생성하는데 실패하였습니다.";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          console.error("JSON 파싱 오류:", jsonError);
         }
-      } else {
-        const error = await response.json();
-        showAlert(`새로운 하우스 데이터 저장에 실패하였습니다. error: ${error}`, "fail");
+
+        showAlert(errorMessage, "fail");
+        return;
+      }
+
+      const { houseId } = await response.json();
+
+      if (houseId) {
+        setNewHouseId(houseId);
+        showAlert(`새로운 ${houseId}번 하우스가 성공적으로 저장되었습니다.`, "success");
       }
     } catch (error) {
-      console.error("Error saving data:", error);
-      showAlert(`데이터 저장 중 오류가 발생했습니다. error:${error}`, "fail");
+      showAlert(`데이터 저장 중 오류가 발생하였습니다. error:${error}`, "fail");
     }
   };
 
@@ -127,7 +133,7 @@ export default function HouseEditorPage() {
           okButton={<Button label="확인" onClick={() => setAlert(null)} />}
         />
       )}
-
+      {/* house 생성 성공 시 모달창 -> 확인-> 상세페이지로 이동 */}
       {alert?.type === "success" && (
         <ModalAlertMessage
           text={alert.text}

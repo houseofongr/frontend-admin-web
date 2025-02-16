@@ -6,7 +6,7 @@ import API_CONFIG from "../../config/api";
 import Modal from "../../components/Modal";
 import HomeCard from "../../components/user/HomeCard";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
-import ModalAlertMessage from "../../components/common/ModalAlertMessage";
+import ModalAlertMessage, { AlertType } from "../../components/common/ModalAlertMessage";
 import Button from "../../components/common/buttons/Button";
 
 interface UserHome {
@@ -26,6 +26,11 @@ export default function UserHomeList() {
   const [isOpenModal, setIsOpenModal] = useState<boolean>(false);
   const [homeToDelete, setHomeToDelete] = useState<number | null>(null);
   const [newHomeId, setNewHomeId] = useState<number | null>(null);
+  const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(null);
+
+  const showAlert = (text: string, type: AlertType) => {
+    setAlert({ text, type });
+  };
 
   const navigate = useNavigate();
 
@@ -41,6 +46,7 @@ export default function UserHomeList() {
 
       setUserHomes(data.homes);
     } catch (error) {
+      showAlert(`유저의 홈 목록 데이저 조회에 실패하였습니다. error : ${error}`, "fail");
       console.error("Failed to fetch user homes:", error);
     }
   };
@@ -48,9 +54,6 @@ export default function UserHomeList() {
   const getAdminHouseList = async () => {
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/houses`);
-      if (!response.ok) {
-        throw new Error("Failed to fetch houses");
-      }
       const { houses } = await response.json();
       // 유저가 가지고 있는 하우스 ID 리스트 추출
       const houseTemplateIds = userHomes ? userHomes.map((home) => home.baseHouse.id) : [];
@@ -58,7 +61,7 @@ export default function UserHomeList() {
       setAdminHouses(filteredHouses);
       setIsOpenModal(true);
     } catch (error) {
-      console.error("유저의 집 목록 페이지에서 관리자 하우스 목록 fetching error:", error);
+      showAlert(`관리자가 가지고 있는 하우스 템플릿 목록 조회에 실패하였습니다. error : ${error}`, "fail");
     }
   };
 
@@ -66,10 +69,9 @@ export default function UserHomeList() {
   const registHomeToUsertHandler = async (houseId: number) => {
     // const userId = parseInt(params.userId);
     if (!userId || !houseId) {
-      console.error("Invalid userId or houseId");
+      showAlert(`유효하지 않은 유저ID 이거나 하우스ID 입니다.`, "fail");
       return;
     }
-    console.log(userId, houseId);
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/homes`, {
         method: "POST",
@@ -81,21 +83,30 @@ export default function UserHomeList() {
           houseId,
         }),
       });
+
       if (!response.ok) {
-        throw new Error("Failed to assign house to user");
+        let errorMessage = "유저에게 새로운 집 할당에 실패하였습니다.";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          console.error("JSON 파싱 오류:", jsonError);
+        }
+
+        showAlert(errorMessage, "fail");
+        return;
       }
 
       const result = await response.json();
       setNewHomeId(result.createdHomeId);
       fetchUserHomes(userId);
       setIsOpenModal(false);
+      showAlert(`해당 유저에게 새로운 집 등록이 완료되었습니다.`, "success");
     } catch (error) {
-      console.log("유저에게 홈 할당 에러 발생", error);
+      showAlert(`유저에게 새로운 홈 할당 오류 발생하였습니다. error: ${error}`, "fail");
     }
   };
 
-  // 유저의 홈 상세페이지로 이동
-  // 하우스 템플릿 아이디 로컬스토리지에 저장
   const navigateUserHome = (homeId: number) => {
     if (homeId) {
       const selectedHome = userHomes?.find((home) => home.id === homeId);
@@ -105,14 +116,13 @@ export default function UserHomeList() {
       navigate(`/users/${userId}/${homeId}`);
     }
   };
-  //  홈 삭제 핸들러
+
   const homeDeleteHandler = async (homeId: number) => {
     if (!homeToDelete) {
       console.error("No home selected for deletion");
       return;
     }
 
-    // const userId = parseInt(userId);
     if (!userId || !homeId) {
       console.error("Invalid userId or homeId");
       return;
@@ -130,9 +140,9 @@ export default function UserHomeList() {
       const { message } = await response.json();
       fetchUserHomes(userId);
       closeModal();
-      console.log("유저의 집 삭제 성공:", message);
+      showAlert(`${message}`, "success");
     } catch (error) {
-      console.log("유저의 홈 삭제 에러 발생", error);
+      showAlert(`유저의 홈 삭제 중 오류가 발생하였습니다. error:${error}`, "fail");
     }
   };
   useEffect(() => {
@@ -146,6 +156,14 @@ export default function UserHomeList() {
   else {
     return (
       <div className="w-full flex flex-col items-center">
+        {alert && (
+          <ModalAlertMessage
+            text={alert.text}
+            type={alert.type}
+            onClose={() => setAlert(null)}
+            okButton={<Button label="확인" onClick={() => setAlert(null)} />}
+          />
+        )}
         <section className="w-full h-full flex justify-center mt-[25%] md:mt-[25%] lg:mt-[15%] mb-[5%]">
           <div className="w-[60%]">
             <div className="flex justify-between items-center py-4">

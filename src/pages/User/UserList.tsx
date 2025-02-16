@@ -20,7 +20,6 @@ export default function UserList() {
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/users?page=${currentPage}&size=${size}`);
       const { users, pagination } = await response.json();
-      console.log("usrs", users, pagination);
       setUsers(users);
       setTotalPages(pagination.totalPages);
       setTotalItems(pagination.totalElements);
