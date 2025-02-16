@@ -39,7 +39,6 @@ export const ImageProvider = ({ children }: { children: ReactNode }) => {
   const [houseImage, setHouseImage] = useState<HouseData | null>(null);
   const [borderImage, setBorderImage] = useState<ImageData | null>(null);
   const [roomImages, setRoomImages] = useState<RoomImageData[]>([]);
-  console.log("borderImage", borderImage);
 
   const updateRoomTitle = (index: number, newTitle: string) => {
     setRoomImages((prev) => prev.map((item, i) => (i == index ? { ...item, title: newTitle } : item)));
@@ -60,7 +59,7 @@ export const ImageProvider = ({ children }: { children: ReactNode }) => {
 
       img.onload = () => {
         const { width, height } = img;
-        console.log("img onload : ", width, height);
+
         resolve({ index, width, height });
       };
 
@@ -86,7 +85,6 @@ export const ImageProvider = ({ children }: { children: ReactNode }) => {
 
         // valid 가 되는 조건 dimension.w = 5000, dimension.h=5000
         if (!isValid) {
-          console.log(type, "isValid 통과 x");
           alert(
             `현재 이미지의 사이즈 ${dimension.width} x ${dimension.height}입니다. 사이즈는 반드시 5000 x 5000 이어야 합니다.`
           );
@@ -94,7 +92,6 @@ export const ImageProvider = ({ children }: { children: ReactNode }) => {
         }
 
         if (type === "house") {
-          console.log("isValid house 통과");
           setHouseImage({
             file: newFiles[0],
             title: "",
@@ -104,8 +101,6 @@ export const ImageProvider = ({ children }: { children: ReactNode }) => {
             height: dimension.height,
           });
         } else if (type === "border") {
-          console.log("isValid border 통과");
-
           setBorderImage({
             file: newFiles[0],
             title: "aoo-border-title",

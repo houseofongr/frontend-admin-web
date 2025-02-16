@@ -11,8 +11,8 @@ const Navigator = () => {
   const pathName = location.pathname;
 
   return (
-    <nav className="md:pt-0 md:pb-0 lg:pt-10 lg:pb-3 w-full flex justify-end md:justify-center text-sm">
-      <ul className="flex gap-10 lg:gap-16 pr-4 md:pr-0">
+    <nav className="md:pt-0 lg:pt-10 w-full flex justify-end md:justify-center text-xs md:text-sm">
+      <ul className="flex gap-5 lg:gap-16 pr-4 md:pr-0">
         {TABS.map(({ label, href }) => {
           const isActive = pathName === href;
           return (

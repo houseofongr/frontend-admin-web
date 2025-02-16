@@ -14,6 +14,7 @@ import NewUserRoomDetail from "./pages/User/NewUserRoomDetail";
 import SoundSources from "./pages/SoundSources";
 import FirstVerificationLogin from "./pages/Login/FirstVerificationLogin";
 import SecondVerificationLogin from "./pages/Login/SecondVerificationLogin";
+import NotFoundPage from "./pages/NotFound";
 
 function App() {
   return (
@@ -57,6 +58,7 @@ function App() {
           <Route path="/users/:userId/:homeId/:roomId" element={<NewUserRoomDetail />} />
 
           <Route path="/sound-sources" element={<SoundSources />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Routes>
       </RootLayout>
     </BrowserRouter>
