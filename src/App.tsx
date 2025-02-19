@@ -12,8 +12,9 @@ import UserHomeList from "./pages/User/UserHomeList";
 import UserHomeDetail from "./pages/User/UserHomeDetail";
 import NewUserRoomDetail from "./pages/User/NewUserRoomDetail";
 import SoundSources from "./pages/SoundSources";
-import FirstVerificationLogin from "./pages/Login/FirstVerificationLogin";
-import SecondVerificationLogin from "./pages/Login/SecondVerificationLogin";
+import FirstAuthenticationLogin from "./pages/Login/FirstAuthenticationLogin";
+import SecondAuthenticationLogin from "./pages/Login/SecondAuthenticationLogin";
+import ThirdAuthenticationLogin from "./pages/Login/ThirdAuthenticationLogin";
 import NotFoundPage from "./pages/NotFound";
 
 function App() {
@@ -22,8 +23,9 @@ function App() {
       <RootLayout>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<FirstVerificationLogin />} />
-          <Route path="/login/2nd" element={<SecondVerificationLogin />} />
+          <Route path="/login" element={<FirstAuthenticationLogin />} />
+          <Route path="/login/2nd" element={<SecondAuthenticationLogin />} />
+          <Route path="/login/3rd" element={<ThirdAuthenticationLogin />} />
 
           <Route path="/houses" element={<HouseList />} />
           <Route

@@ -17,7 +17,7 @@ const Navigator = () => {
           const isActive = pathName === href;
           return (
             <li key={label}>
-              <Link to={href} className={`${isActive ? "text-black font-semibold" : ""} hover:text-slate-600`}>
+              <Link to={href} className={`${isActive ? " font-semibold" : ""} hover:text-slate-600`}>
                 {label}
               </Link>
             </li>

@@ -6,8 +6,10 @@ import CustomInput from "../../components/CustomInput";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import LoginButton from "../../components/common/buttons/LoginButton";
 import API_CONFIG from "../../config/api";
+import StepIndicator from "../../components/StepIndicator";
+import LoginLayout from "../../components/layout/LoginLayout";
 
-export default function FirstVerificationLogin() {
+export default function FirstAuthenticationLogin() {
   const [isAnimationComplete, setIsAnimationComplete] = useState<boolean>(false);
   const [formData, setFormData] = useState({
     username: "",
@@ -64,24 +66,22 @@ export default function FirstVerificationLogin() {
         // redirect: "manual", //fetch가 자동 리다이렉트 하지 않도록 설정
       });
 
-      // 백에서 리다이렉트 처리:  성공 시 메인 페이지, 실패 시 로그인 페이지
+      if (response.status === 302) {
+        const redirectUrl = response.headers.get("Location");
+        console.log("Redirect Location:", redirectUrl);
 
-      // if (response.status === 302) {
-      //   const location = response.headers.get("Location");
-      //   console.log("Redirect Location:", location);
-      //   // navigate("/houses");
-      //   if (location) {
-      //     window.location.href = location;
-      //   }
-      // } else {
-      if (!response.ok) {
-        setMessage("로그인에 실패했습니다. 관리자가 맞나요?");
-        setFormData({
-          username: "",
-          password: "",
-        });
+        if (redirectUrl) {
+          window.location.href = redirectUrl;
+        }
+      } else {
+        if (!response.ok) {
+          setMessage("로그인에 실패했습니다. 아오옹의 관리자가 맞나요?");
+          setFormData({
+            username: "",
+            password: "",
+          });
+        }
       }
-      // }
     } catch (error) {
       console.error("Login error:", error);
       setMessage("서버와 통신 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
@@ -97,7 +97,8 @@ export default function FirstVerificationLogin() {
   }, []);
 
   return (
-    <div className="flex-center relative h-full w-full">
+    <LoginLayout>
+      <StepIndicator />
       <motion.div
         initial={{ y: 0 }}
         animate={{ y: -100 }}
@@ -113,7 +114,7 @@ export default function FirstVerificationLogin() {
         <motion.form
           onSubmit={formSubmitHandler}
           initial={{ opacity: 0, y: 180 }}
-          animate={{ opacity: 1, y: 120 }}
+          animate={{ opacity: 1, y: 120 }} //  * 반응형 구현 시 : mobile 에선 y : 80 , 노트북에서는 y: 120 동적 구현
           transition={{ duration: 0.7 }}
           className="absolute z-10 flex-center flex-col gap-2"
         >
@@ -147,6 +148,6 @@ export default function FirstVerificationLogin() {
           </div>
         </motion.form>
       )}
-    </div>
+    </LoginLayout>
   );
 }
