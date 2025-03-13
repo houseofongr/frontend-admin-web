@@ -1,9 +1,9 @@
 import SoundItem from "./SoundItem";
 import { ItemSoundsData } from "../../types/sound";
 import { useState } from "react";
-import Modal from "../Modal";
-import PreviewContent from "./PreviewContent";
+import Modal from "../modal/Modal";
 import { PiMonitorPlay } from "react-icons/pi";
+import ModalContent from "./PreviewContent";
 
 type SoundListProps = {
   sounds: ItemSoundsData;
@@ -45,7 +45,7 @@ export default function ItemSoundList({ sounds, onSoundSelect }: SoundListProps)
       </ul>
       {openPreview && currentSound !== null && (
         <Modal onClose={modalHandler} bgColor="dark">
-          <PreviewContent data={sounds.soundSource.find((sound) => sound.id === currentSound)!} />
+          <ModalContent data={sounds.soundSource.find((sound) => sound.id === currentSound)!} />
         </Modal>
       )}
     </section>

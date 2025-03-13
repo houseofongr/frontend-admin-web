@@ -10,7 +10,7 @@ import RoomForm from "../../components/RoomForm";
 import RenderImages from "../../components/RenderImages";
 import Button from "../../components/common/buttons/Button";
 import { MAX_HOUSE_HEIGHT_SIZE } from "../../constants/formDataMaxLength";
-import ModalAlertMessage, { AlertType } from "../../components/common/ModalAlertMessage";
+import ModalAlertMessage, { AlertType } from "../../components/modal/ModalAlertMessage";
 
 export type HouseData = {
   house: HouseDetailInfo;
@@ -29,6 +29,7 @@ export default function HouseDetail() {
   const [isEditRoomInfo, setIsEditRoomInfo] = useState<boolean>(false);
   const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(null);
 
+  console.log("house data", houseData);
   const showAlert = (text: string, type: AlertType) => {
     setAlert({ text, type });
   };

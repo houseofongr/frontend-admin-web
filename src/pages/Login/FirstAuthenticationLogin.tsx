@@ -6,7 +6,6 @@ import CustomInput from "../../components/CustomInput";
 import { IoAlertCircleOutline } from "react-icons/io5";
 import LoginButton from "../../components/common/buttons/LoginButton";
 import API_CONFIG from "../../config/api";
-import StepIndicator from "../../components/StepIndicator";
 import LoginLayout from "../../components/layout/LoginLayout";
 
 export default function FirstAuthenticationLogin() {
@@ -98,7 +97,7 @@ export default function FirstAuthenticationLogin() {
 
   return (
     <LoginLayout>
-      <StepIndicator />
+      {/* <StepIndicator /> */}
       <motion.div
         initial={{ y: 0 }}
         animate={{ y: -100 }}

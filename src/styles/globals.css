@@ -86,6 +86,7 @@ body {
   height: 100vh;
   color: #434a40;
   box-sizing: border-box;
+  font-family: "Apple SD Gothic Neo";
 }
 
 /* 스크롤바 숨기면서 스크롤링 기능은 허용 */
@@ -104,17 +105,8 @@ section::-webkit-scrollbar {
   display: none; /* for Chrome, Safari, and Opera */
 }
 
-header,
-button,
-div,
-p,
-span {
-  font-family: "Apple SD Gothic Neo";
-}
-
 h1,
-h2,
-h3 {
+h2 {
   font-family: "GabiaNull-Regular";
 }
 
@@ -142,7 +134,6 @@ input::-webkit-slider-thumb {
 ul,
 li {
   margin: 0;
-  /* padding: 0; */
 }
 
 button {

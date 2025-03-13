@@ -38,11 +38,11 @@ export default function HomeCard({ home, isNew, onNavigate, onDelete }: UserHome
           <span className="mr-2">설명</span>
           <span className="font-light overflow-hidden">{home.baseHouse.description}</span>
         </div>
-        <div>
+        {/* <div>
           <span className="mr-2">음원 개수</span>
-          <span className="font-light">10개</span>
-        </div>
-        <p className="text-sm font-thin text-gray-400">
+          <span className="font-light">- 개</span>
+        </div> */}
+        <p className="text-sm font-extralight">
           생성일 {formatDate(home.updatedDate)} / 수정일 {formatDate(home.updatedDate)}
         </p>
       </div>

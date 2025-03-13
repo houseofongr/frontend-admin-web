@@ -8,7 +8,7 @@ import KonvaContainer from "../../components/itemEditor/KonvaContainer";
 import SlideBar from "../../components/itemEditor/SlideBar";
 import { formatShapeData } from "../../utils/formatShapeData";
 import RoomDetailLayout from "../../components/layout/RoomDetailLayout";
-import ModalAlertMessage, { AlertType } from "../../components/common/ModalAlertMessage";
+import ModalAlertMessage, { AlertType } from "../../components/modal/ModalAlertMessage";
 import Button from "../../components/common/buttons/Button";
 
 type UpdateItemsPayload = {

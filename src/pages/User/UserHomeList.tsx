@@ -3,11 +3,12 @@ import { BaseHouse } from "../../types/house";
 import { useEffect, useState } from "react";
 import HouseTemplates, { AdminHouse } from "../../components/user/HouseTemplates";
 import API_CONFIG from "../../config/api";
-import Modal from "../../components/Modal";
+import Modal from "../../components/modal/Modal";
 import HomeCard from "../../components/user/HomeCard";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
-import ModalAlertMessage, { AlertType } from "../../components/common/ModalAlertMessage";
+import ModalAlertMessage, { AlertType } from "../../components/modal/ModalAlertMessage";
 import Button from "../../components/common/buttons/Button";
+import PageLayout from "../../components/layout/PageLayout";
 
 interface UserHome {
   id: number;
@@ -155,7 +156,38 @@ export default function UserHomeList() {
   if (!userHomes) return <SpinnerIcon />;
   else {
     return (
-      <div className="w-full flex flex-col items-center">
+      <PageLayout>
+        <div className="w-[65%] py-10 md:py-20">
+          <div className="flex justify-between items-center pb-4">
+            <h2 className="text-lg font-bold">
+              {userHomes.length > 0 ? (
+                <>
+                  {userHomes[0]?.user?.nickname} 님의 집 ({`${userHomes.length}`})
+                </>
+              ) : (
+                ""
+              )}
+            </h2>
+            <Button label="ADD" onClick={getAdminHouseList} />
+          </div>
+
+          {userHomes.length === 0 ? (
+            <div className="h-[300px] flex-center">해당 유저에게 할당된 집이 존재하지 않습니다.</div>
+          ) : (
+            <ul className="mt-10 grid grid-cols-2 gap-8">
+              {userHomes.map((home) => (
+                <HomeCard
+                  key={home.id}
+                  home={home}
+                  isNew={home.id === newHomeId}
+                  onNavigate={navigateUserHome}
+                  onDelete={setHomeToDelete}
+                />
+              ))}
+            </ul>
+          )}
+        </div>
+
         {alert && (
           <ModalAlertMessage
             text={alert.text}
@@ -164,55 +196,23 @@ export default function UserHomeList() {
             okButton={<Button label="확인" onClick={() => setAlert(null)} />}
           />
         )}
-        <section className="w-full h-full flex justify-center mt-[25%] md:mt-[25%] lg:mt-[15%] mb-[5%]">
-          <div className="w-[60%]">
-            <div className="flex justify-between items-center py-4">
-              <h3 className="text-lg font-bold">
-                {userHomes.length > 0 ? (
-                  <>
-                    {userHomes[0]?.user?.nickname} 님의 집 ({`${userHomes.length}`})
-                  </>
-                ) : (
-                  ""
-                )}
-              </h3>
-              <Button label="ADD" onClick={getAdminHouseList} />
-            </div>
 
-            {userHomes.length === 0 ? (
-              <div className="h-[300px] flex-center">해당 유저에게 할당된 집이 존재하지 않습니다.</div>
-            ) : (
-              <ul className="mt-10 grid grid-cols-2 gap-8">
-                {userHomes.map((home) => (
-                  <HomeCard
-                    key={home.id}
-                    home={home}
-                    isNew={home.id === newHomeId}
-                    onNavigate={navigateUserHome}
-                    onDelete={setHomeToDelete}
-                  />
-                ))}
-              </ul>
-            )}
-          </div>
+        {isOpenModal && adminHouses && (
+          <Modal onClose={closeModal} bgColor="white">
+            <HouseTemplates adminHouses={adminHouses} registHomeToUsertHandler={registHomeToUsertHandler} />
+          </Modal>
+        )}
 
-          {isOpenModal && adminHouses && (
-            <Modal onClose={closeModal} bgColor="white">
-              <HouseTemplates adminHouses={adminHouses} registHomeToUsertHandler={registHomeToUsertHandler} />
-            </Modal>
-          )}
-
-          {homeToDelete && (
-            <ModalAlertMessage
-              text={`${userHomes[0].user.nickname}의 홈 ID# ${homeToDelete}을 홈 목록에서 삭제하시겠습니까? 등록된 아이템과 음원이 있다면 모두 삭제됩니다.`}
-              type="warning"
-              okButton={<Button label="확인" onClick={() => homeDeleteHandler(homeToDelete)} />}
-              cancelButton={<Button label="취소" onClick={closeModal} />}
-              onClose={closeModal}
-            />
-          )}
-        </section>
-      </div>
+        {homeToDelete && (
+          <ModalAlertMessage
+            text={`${userHomes[0].user.nickname}의 홈 ID# ${homeToDelete}을 홈 목록에서 삭제하시겠습니까? 등록된 아이템과 음원이 있다면 모두 삭제됩니다.`}
+            type="warning"
+            okButton={<Button label="확인" onClick={() => homeDeleteHandler(homeToDelete)} />}
+            cancelButton={<Button label="취소" onClick={closeModal} />}
+            onClose={closeModal}
+          />
+        )}
+      </PageLayout>
     );
   }
 }

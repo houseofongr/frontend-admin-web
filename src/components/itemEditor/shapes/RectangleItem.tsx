@@ -1,30 +1,34 @@
-import { Ellipse, Transformer } from "react-konva";
+import { Rect, Transformer } from "react-konva";
 import Konva from "konva";
 import { useEffect, useRef } from "react";
-import { EllipseData } from "../../types/items";
+import { RectangleData } from "../../../types/items";
 
-interface EllipseProps {
-  shapeProps: EllipseData["ellipseData"];
+interface RectangleProps {
+  shapeProps: RectangleData["rectangleData"];
   isSelected: boolean;
   onSelect: () => void;
-  onChange: (newAttrs: EllipseData["ellipseData"]) => void;
+  onChange: (newAttrs: RectangleData["rectangleData"]) => void;
   fill: string;
   isEditable: boolean;
 }
 
-function EllipseItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable }: EllipseProps) {
-  const shapeRef = useRef<Konva.Ellipse | null>(null);
+function RectItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable }: RectangleProps) {
+  const shapeRef = useRef<Konva.Rect | null>(null);
   const trRef = useRef<Konva.Transformer | null>(null);
 
   useEffect(() => {
     if (isSelected && trRef.current && shapeRef.current) {
       trRef.current.nodes([shapeRef.current]);
-      trRef.current.getLayer()?.batchDraw();
+      const layer = trRef.current.getLayer();
+      if (layer) {
+        layer.batchDraw();
+      }
     }
   }, [isSelected]);
+
   return (
     <>
-      <Ellipse
+      <Rect
         {...shapeProps}
         draggable
         listening={isEditable}
@@ -48,7 +52,8 @@ function EllipseItem({ shapeProps, isSelected, onSelect, onChange, fill, isEdita
           if (!node) return;
           const scaleX = node.scaleX();
           const scaleY = node.scaleY();
-          const rotation = node.rotation();
+          const newWidth = Math.max(5, node.width() * scaleX);
+          const newHeight = Math.max(5, node.height() * scaleY);
 
           node.scaleX(1);
           node.scaleY(1);
@@ -57,13 +62,12 @@ function EllipseItem({ shapeProps, isSelected, onSelect, onChange, fill, isEdita
             ...shapeProps,
             x: node.x(),
             y: node.y(),
-            radiusX: Math.max(5, node.radiusX() * scaleX),
-            radiusY: Math.max(5, node.radiusY() * scaleY),
-            rotation: rotation,
+            width: newWidth,
+            height: newHeight,
+            rotation: node.rotation(),
           });
         }}
       />
-
       {isSelected && (
         <Transformer
           ref={trRef}
@@ -80,4 +84,4 @@ function EllipseItem({ shapeProps, isSelected, onSelect, onChange, fill, isEdita
   );
 }
 
-export default EllipseItem;
+export default RectItem;

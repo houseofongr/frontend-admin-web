@@ -2,7 +2,6 @@
 import API_CONFIG from "../../config/api";
 // import { useNavigate, useSearchParams } from "react-router-dom";
 import LoginLayout from "../../components/layout/LoginLayout";
-import StepIndicator from "../../components/StepIndicator";
 import InitHouseImage from "../../components/InitHouseImage";
 
 export default function SecondAuthenticationLogin() {
@@ -31,15 +30,15 @@ export default function SecondAuthenticationLogin() {
 
   return (
     <LoginLayout>
-      <StepIndicator />
+      {/* <StepIndicator /> */}
       <section className="flex flex-col gap-10">
         <InitHouseImage />
         <div className="cursor-pointer">
           <img
             onClick={() => handleLogin("kakao")}
-            src={"/images/kakaoLoginButton.png"}
+            src={"/images/sns/kakaoLogin.png"}
             alt="kakaoLoginButton"
-            width={200} // 모바일에서는 150, 웹에서 200
+            width={200}
             height={100}
           />
         </div>

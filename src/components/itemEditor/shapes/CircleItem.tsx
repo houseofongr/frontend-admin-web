@@ -1,19 +1,19 @@
-import { Rect, Transformer } from "react-konva";
 import Konva from "konva";
 import { useEffect, useRef } from "react";
-import { RectangleData } from "../../types/items";
+import { Circle, Transformer } from "react-konva";
+import { CircleData } from "../../../types/items";
 
-interface RectangleProps {
-  shapeProps: RectangleData["rectangleData"];
+interface CircleProps {
+  shapeProps: CircleData["circleData"];
   isSelected: boolean;
   onSelect: () => void;
-  onChange: (newAttrs: RectangleData["rectangleData"]) => void;
+  onChange: (newAttrs: CircleData["circleData"]) => void;
   fill: string;
   isEditable: boolean;
 }
 
-function RectItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable }: RectangleProps) {
-  const shapeRef = useRef<Konva.Rect | null>(null);
+function CircleItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable }: CircleProps) {
+  const shapeRef = useRef<Konva.Circle | null>(null);
   const trRef = useRef<Konva.Transformer | null>(null);
 
   useEffect(() => {
@@ -28,11 +28,11 @@ function RectItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable
 
   return (
     <>
-      <Rect
+      <Circle
         {...shapeProps}
+        fill={fill}
         draggable
         listening={isEditable}
-        fill={fill}
         opacity={0.6}
         stroke={"red"}
         strokeWidth={2}
@@ -44,27 +44,26 @@ function RectItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable
             ...shapeProps,
             x: e.target.x(),
             y: e.target.y(),
-            rotation: e.target.rotation(),
           });
         }}
         onTransformEnd={() => {
+          //radius transform
           const node = shapeRef.current;
           if (!node) return;
+
           const scaleX = node.scaleX();
           const scaleY = node.scaleY();
-          const newWidth = Math.max(5, node.width() * scaleX);
-          const newHeight = Math.max(5, node.height() * scaleY);
 
           node.scaleX(1);
           node.scaleY(1);
+
+          const newRadius = Math.max(5, node.radius() * Math.max(scaleX, scaleY));
 
           onChange({
             ...shapeProps,
             x: node.x(),
             y: node.y(),
-            width: newWidth,
-            height: newHeight,
-            rotation: node.rotation(),
+            radius: newRadius,
           });
         }}
       />
@@ -84,4 +83,4 @@ function RectItem({ shapeProps, isSelected, onSelect, onChange, fill, isEditable
   );
 }
 
-export default RectItem;
+export default CircleItem;

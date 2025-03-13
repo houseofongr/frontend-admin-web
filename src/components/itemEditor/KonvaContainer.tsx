@@ -2,15 +2,15 @@ import { Stage, Layer, Image as KonvaImage } from "react-konva";
 import { Dispatch, SetStateAction } from "react";
 import { ShapeData } from "../../types/items";
 import Konva from "konva";
-import RectItem from "./RectangleItem";
-import CircleItem from "./CircleItem";
-import EllipseItem from "./EllipseItem";
 import SpinnerIcon from "../icons/SpinnerIcon";
 import ShapeSelectorTool from "./ShapeSelectorTool";
 import { RectangleShape, CircleShape, EllipseShape } from "../../constants/initialShapeData";
 import CircleButton from "../common/buttons/CircleButton";
 import { BsTrash3 } from "react-icons/bs";
 import { ImageSize } from "../../utils/formatShapeData";
+import RectItem from "./shapes/RectangleItem";
+import CircleItem from "./shapes/CircleItem";
+import EllipseItem from "./shapes/EllipseItem";
 
 type KonvaContainerProps = {
   shapes: ShapeData[];

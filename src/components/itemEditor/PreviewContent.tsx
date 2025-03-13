@@ -7,7 +7,7 @@ type NotepadContentProps = {
   data: SoundSource;
 };
 
-export default function PreviewContent({ data }: NotepadContentProps) {
+export default function ModalContent({ data }: NotepadContentProps) {
   const { name, description, audioFileId, updatedDate } = data;
 
   return (

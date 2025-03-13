@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import ContainerTitle from "../ContainerTitle";
 import HouseImageInfoForm from "./HouseInfoForm";
 import { useImageContext } from "../../context/ImageContext";
-import AlertMessage, { AlertType } from "../common/ModalAlertMessage";
+import AlertMessage, { AlertType } from "../modal/ModalAlertMessage";
 import FileUploadButton from "../common/buttons/FileUploadButton";
 import Button from "../common/buttons/Button";
 import FileName from "./FileName";

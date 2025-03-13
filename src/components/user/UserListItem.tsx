@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { User } from "../../types/user";
 import { formatDate } from "../../utils/formatDate";
 import CircleButton from "../common/buttons/CircleButton";
-import { userListHeaderTitles } from "../../constants/listHeader";
+import { userListHeaderTitles } from "../../constants/headerList";
 import { BsHouseAdd } from "react-icons/bs";
 
 interface UserListItemProps {

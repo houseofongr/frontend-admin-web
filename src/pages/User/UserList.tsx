@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { User } from "../../types/user";
 import API_CONFIG from "../../config/api";
 import GridHeader from "../../components/GridHeader";
-import { userListHeaderTitles } from "../../constants/listHeader";
+import { userListHeaderTitles } from "../../constants/headerList";
 import { userSearchOptions } from "../../constants/searchOptions";
 import UserListItem from "../../components/user/UserListItem";
 import Pagination from "../../components/Pagination";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
 import SearchComponent from "../../components/SearchComponent";
+import PageLayout from "../../components/layout/PageLayout";
 
 export default function UserList() {
   const [users, setUsers] = useState<User[]>([]);
@@ -36,8 +37,8 @@ export default function UserList() {
   if (!users) return <SpinnerIcon />;
 
   return (
-    <div className="flex-center mt-[25%] md:mt-[25%] lg:mt-[15%]">
-      <div className="w-[65%]">
+    <PageLayout>
+      <section className="w-[65%]  py-10 md:py-20">
         <div className="flex items-center flex-col md:flex-row justify-between">
           <h1 className="font-bold text-base lg:text-lg">
             아・오・옹의 유저 {totalItems !== 0 && ` ・  ${totalItems} 명`}
@@ -59,7 +60,7 @@ export default function UserList() {
         {totalPages !== 0 && (
           <Pagination currentPage={currentPage} totalPages={totalPages} onPageChange={setCurrentPage} />
         )}
-      </div>
-    </div>
+      </section>
+    </PageLayout>
   );
 }

@@ -19,7 +19,7 @@ export default function SearchComponent({ onSearch, options }: SearchProp) {
     onSearch(filter, query);
   };
   return (
-    <div className="flex md:flex-row items-center gap-2 py-1 px-2">
+    <div className="hidden lg:flex items-center gap-2 py-1 px-2">
       <select
         value={filter}
         onChange={(e) => setFilter(e.target.value)}

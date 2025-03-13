@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { soundListHeaderTitles } from "../constants/listHeader";
+import { soundListHeaderTitles } from "../constants/headerList";
 import { SoundListItem as SoundItem } from "../types/sound";
 import CircleButton from "./common/buttons/CircleButton";
 import API_CONFIG from "../config/api";
@@ -76,7 +76,7 @@ export default function SoundListItem({ sound, currentPage, size, index }: Sound
         </a>
       </div>
 
-      <button type="button" onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+      <div onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
         <CircleButton
           hasBorder={false}
           label={
@@ -93,7 +93,7 @@ export default function SoundListItem({ sound, currentPage, size, index }: Sound
           }
           onClick={() => {}}
         />
-      </button>
+      </div>
     </li>
   );
 }

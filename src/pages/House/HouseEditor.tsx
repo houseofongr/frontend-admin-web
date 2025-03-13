@@ -8,7 +8,7 @@ import BorderImageUploader from "../../components/houseEditor/BorderImageUploade
 import RoomImagesUploader from "../../components/houseEditor/RoomImagesUploader";
 import BorderImagePreview from "../../components/houseEditor/BorderImagePreview";
 import DraggableItemWrapper from "../../components/houseEditor/DraggableItemWrapper";
-import ModalAlertMessage, { AlertType } from "../../components/common/ModalAlertMessage";
+import ModalAlertMessage, { AlertType } from "../../components/modal/ModalAlertMessage";
 import Button from "../../components/common/buttons/Button";
 
 export default function HouseEditorPage() {

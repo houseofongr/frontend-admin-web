@@ -28,7 +28,7 @@ const STEPS = [
 export default function StepIndicator() {
   const location = useLocation();
   const currentPath = location.pathname;
-  console.log("currentPath", currentPath);
+
   const currentStep = STEPS.findIndex((step) => step.path === currentPath);
   return (
     <ol className="hidden md:flex w-[23%] h-[40%] flex-col justify-between text-gray-200 border-s absolute left-20 md:ml-0 lg:ml-10">

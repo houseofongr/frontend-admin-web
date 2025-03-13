@@ -6,7 +6,7 @@ import API_CONFIG from "../../config/api";
 import CardLabel from "../../components/label/CardLabel";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
 import Button from "../../components/common/buttons/Button";
-import ModalAlertMessage, { AlertType } from "../../components/common/ModalAlertMessage";
+import ModalAlertMessage, { AlertType } from "../../components/modal/ModalAlertMessage";
 
 export default function RoomDetail() {
   const { rooms } = useRoomContext();
@@ -49,6 +49,7 @@ export default function RoomDetail() {
           throw new Error("Failed to fetch room data");
         }
         const data = await response.json();
+        console.log(data);
         setRoomData(data);
       } catch (error) {
         console.error("Error fetching room data:", error);

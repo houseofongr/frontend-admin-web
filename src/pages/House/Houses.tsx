@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import GridHouseList from "../../components/GridHouseList";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
 import Button from "../../components/common/buttons/Button";
+import PageLayout from "../../components/layout/PageLayout";
 
 export default function HouseList() {
   const [houses, setHouses] = useState<House[]>([]);
@@ -14,7 +15,7 @@ export default function HouseList() {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [totalItems, setTotalItems] = useState<number>(0);
-  const [size, setSize] = useState<number>(0);
+  const [size, setSize] = useState<number>(9);
   const [pageNum, setPageNum] = useState<number>(0);
 
   const fetchHouses = async () => {
@@ -61,27 +62,28 @@ export default function HouseList() {
 
   if (!filteredHouses) return <SpinnerIcon />;
   return (
-    <div className="mt-[25%] md:mt-[25%] lg:mt-[15%] mx-20">
-      {/* 타이틀 + 검색 컴포넌트 */}
-      <div className="flex items-center flex-col md:flex-row justify-between pb-10 ">
-        <h1 className="font-bold text-base md:text-lg ">
-          아・오・옹의 하우스 {totalItems !== 0 && ` ・ ${totalItems} 개`}
-        </h1>
-        <div className="flex justify-center items-center gap-5">
-          <SearchComponent onSearch={searchHandler} options={houseSearchOptions} />
-          <Link to={"/houses/house-editor"}>
-            <Button label="NEW" />
-          </Link>
+    <PageLayout>
+      <div className="w-[90%] flex flex-col  mx-8 py-10 md:py-20 ">
+        <div className="flex justify-between pb-10">
+          <h1 className="font-bold text-base md:text-lg ">
+            아・오・옹의 하우스 {totalItems !== 0 && ` ・ ${totalItems} 개`}
+          </h1>
+          <div className="flex justify-center items-center gap-5">
+            <SearchComponent onSearch={searchHandler} options={houseSearchOptions} />
+            <Link to={"/houses/house-editor"}>
+              <Button label="NEW" />
+            </Link>
+          </div>
         </div>
-      </div>
 
-      <GridHouseList
-        houses={filteredHouses}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-        totalPages={totalPages}
-        totalItems={totalItems}
-      />
-    </div>
+        <GridHouseList
+          houses={filteredHouses}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+        />
+      </div>
+    </PageLayout>
   );
 }
