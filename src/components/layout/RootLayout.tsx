@@ -30,7 +30,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     isUserRoomDetailPage;
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col">
       {!shouldHideLayout && <Header />}
       <QueryClientProvider client={queryClient}>
         <main className="w-full h-screen overflow-auto">{children}</main>

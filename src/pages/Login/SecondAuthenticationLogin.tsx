@@ -1,8 +1,8 @@
 // import { useEffect } from "react";
 import API_CONFIG from "../../config/api";
 // import { useNavigate, useSearchParams } from "react-router-dom";
-import LoginLayout from "../../components/layout/LoginLayout";
 import InitHouseImage from "../../components/InitHouseImage";
+import { FOOTER_HEIGHT, HEADER_HEIGHT } from "../../constants/size";
 
 export default function SecondAuthenticationLogin() {
   // useSearchParams : 현재 위치에 대한 url 의 쿼리 문자열을 읽고 처리하는데 사용. url의 ? 뒤에 있는 부분은 key-value 구조
@@ -29,7 +29,10 @@ export default function SecondAuthenticationLogin() {
   // }
 
   return (
-    <LoginLayout>
+    <div
+      className="flex-center flex-col md:pb-20"
+      style={{ minHeight: `calc(100vh - ${HEADER_HEIGHT}px - ${FOOTER_HEIGHT}px)` }}
+    >
       {/* <StepIndicator /> */}
       <section className="flex flex-col gap-10">
         <InitHouseImage />
@@ -43,6 +46,6 @@ export default function SecondAuthenticationLogin() {
           />
         </div>
       </section>
-    </LoginLayout>
+    </div>
   );
 }
