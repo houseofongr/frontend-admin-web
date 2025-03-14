@@ -2,7 +2,7 @@ import { RiPlayListFill } from "react-icons/ri";
 
 export default function NoDataNotice() {
   return (
-    <div className="w-full flex-col flex-center transition-opacity duration-300">
+    <div className="w-full flex-col flex-center py-5">
       <p> 조회를 요청한 데이터가 없습니다.</p>
       <div>
         각 아이템의 오른쪽 리스트 아이콘

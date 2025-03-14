@@ -61,7 +61,6 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
       queryClient.invalidateQueries({
         queryKey: ["itemSounds", itemId],
       });
-      // setSoundMetaData(initialData);
       resetForm();
     },
     onError: (error) => {

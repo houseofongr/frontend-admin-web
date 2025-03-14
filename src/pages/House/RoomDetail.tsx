@@ -49,7 +49,6 @@ export default function RoomDetail() {
           throw new Error("Failed to fetch room data");
         }
         const data = await response.json();
-        console.log(data);
         setRoomData(data);
       } catch (error) {
         console.error("Error fetching room data:", error);

@@ -16,7 +16,7 @@ type UpdateItemsPayload = {
   updatedItems: object[];
 };
 
-export default function NewUserRoomDetail() {
+export default function UserRoomItemEditorPage() {
   const { userId, homeId, roomId } = useParams<{ userId: string; homeId: string; roomId: string }>();
   const [originData, setOriginData] = useState<ShapeData[]>([]);
   const [shapes, setShapes] = useState<ShapeData[]>([]);
@@ -122,6 +122,7 @@ export default function NewUserRoomDetail() {
     },
   });
 
+  // 배경 이미지 크기 및 아이템(도형) 위치를 화면 크기에 맞게 조정하는 코드
   useEffect(() => {
     if (!data) return;
 
@@ -129,23 +130,27 @@ export default function NewUserRoomDetail() {
 
     image.src = `${API_CONFIG.PRIVATE_IMAGE_LOAD_API}/${data.room.imageId}`;
     image.onload = () => {
+      // 브라우저 화면 크기 및 이미지 크기 계산
       const stageWidth = window.innerWidth;
       const stageHeight = window.innerHeight;
 
       const imgWidth = image.width;
       const imgHeight = image.height;
 
+      //이미지 비율에 맞춰 화면에 최적화된 크기 계산
       const scaleX = stageWidth / imgWidth;
       const scaleY = stageHeight / imgHeight;
 
+      //이미지를 화면에 맞게 축소할 때 유지할 비율 (최소값을 선택하여 비율 유지)
       const scale = Math.min(scaleX, scaleY);
+      //어느 축을 기준으로 크기를 조정할지 결정
       const scaleAxis = scaleX > scaleY ? "Y" : "X";
-
+      //이미지 중앙 정렬을 위한 오프셋 계산
       const offsetWay = scaleAxis;
-
       const offsetX = (window.innerWidth - imgWidth * scale) / 2;
       const offsetY = (window.innerHeight - imgHeight * scale) / 2;
-
+      //도형 데이터(아이템) 크기 및 위치 조정
+      //3가지 도형이 공통적으로 x, y 좌표를 scale 비율만큼 조정
       data.items.forEach((item: ShapeData, i: number) => {
         if ("circleData" in item && item.circleData) {
           data.items[i].circleData.x =
@@ -177,17 +182,17 @@ export default function NewUserRoomDetail() {
         height: imgHeight,
         scale: scale,
         scaleAxis: scaleAxis,
-      });
-      setBackgroundImage(image);
+      }); // 배경 이미지 정보 상태 저장
+      setBackgroundImage(image); // 이미지 객체 상태 저장
       setOriginData(data.items); // 비교용 원본 데이터 상태
-      setShapes(data.items); // 페이지에 보여줄 상태
+      setShapes(data.items); //  화면에 표시할 도형 데이터 업데이트
     };
   }, [data]);
 
   if (!data && isLoading) return <SpinnerIcon />;
   return (
     <RoomDetailLayout isEditable={isEditable}>
-      {/* konvaContainer - konva.stage / konva.layer / konva.shapes */}
+      {/* Konva 관련 컴포넌트 */}
       <KonvaContainer
         shapes={shapes}
         setShapes={setShapes}

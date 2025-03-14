@@ -3,7 +3,7 @@ import InitText from "../components/InitText";
 import { Link } from "react-router-dom";
 import { FOOTER_HEIGHT, HEADER_HEIGHT } from "../constants/size";
 
-export default function Home() {
+export default function InitPage() {
   return (
     <div
       className="flex-center flex-col md:pb-20"

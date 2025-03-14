@@ -53,7 +53,7 @@ export default function SlideBar({
   const toggleEditMode = () => {
     setIsEditable((prev) => !prev);
     setIsExpanded(false);
-    setSelectedId(null); // editmode=false 일때 선택된 아이템의 stroke(사이즈 조절/위치) 표시 x
+    setSelectedId(null);
   };
 
   const toggleAsideWidth = () => {
@@ -118,6 +118,7 @@ export default function SlideBar({
             />
           </div>
 
+          {/* 아이템 생성 목록 - 컴포넌트화 X  */}
           <div className="flex px-4 gap-4 mr-5">
             <ul className={clsx("flex flex-col gap-1 ", isExpanded ? "w-[40%]" : "w-full")}>
               <div className="text-center py-4">아이템 생성 목록</div>
@@ -174,7 +175,7 @@ export default function SlideBar({
           )}
         </aside>
       ) : (
-        // aside 창 전체 숨기기
+        // aside element (슬라이드바) 전체 숨기기
         <div className="absolute top-0 right-0 p-2 z-10">
           <CircleButton
             label={<TbLayoutSidebarLeftCollapseFilled size={25} color="white" />}
