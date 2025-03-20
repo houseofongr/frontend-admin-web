@@ -9,7 +9,7 @@ type NotepadContentProps = {
 
 export default function ModalContent({ data }: NotepadContentProps) {
   const { name, description, audioFileId, updatedDate } = data;
-
+  console.log("d::", description);
   return (
     <div className="flex flex-col md:flex-row gap-5 text-black px-7 min-h-[600px] min-w-[1000px]  ">
       <div className="fixed mt-2 flex  gap-2 items-end">
@@ -30,14 +30,14 @@ export default function ModalContent({ data }: NotepadContentProps) {
           style={{ backgroundImage: 'url("/images/notepad/v2/notepad_5.png")', width: 465, height: 460 }}
         />
 
-        <div className="relative  flex items-center px-13 pt-5 text-gray-700 w-full h-[400px] ">
+        <div className="relative  flex items-center px-13 pt-5 text-gray-700 w-full h-[400px]">
           <div className="gap-3 flex flex-col ">
             <h2 className="text-4xl " style={{ fontFamily: "SangSangShinb7" }}>
               제목 : {name}
             </h2>
             <p
-              className="leading-tight break-words text-2xl w-full min-h-[140px] "
-              style={{ fontFamily: "SangSangShinb7" }}
+              className="leading-tight break-words text-2xl w-full min-h-[140px] max-h-[200px]"
+              style={{ fontFamily: "SangSangShinb7", whiteSpace: "pre-wrap" }}
             >
               {description}
             </p>
