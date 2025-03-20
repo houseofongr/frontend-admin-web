@@ -94,7 +94,7 @@ export default function SlideBar({
         <aside
           className={clsx(
             "h-full fixed top-0 right-0 z-10 bg-stone-800/90 text-white transition-all duration-300",
-            isExpanded ? "w-3/5" : "w-1/5"
+            isExpanded ? "w-full lg:w-3/5" : "w-1/2 lg:w-1/5"
           )}
         >
           {/*  top section - action buttons */}

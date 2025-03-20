@@ -12,7 +12,7 @@ type RoomDetailLayoutProp = {
 export default function RoomDetailLayout({ isEditable, children }: RoomDetailLayoutProp) {
   const navigate = useNavigate();
   const exitCurrentPage = () => {
-    navigate(-1);
+    navigate("/sound-sources");
   };
   return (
     <div
