@@ -3,7 +3,7 @@ import NewSoundForm from "./NewSoundForm";
 import ItemSoundList from "./ItemSoundList";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { fetchSoundDetails } from "../../service /soundService";
+import { fetchSoundDetails } from "../../service/soundService";
 
 type SoundListProps = {
   sounds: ItemSoundsData;

@@ -7,7 +7,7 @@ import FileUploadButton from "../common/buttons/FileUploadButton";
 import Button from "../common/buttons/Button";
 import { SoundMetadata, SoundSource } from "../../types/sound";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createSound, deleteSound, updateSound } from "../../service /soundService";
+import { createSound, deleteSound, updateSound } from "../../service/soundService";
 import { MdCancel } from "react-icons/md";
 import { bytesToKB } from "../../utils/formatFileSize";
 import { AUDIO_DESCRIPTION_MAX_LENGTH, AUDIO_NAME_MAX_LENGTH } from "../../constants/formDataMaxLength";
