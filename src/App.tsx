@@ -9,13 +9,14 @@ import RoomDetail from "./pages/House/RoomDetail";
 import UserList from "./pages/User/UserList";
 import UserHomeList from "./pages/User/UserHomeList";
 import UserHomeDetail from "./pages/User/UserHomeDetail";
-import SoundSources from "./pages/SoundSources";
+import SoundSources from "./pages/Sound/SoundSources";
 import FirstAuthenticationLogin from "./pages/Login/FirstAuthenticationLogin";
 import SecondAuthenticationLogin from "./pages/Login/SecondAuthenticationLogin";
 import ThirdAuthenticationLogin from "./pages/Login/ThirdAuthenticationLogin";
 import NotFoundPage from "./pages/NotFound";
 import InitPage from "./pages/Init";
 import UserRoomItemEditorPage from "./pages/User/UserRoomItemEditor";
+import UniverseList from "./pages/Universe/UniverseList";
 
 function App() {
   return (
@@ -66,7 +67,14 @@ function App() {
           {/* 유저 홈 상세 */}
           <Route path="/users/:userId/:homeId" element={<UserHomeDetail />} />
           {/* 유저 룸 상세 + 아이템 누끼 + 음원 등록 관련 페이지 */}
-          <Route path="/users/:userId/:homeId/:roomId" element={<UserRoomItemEditorPage />} />
+          <Route
+            path="/users/:userId/:homeId/:roomId"
+            element={<UserRoomItemEditorPage />}
+          />
+
+          {/* 유니버스 메인화면 */}
+          <Route path="/universe" element={<UniverseList />} />
+
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />
         </Routes>

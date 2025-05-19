@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
-import GridHeader from "../components/GridHeader";
-import Pagination from "../components/Pagination";
-import SearchComponent from "../components/SearchComponent";
-import { soundSouceSearchOptions } from "../constants/searchOptions";
-import { soundListHeaderTitles } from "../constants/headerList";
-import API_CONFIG from "../config/api";
-import SpinnerIcon from "../components/icons/SpinnerIcon";
-import SoundListItem from "../components/SoundListItem";
-import { SoundListItem as SoundData } from "../types/sound";
-import PageLayout from "../components/layout/PageLayout";
+import GridHeader from "../../components/GridHeader";
+import Pagination from "../../components/Pagination";
+import SearchComponent from "../../components/SearchComponent";
+import { soundSouceSearchOptions } from "../../constants/searchOptions";
+import { soundListHeaderTitles } from "../../constants/headerList";
+import API_CONFIG from "../../config/api";
+import SpinnerIcon from "../../components/icons/SpinnerIcon";
+import SoundListItem from "../../components/SoundListItem";
+import { SoundListItem as SoundData } from "../../types/sound";
+import PageLayout from "../../components/layout/PageLayout";
 
 export default function SoundSources() {
   const [sounds, setSounds] = useState<SoundData[]>([]);
