@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import { House } from "../types/house";
+import { House } from "../../../types/house";
 import HouseCard from "./HouseCard";
-import Pagination from "./Pagination";
-import SpinnerIcon from "./icons/SpinnerIcon";
+import Pagination from "../../Pagination";
+import SpinnerIcon from "../../icons/SpinnerIcon";
 
 type Props = {
   houses: House[];

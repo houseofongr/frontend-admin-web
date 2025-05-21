@@ -1,10 +1,10 @@
 import React from "react";
-import ContainerTitle from "../ContainerTitle";
+import ContainerTitle from "../../ContainerTitle";
 import FileName from "./FileName";
 import { IoAlertCircle } from "react-icons/io5";
-import { useImageContext } from "../../context/ImageContext";
-import FileUploadButton from "../common/buttons/FileUploadButton";
-import { ROOM_NAME_MAX_LENGTH } from "../../constants/formDataMaxLength";
+import { useImageContext } from "../../../context/ImageContext";
+import FileUploadButton from "../../common/buttons/FileUploadButton";
+import { ROOM_NAME_MAX_LENGTH } from "../../../constants/formDataMaxLength";
 
 export default function RoomImagesUploader() {
   const { borderImage, roomImages, updateRoomZIndex, handleFileChange, updateRoomTitle } = useImageContext();

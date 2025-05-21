@@ -16,3 +16,11 @@ export const soundSouceSearchOptions = [
   { value: "item-name", label: "아이템네임" },
   { value: "sound-name", label: "소리네임" },
 ];
+
+export const categoryOptions = [
+  { value: "ALL", label: "전체" },
+  { value: "GOVERNMENT_AND_PUBLIC_INSTITUTION", label: "정부/기관" },
+  { value: "HEALTH_INSTITUTION", label: "의료재단" },
+  { value: "LIFE", label: "라이프" },
+  { value: "FASHION_AND_BEAUTY", label: "패션/뷰티" },
+];

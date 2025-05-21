@@ -1,7 +1,7 @@
 import { BiToggleLeft, BiToggleRight } from "react-icons/bi";
 import CustomInput from "../CustomInput";
 import CardLabel from "../label/CardLabel";
-import FileName from "../houseEditor/FileName";
+import FileName from "../pageComponent/houseEditor/FileName";
 import { useEffect, useState } from "react";
 import FileUploadButton from "../common/buttons/FileUploadButton";
 import Button from "../common/buttons/Button";

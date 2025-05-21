@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import API_CONFIG from "../../config/api";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
 import ArrowBackIcon from "../../components/icons/ArrowBackIcon";
-import HouseForm from "../../components/HouseForm";
+import HouseForm from "../../components/pageComponent/house/HouseForm";
 import RoomForm from "../../components/RoomForm";
 import RenderImages from "../../components/RenderImages";
 import Button from "../../components/common/buttons/Button";

@@ -1,8 +1,8 @@
-import InputField from "./InputField";
-import ContainerTitle from "./ContainerTitle";
-import { EditableHouseData } from "../types/house";
-import { IoMdClose, IoMdCheckmark, TbHomeEdit } from "./icons";
-import CircleButton from "./common/buttons/CircleButton";
+import InputField from "../../InputField";
+import ContainerTitle from "../../ContainerTitle";
+import { EditableHouseData } from "../../../types/house";
+import { IoMdClose, IoMdCheckmark, TbHomeEdit } from "../../icons";
+import CircleButton from "../../common/buttons/CircleButton";
 
 type HouseFormProps = {
   houseData: EditableHouseData["house"];

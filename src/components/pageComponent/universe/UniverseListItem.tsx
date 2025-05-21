@@ -1,7 +1,8 @@
-import { Universe } from "../../types/universe";
-import { UniverseCategory } from "../../constants/universeData";
-import { universeListHeaderTitles } from "../../constants/headerList";
+import { Universe } from "../../../types/universe";
+import { UniverseCategory } from "../../../constants/universeData";
+import { universeListHeaderTitles } from "../../../constants/headerList";
 import { RiDeleteBin6Line, RiPencilLine } from "react-icons/ri";
+import Thumbnail from "../../Thumbnail";
 
 
 interface UniverseListItemProps {
@@ -35,8 +36,8 @@ export default function UniverseListItem({ universe: universe }: UniverseListIte
       key={id}
       className="py-2 flex items-center text-center rounded-md bg-[#fbfafa] shadow "
     >
-      <span style={{ width: universeListHeaderTitles[0].width }}>
-        {thumbnailId}
+      <span style={{ width: universeListHeaderTitles[0].width }} className="flex justify-center">
+        <Thumbnail imageUrl="" onEdit={() => {}}/>
       </span>
       <div
         className="flex flex-col items-start"

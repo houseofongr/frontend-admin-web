@@ -3,14 +3,19 @@ import { Universe } from "../../types/universe";
 import API_CONFIG from "../../config/api";
 import GridHeader from "../../components/GridHeader";
 import { universeListHeaderTitles } from "../../constants/headerList";
-import { userSearchOptions } from "../../constants/searchOptions";
+import { userSearchOptions as universeOptions } from "../../constants/searchOptions";
+import { categoryOptions as categoryOptions } from "../../constants/searchOptions";
 import UserListItem from "../../components/user/UserListItem";
 import Pagination from "../../components/Pagination";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
 import SearchComponent from "../../components/SearchComponent";
 import PageLayout from "../../components/layout/PageLayout";
 import { UNIVERSE_DATA } from "../../mocks/universe-data";
-import UniverseListItem from "../../components/universe/UniverseListItem";
+import UniverseListItem from "../../components/pageComponent/universe/UniverseListItem";
+import CircleButton from "../../components/common/buttons/CircleButton";
+import { GoPlusCircle } from "react-icons/go";
+import CategorySelect from "../../components/pageComponent/universe/CategorySelect";
+
 
 export default function UniverseList() {
   const [universe, setUniverse] = useState<Universe[]>([]);
@@ -70,12 +75,24 @@ export default function UniverseList() {
   return (
     <PageLayout>
       <section className="w-[65%]  py-10 md:py-20">
-        <div className="flex items-center flex-col md:flex-row justify-between">
-          {/* <h1 className="font-bold text-base lg:text-lg">
-            아・오・옹의 유저 {totalItems !== 0 && ` ・  ${totalItems} 명`}
-          </h1> */}
-          <SearchComponent onSearch={() => {}} options={userSearchOptions} />
+        <div className="flex items-center flex-col md:flex-row justify-between pb-3">
+          <div className="flex items-center space-x-5">
+            <h1 className="font-bold text-base lg:text-lg">
+              아・오・옹의 유니버스{" "}
+              {totalItems !== 0 && ` ・  ${totalItems} 개`}
+            </h1>
+            <GoPlusCircle
+              size={23}
+              color="#5f5c5d"
+              className="hover:text-white"
+            />
+          </div>
+          <div className="flex items-center">
+            <CategorySelect onSearch={() => {}} options={categoryOptions} />
+            <SearchComponent onSearch={() => {}} options={universeOptions} />
+          </div>
         </div>
+        <div className="flex flex-row items-center justify-between"></div>
 
         <div className="flex items-center flex-col py-4">
           <GridHeader headerTitles={universeListHeaderTitles} />
@@ -86,10 +103,7 @@ export default function UniverseList() {
             <ul className="w-full flex flex-col gap-5 ">
               {universe.map((universe, index) => {
                 return (
-                  <UniverseListItem
-                    key={universe.id}
-                    universe={universe}
-                  />
+                  <UniverseListItem key={universe.id} universe={universe} />
                 );
               })}
             </ul>

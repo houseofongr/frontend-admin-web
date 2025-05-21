@@ -4,7 +4,7 @@ import API_CONFIG from "../../config/api";
 import SearchComponent from "../../components/SearchComponent";
 import { houseSearchOptions } from "../../constants/searchOptions";
 import { Link } from "react-router-dom";
-import GridHouseList from "../../components/GridHouseList";
+import GridHouseList from "../../components/pageComponent/house/GridHouseList";
 import SpinnerIcon from "../../components/icons/SpinnerIcon";
 import Button from "../../components/common/buttons/Button";
 import PageLayout from "../../components/layout/PageLayout";

@@ -1,5 +1,5 @@
 import { PiSelectionPlusBold } from "react-icons/pi";
-import DraggableItem from "../houseEditor/DraggableItem";
+import DraggableItem from "../pageComponent/houseEditor/DraggableItem";
 
 type ShapeSelectorProps = {
   addRect: () => void;

@@ -3,11 +3,11 @@ import { useImageContext } from "../../context/ImageContext";
 import { useNavigate } from "react-router-dom";
 import API_CONFIG from "../../config/api";
 import ArrowBackIcon from "../../components/icons/ArrowBackIcon";
-import HouseImageUploader from "../../components/houseEditor/HouseImageUploader";
-import BorderImageUploader from "../../components/houseEditor/BorderImageUploader";
-import RoomImagesUploader from "../../components/houseEditor/RoomImagesUploader";
-import BorderImagePreview from "../../components/houseEditor/BorderImagePreview";
-import DraggableItemWrapper from "../../components/houseEditor/DraggableItemWrapper";
+import HouseImageUploader from "../../components/pageComponent/houseEditor/HouseImageUploader";
+import BorderImageUploader from "../../components/pageComponent/houseEditor/BorderImageUploader";
+import RoomImagesUploader from "../../components/pageComponent/houseEditor/RoomImagesUploader";
+import BorderImagePreview from "../../components/pageComponent/houseEditor/BorderImagePreview";
+import DraggableItemWrapper from "../../components/pageComponent/houseEditor/DraggableItemWrapper";
 import ModalAlertMessage, { AlertType } from "../../components/modal/ModalAlertMessage";
 import Button from "../../components/common/buttons/Button";
 

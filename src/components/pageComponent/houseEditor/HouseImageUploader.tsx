@@ -1,12 +1,12 @@
 import React, { useState } from "react";
-import ContainerTitle from "../ContainerTitle";
+import ContainerTitle from "../../ContainerTitle";
 import HouseImageInfoForm from "./HouseInfoForm";
-import { useImageContext } from "../../context/ImageContext";
-import AlertMessage, { AlertType } from "../modal/ModalAlertMessage";
-import FileUploadButton from "../common/buttons/FileUploadButton";
-import Button from "../common/buttons/Button";
+import { useImageContext } from "../../../context/ImageContext";
+import AlertMessage, { AlertType } from "../../modal/ModalAlertMessage";
+import FileUploadButton from "../../common/buttons/FileUploadButton";
+import Button from "../../common/buttons/Button";
 import FileName from "./FileName";
-import { HOUSE_NAME_MAX_LENGTH } from "../../constants/formDataMaxLength";
+import { HOUSE_NAME_MAX_LENGTH } from "../../../constants/formDataMaxLength";
 
 export default function HouseImageUploader() {
   const { houseImage, setHouseImage, handleFileChange } = useImageContext();
