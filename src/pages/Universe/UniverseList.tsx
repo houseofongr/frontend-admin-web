@@ -1,20 +1,17 @@
 import { useEffect, useState } from "react";
 import { Universe } from "../../types/universe";
-import API_CONFIG from "../../config/api";
 import GridHeader from "../../components/GridHeader";
 import { universeListHeaderTitles } from "../../constants/headerList";
 import { userSearchOptions as universeOptions } from "../../constants/searchOptions";
 import { categoryOptions as categoryOptions } from "../../constants/searchOptions";
-import UserListItem from "../../components/user/UserListItem";
 import Pagination from "../../components/Pagination";
-import SpinnerIcon from "../../components/icons/SpinnerIcon";
 import SearchComponent from "../../components/SearchComponent";
 import PageLayout from "../../components/layout/PageLayout";
 import { UNIVERSE_DATA } from "../../mocks/universe-data";
 import UniverseListItem from "../../components/pageComponent/universe/UniverseListItem";
-import CircleButton from "../../components/common/buttons/CircleButton";
 import { GoPlusCircle } from "react-icons/go";
 import CategorySelect from "../../components/pageComponent/universe/CategorySelect";
+import { AOO_COLOR } from "../../constants/color";
 
 
 export default function UniverseList() {
@@ -83,8 +80,7 @@ export default function UniverseList() {
             </h1>
             <GoPlusCircle
               size={23}
-              color="#5f5c5d"
-              className="hover:text-white"
+              className={`cursor-pointer  hover:text-[${AOO_COLOR.Orange}]`}
             />
           </div>
           <div className="flex items-center">
@@ -103,7 +99,22 @@ export default function UniverseList() {
             <ul className="w-full flex flex-col gap-5 ">
               {universe.map((universe, index) => {
                 return (
-                  <UniverseListItem key={universe.id} universe={universe} />
+                  <UniverseListItem
+                    key={universe.id}
+                    universe={universe}
+                    onDelete={(id: number) => {
+                      console.log(id + " Delete");
+                    }}
+                    onEdit={(id: number) => {
+                      console.log(id + " Edit");
+                    }}
+                    onEditThumbnail={(id: number) => {
+                      console.log(id + " Edit Thumbnail");
+                    }}
+                    onPlayMusic={(id: number) => {
+                      console.log(id + " Play Music");
+                    }}
+                  />
                 );
               })}
             </ul>

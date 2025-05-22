@@ -19,6 +19,7 @@ export default function CategorySelect({ onSearch, options }: SearchProp) {
   const searchHandler = () => {
     onSearch(filter, query);
   };
+
   return (
     <div className="hidden lg:flex items-center py-1">
       <button
@@ -50,7 +51,7 @@ export default function CategorySelect({ onSearch, options }: SearchProp) {
         </div>
       )}
 
-      <select
+      {/* <select
         value={filter}
         onChange={(e) => setFilter(e.target.value)}
         className="border border-gray-300 rounded text-sm md:px-3 py-2  focus:outline-hidden focus:ring-1 focus:ring-[#f5946d]"
@@ -60,7 +61,7 @@ export default function CategorySelect({ onSearch, options }: SearchProp) {
             {option.label}
           </option>
         ))}
-      </select>
+      </select> */}
     </div>
   );
 }

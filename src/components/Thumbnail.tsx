@@ -1,4 +1,5 @@
 import { RiPencilLine } from "react-icons/ri";
+import { AOO_COLOR } from "../constants/color";
 
 type ThumbnailProps = {
   imageUrl: string;
