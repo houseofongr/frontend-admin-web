@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+/* @theme {
+  --color-mint-500: oklch(0.72 0.11 178);
+} */
+
+/* 상상신비 - 모달 메모지 */
 @font-face {
   font-family: "SangSangShinb7";
   src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_three@1.1/SangSangShinb7.woff") format("woff");
@@ -7,6 +12,7 @@
   font-style: normal;
 }
 
+/* 타이틀용 - h1,h2 */
 @font-face {
   font-family: "GabiaNull-Regular";
   src: url("https://fastly.jsdelivr.net/gh/projectnoonnu/2409-2@1.0/GabiaNull-Regular.woff2") format("woff2");
@@ -14,6 +20,7 @@
   font-style: normal;
 }
 
+/* 기본 폰트 */
 @font-face {
   font-family: "Apple SD Gothic Neo";
   font-weight: 100;
@@ -81,17 +88,42 @@
     url("https://cdn.jsdelivr.net/gh/fonts-archive/AppleSDGothicNeo/AppleSDGothicNeo-ExtraBold.ttf") format("truetype");
 }
 
+:root {
+  --primary-color: #f5946d;
+  --warning-color: #D01c1f;
+}
+
+.text-primary {
+  color: var(--primary-color);
+}
+
+.text-warning{
+  color: var(--warning-color);
+}
+
+
+.border-primary {
+  border-color: var(--primary-color);
+}
+
+.bg-primary {
+  background-color: var(--primary-color);
+}
+
 html,
 body {
   height: 100vh;
-  color: #434a40;
   box-sizing: border-box;
+  /* default text color */
+  color: #434a40;
+  /* default font */
   font-family: "Apple SD Gothic Neo";
 }
 
 /* 스크롤바 숨기면서 스크롤링 기능은 허용 */
 html,
-section {
+section,
+div {
   -ms-overflow-style: none; /* for Internet Explorer, Edge */
   scrollbar-width: none; /* for Firefox */
   overflow-y: scroll;
@@ -133,12 +165,4 @@ input::-webkit-slider-thumb {
 ul,
 li {
   margin: 0;
-}
-
-button {
-  cursor: pointer;
-}
-
-button:disabled {
-  cursor: not-allowed;
 }

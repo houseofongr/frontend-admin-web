@@ -1,4 +1,6 @@
 import { useState } from "react";
+import { BiCategory } from "react-icons/bi";
+
 
 type Option = {
   value: string;
@@ -21,12 +23,12 @@ export default function CategorySelect({ onSearch, options }: SearchProp) {
   };
 
   return (
-    <div className="hidden lg:flex items-center py-1">
+    <div className="lg:flex items-center py-1">
       <button
         onClick={() => setOpen(!open)}
-        className="text-white mx-2 bg-[#f5946d] hover:opacity-90 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
+        className="text-white mx-2 bg-primary hover:opacity-90 focus:ring-4 focus:outline-none font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center"
       >
-        카테고리
+        <BiCategory size={18}/>
       </button>
       {open && (
         <div className="absolute z-10 bg-white divide-y divide-gray-100 rounded-lg shadow-sm w-72 mt-64">

@@ -25,7 +25,7 @@ const Modal: React.FC<ModalProps> = ({ onClose, children, bgColor }) => {
             "text-white": bgColor === "dark",
           })}
         >
-          <IoMdClose size={20} />
+          <IoMdClose size={20} className="cursor-pointer hover:opacity-80"/>
         </button>
         <div className=" p-4 ">{children}</div>
       </div>

@@ -16,7 +16,7 @@ import ThirdAuthenticationLogin from "./pages/Login/ThirdAuthenticationLogin";
 import NotFoundPage from "./pages/NotFound";
 import InitPage from "./pages/Init";
 import UserRoomItemEditorPage from "./pages/User/UserRoomItemEditor";
-import UniverseList from "./pages/Universe/UniverseList";
+import UniverseListPage from "./pages/Universe/UniverseListPage";
 
 function App() {
   return (
@@ -73,7 +73,7 @@ function App() {
           />
 
           {/* 유니버스 메인화면 */}
-          <Route path="/universe" element={<UniverseList />} />
+          <Route path="/universe" element={<UniverseListPage />} />
 
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />

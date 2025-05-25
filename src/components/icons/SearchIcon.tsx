@@ -9,7 +9,7 @@ export default function SearchIcon({ onClick }: Prop) {
       onClick={onClick}
       className="p-2 border border-[#f5946d] bg-[#f5946d] rounded-full flex-center text-white cursor-pointer"
     >
-      <IoSearch className="w-5 h-5 " />
+      <IoSearch className="w-5 h-5" />
     </div>
   );
 }

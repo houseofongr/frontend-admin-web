@@ -12,14 +12,24 @@ import UniverseListItem from "../../components/pageComponent/universe/UniverseLi
 import { GoPlusCircle } from "react-icons/go";
 import CategorySelect from "../../components/pageComponent/universe/CategorySelect";
 import { AOO_COLOR } from "../../constants/color";
+import Modal from "../../components/modal/Modal";
+import UniverseThumbnailEdit from "../../components/pageComponent/universe/UniverseThumbnailEdit";
+import UniverseModal from "../../components/modal/UniverseModal";
+import { IoCloudUploadOutline } from "react-icons/io5";
+import UniverseCreat from "../../components/pageComponent/universe/UniverseCreat";
 
 
-export default function UniverseList() {
-  const [universe, setUniverse] = useState<Universe[]>([]);
+
+export default function UniverseListPage() {
+  const [universeList, setUniverseList] = useState<Universe[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [size, setSize] = useState<number>(0);
+
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [editThumbnailUniverseId, setEditThumbnailUniverseId] = useState<number | null>(null);
+
 
   const fetchUniverse = async () => {
     try {
@@ -31,7 +41,7 @@ export default function UniverseList() {
       const universes  = response.universes;
       const pagination = response.pagination;
 
-      setUniverse(universes);
+      setUniverseList(universes);
       setTotalPages(pagination.totalPages);
       setTotalItems(pagination.totalElements);
       setSize(pagination.size);
@@ -39,6 +49,14 @@ export default function UniverseList() {
       console.error("Failed to fetch users:", error);
     }
   };
+
+  function handleOpenEditThumbnail(id: number) {
+    setEditThumbnailUniverseId(id);
+  }
+
+  function handleCloseModal() {
+    setEditThumbnailUniverseId(null);
+  }
 
   useEffect(() => {
     fetchUniverse();
@@ -71,33 +89,40 @@ export default function UniverseList() {
 
   return (
     <PageLayout>
-      <section className="w-[65%]  py-10 md:py-20">
-        <div className="flex items-center flex-col md:flex-row justify-between pb-3">
-          <div className="flex items-center space-x-5">
+      <section className="w-full sm:w-[90%] md:w-[90%] lg:w-[70%] py-10 px-3 mx-auto">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:pb-3 justify-between">
+          <div className="flex items-center space-x-5 mb-3">
             <h1 className="font-bold text-base lg:text-lg">
               아・오・옹의 유니버스{" "}
               {totalItems !== 0 && ` ・  ${totalItems} 개`}
             </h1>
-            <GoPlusCircle
-              size={23}
-              className={`cursor-pointer  hover:text-[${AOO_COLOR.Orange}]`}
-            />
+
+            {/* 유니버스 생성 */}
+            <div>
+              <GoPlusCircle
+                size={23}
+                className={`cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
+                onClick={() => setShowCreateModal(true)}
+              />
+            </div>
           </div>
-          <div className="flex items-center">
+
+          {/* 카테고리 선택 & 검색 */}
+          <div className="flex items-center mb-3">
             <CategorySelect onSearch={() => {}} options={categoryOptions} />
             <SearchComponent onSearch={() => {}} options={universeOptions} />
           </div>
         </div>
-        <div className="flex flex-row items-center justify-between"></div>
 
-        <div className="flex items-center flex-col py-4">
+        {/* 유니버스 리스트 */}
+        <div className="flex items-center flex-col lg:py-4">
           <GridHeader headerTitles={universeListHeaderTitles} />
-          {universe.length === 0 && (
+          {universeList.length === 0 && (
             <div className="py-10 ">유니버스가 존재하지 않습니다.</div>
           )}
-          {universe && (
+          {universeList && (
             <ul className="w-full flex flex-col gap-5 ">
-              {universe.map((universe, index) => {
+              {universeList.map((universe, index) => {
                 return (
                   <UniverseListItem
                     key={universe.id}
@@ -108,9 +133,9 @@ export default function UniverseList() {
                     onEdit={(id: number) => {
                       console.log(id + " Edit");
                     }}
-                    onEditThumbnail={(id: number) => {
-                      console.log(id + " Edit Thumbnail");
-                    }}
+                    onEditThumbnail={(id: number) =>
+                      handleOpenEditThumbnail(id)
+                    }
                     onPlayMusic={(id: number) => {
                       console.log(id + " Play Music");
                     }}
@@ -128,6 +153,31 @@ export default function UniverseList() {
           />
         )}
       </section>
+
+      {editThumbnailUniverseId !== null && (
+        <UniverseModal
+          onClose={handleCloseModal}
+          title="이미지 업로드"
+          description="유니버스에 적용할 새로운 썸네일을 등록하세요."
+          icon={<IoCloudUploadOutline size={20} />}
+          bgColor="white"
+        >
+          <UniverseThumbnailEdit universeId={editThumbnailUniverseId} />
+        </UniverseModal>
+      )}
+
+      {showCreateModal && (
+        <UniverseModal
+          onClose={() => setShowCreateModal(false)}
+          title="유니버스 생성"
+          description="새로운 유니버스를 생성합니다."
+          icon={<IoCloudUploadOutline size={20} />}
+          bgColor="white"
+        >
+          <UniverseCreat universeId={3} />
+          {/* <UniverseCreat onClose={() => setShowCreateModal(false)} /> */}
+        </UniverseModal>
+      )}
     </PageLayout>
   );
 }

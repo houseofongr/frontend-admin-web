@@ -16,7 +16,7 @@ export default function GridHeader({ headerTitles }: HeaderProps) {
 
   return (
     <ul
-      className="w-full grid p-2 invisible lg:visible text-neutral-500"
+      className="w-full p-2 hidden lg:grid text-neutral-500 items-center"
       style={{ gridTemplateColumns: gridTemplate }}
     >
       {headerTitles.map((item) => (
@@ -28,6 +28,7 @@ export default function GridHeader({ headerTitles }: HeaderProps) {
               : "pt-5 flex-center gap-[1px]"
           }
         >
+
           <span> {item.name}</span>
           <div>{item.name === "홈" && <GoHome />}</div>
           <div>{item.name === "룸" && <MdOutlineBedroomChild />}</div>
