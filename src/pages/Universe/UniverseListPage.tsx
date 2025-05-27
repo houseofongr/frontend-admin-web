@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Universe } from "../../types/universe";
 import GridHeader from "../../components/GridHeader";
 import { universeListHeaderTitles } from "../../constants/headerList";
@@ -17,10 +18,11 @@ import UniverseThumbnailEdit from "../../components/pageComponent/universe/Unive
 import UniverseModal from "../../components/modal/UniverseModal";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import UniverseCreat from "../../components/pageComponent/universe/UniverseCreat";
-
-
+import API_CONFIG from "../../config/api";
 
 export default function UniverseListPage() {
+  const navigate = useNavigate();
+
   const [universeList, setUniverseList] = useState<Universe[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(0);
@@ -28,17 +30,18 @@ export default function UniverseListPage() {
   const [size, setSize] = useState<number>(0);
 
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [editThumbnailUniverseId, setEditThumbnailUniverseId] = useState<number | null>(null);
-
+  const [editThumbnailUniverseId, setEditThumbnailUniverseId] = useState<
+    number | null
+  >(null);
 
   const fetchUniverse = async () => {
     try {
       // const response = await fetch(
-      //   `${API_CONFIG.BACK_API}/admin/universes?page=${currentPage}&size=${size}`
+      //   `${API_CONFIG.BACK_API}/universes?page=${currentPage}&size=${size}`
       // );
       // const { universes, pagination } = await response.json();
       const response = UNIVERSE_DATA;
-      const universes  = response.universes;
+      const universes = response.universes;
       const pagination = response.pagination;
 
       setUniverseList(universes);
@@ -65,7 +68,7 @@ export default function UniverseListPage() {
   // if (!users) return <SpinnerIcon />;
 
   // const universe
-  
+
   // const searchHandler = (filter: string, query: string) => {
   //   let results = houses;
   //   if (filter === "house-title") {
@@ -86,6 +89,14 @@ export default function UniverseListPage() {
 
   //   setFilteredHouses(results);
   // };
+  const onEdit = (id: number) => {
+    var uni = universeList.find((x) => x.id == id);
+
+    console.log(id + " Edit");
+    console.log(uni);
+    
+    navigate(`/universe/edit/${id}`);
+  };
 
   return (
     <PageLayout>
@@ -130,9 +141,7 @@ export default function UniverseListPage() {
                     onDelete={(id: number) => {
                       console.log(id + " Delete");
                     }}
-                    onEdit={(id: number) => {
-                      console.log(id + " Edit");
-                    }}
+                    onEdit={onEdit}
                     onEditThumbnail={(id: number) =>
                       handleOpenEditThumbnail(id)
                     }

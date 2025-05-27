@@ -1,115 +1,59 @@
-import { useState, useEffect } from "react";
-import WaveformWithAudioLight from "../../../Sound/AudioLight";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import WaveformWithAudioLight from "../../components/Sound/AudioLight";
 import { HiGlobeAsiaAustralia } from "react-icons/hi2";
 import { TbShieldLock } from "react-icons/tb";
+import PageLayout from "../../components/layout/PageLayout";
 
+export default function UniverseEditPage() {
+  const { id } = useParams(); // id는 문자열로 들어옴
+  const universeId = parseInt(id || "", 10); // 숫자로 변환
 
-
-interface DetailInfoStepProps {
-  innerImg: File | null;
-  thumbMusic: File | null;
-  thumbnail: File | null;
-  onChange: (data: {
-    title: string;
-    description: string;
-    isPublic: boolean;
-    tags: string[];
-  }) => void;
-}
-
-export default function DetailInfoStep({
-  innerImg,
-  thumbMusic,
-  thumbnail,
-  onChange,
-}: DetailInfoStepProps) {
+  // 내부 이미지 미리보기
   const [previewInnerImg, setPreviewInnerImg] = useState<string | null>(null);
-  const [previewMusic, setPreviewMusic] = useState<string | null>(null);
-  const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(null);
 
-  // 입력 상태
+  // 음악 미리듣기
+  const [previewMusic, setPreviewMusic] = useState<string | null>(null);
+  const [thumbMusic, setThumbMusic] = useState<File | null>(null); // 또는 해당 음악의 이름 등
+
+  // 제목, 설명
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [isPublic, setIsPublic] = useState(true);
-  const [tags, setTags] = useState<string>("");
 
-  // 태그 상태 (배열로 관리)
+  // 공개 여부
+  const [isPublic, setIsPublic] = useState(true); // 기본값: 공개
+
+  // 태그 관련
+  const [tags, setTags] = useState("");
   const [tagList, setTagList] = useState<string[]>([]);
 
   useEffect(() => {
-    if (innerImg) {
-      const url = URL.createObjectURL(innerImg);
-      setPreviewInnerImg(url);
-      return () => URL.revokeObjectURL(url);
-    } else {
-      setPreviewInnerImg(null);
+    if (!isNaN(universeId)) {
+      // fetch나 상태에서 universeId를 기반으로 데이터 불러오기
+      console.log("편집할 ID:", universeId);
     }
-  }, [innerImg]);
+  }, [universeId]);
 
-  useEffect(() => {
-    if (thumbMusic) {
-      console.log(thumbMusic);
-
-      const url = URL.createObjectURL(thumbMusic);
-      setPreviewMusic(url);
-      return () => URL.revokeObjectURL(url);
-    } else {
-      setPreviewMusic(null);
-    }
-  }, [thumbMusic]);
-
-  useEffect(() => {
-    if (thumbnail) {
-      const url = URL.createObjectURL(thumbnail);
-      setPreviewThumbnail(url);
-      return () => URL.revokeObjectURL(url);
-    } else {
-      setPreviewThumbnail(null);
-    }
-  }, [thumbnail]);
-
-  // 태그 입력 처리: 스페이스 입력 시 자동 # 붙이기
   const handleTagInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let val = e.target.value;
+    const input = e.target.value;
+    setTags(input);
 
-    // 스페이스바 입력 시 자동으로 # 붙이기
-    if (val.endsWith(" ")) {
-      val = val.trimEnd();
-      if (val.length === 0) {
-        val = "#";
-      } else {
-        // 태그가 #로 시작하지 않는 단어가 있다면 붙이기
-        const parts = val.split(" ");
-        val = parts
-          .map((part) => (part.startsWith("#") ? part : `#${part}`))
-          .join(" ");
-        val += " ";
+    if (input.endsWith(" ")) {
+      const newTag = input.trim();
+      if (newTag && !tagList.includes(newTag) && tagList.length < 10) {
+        setTagList([...tagList, newTag]);
       }
+      setTags(""); // 입력창 초기화
     }
-    setTags(val);
-
-    // 태그 리스트로 업데이트 (#만 있는 태그 제외)
-    const arr = val
-      .split(" ")
-      .map((t) => t.trim())
-      .filter((t) => t.startsWith("#") && t.length > 1);
-    setTagList(arr);
   };
 
-  // 상위 컴포넌트로 데이터 전달
-  useEffect(() => {
-    onChange({ title, description, isPublic, tags: tagList });
-  }, [title, description, isPublic, tagList]);
-
   return (
-    <div className="w-full max-w-[1000px] mx-auto">
-      <div className="text-xl font-semibold mb-4">세부정보 작성</div>
-
-      <div className="flex flex-col lg:flex-row h-full lg:h-[500px] gap-4">
+    <PageLayout>
+      <div className="flex flex-1 flex-col lg:flex-row gap-4 p-3 lg:w-[80%] w-[90%]">
         {/* 좌측 영역 */}
-        <div className="flex flex-col flex-shrink-0 gap-3 w-full lg:w-[500px]">
+        <div className="flex flex-2 flex-col flex-shrink-0 gap-3">
           {/* 내부 이미지 미리보기 */}
-          <div className="min-w-[300px] min-h-[300px] flex items-center justify-center border border-gray-300 rounded-xl bg-transparent p-5">
+          <div className=" flex flex-2 items-center justify-center border border-gray-300 rounded-xl bg-transparent p-5">
             {previewInnerImg ? (
               <img
                 src={previewInnerImg}
@@ -122,7 +66,7 @@ export default function DetailInfoStep({
           </div>
 
           {/* 썸뮤직 미리듣기 */}
-          <div className="min-w-[490px] min-h-[150px] flex items-center justify-center border border-gray-300 rounded-xl bg-transparent p-1">
+          <div className="min-w-[490px] min-h-[150px] flex-1 flex items-center justify-center border border-gray-300 rounded-xl bg-transparent p-1">
             {previewMusic && (
               <WaveformWithAudioLight
                 audioUrl={previewMusic}
@@ -133,7 +77,7 @@ export default function DetailInfoStep({
         </div>
 
         {/* 우측 영역 */}
-        <div className="flex flex-col flex-1 gap-3 min-w-[450px]">
+        <div className="flex flex-col flex-1 gap-3 min-w-[300px]">
           {/* 제목 */}
           <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px]">
             <label className="text-neutral-500 mb-0.5">제목</label>
@@ -225,6 +169,6 @@ export default function DetailInfoStep({
           </div>
         </div>
       </div>
-    </div>
+    </PageLayout>
   );
 }

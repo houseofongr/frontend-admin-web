@@ -14,7 +14,7 @@ export default function InnerImgStep({
   onFileChange,
 }: Props) {
   return (
-    <>
+    <div className="flex flex-col items-center">
       <input
         type="file"
         accept="image/*"
@@ -23,12 +23,15 @@ export default function InnerImgStep({
         onChange={onFileChange}
       />
 
-      <label htmlFor="innerImgUpload" className="cursor-pointer block">
+      <label
+        htmlFor="innerImgUpload"
+        className="flex flex-col justify-center items-center cursor-pointer"
+      >
         {previewInnerImg ? (
           <img
             src={previewInnerImg}
             alt="미리보기"
-            className="mx-auto max-h-60 rounded-md mb-4"
+            className="w-30 h-30 rounded-md mb-4"
           />
         ) : (
           <PiImagesThin className="inline-flex mb-5 text-gray-500" size={50} />
@@ -52,6 +55,6 @@ export default function InnerImgStep({
       {warning && (
         <div className={`mt-1 text-sm text-warning font-normal`}>{warning}</div>
       )}
-    </>
+    </div>
   );
 }

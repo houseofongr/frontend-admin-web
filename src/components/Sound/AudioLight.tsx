@@ -13,7 +13,7 @@ interface WaveformProps {
   audioTitle: string;
 }
 
-const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) => {
+const WaveformWithAudioLight: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) => {
   const waveformRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [waveSurfer, setWaveSurfer] = useState<WaveSurfer | null>(null);
@@ -59,7 +59,8 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) =>
     waveSurferInstance.on("error", (error) => {
       console.error("WaveSurfer error:", error);
     });
-
+    console.log(audioUrl);
+    
     return () => waveSurferInstance.destroy();
   }, [audioUrl]);
 
@@ -148,14 +149,14 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) =>
   return (
     <div className="flex flex-col px-5 max-w-[450px]">
       {/* 파형/오디오 */}
-      <div ref={waveformRef} className=" bg-stone-800/90 " />
-      <div className="mb-8">
+      <div className="hidden" ref={waveformRef} />
+      <div className="hidden mb-8">
         <audio ref={audioRef} controls src={audioUrl} className="hidden" />
       </div>
 
       {/* 컨트롤러 */}
-      <div className="w-full py-5 px-4  bg-stone-800/90">
-        <div className="text-center  text-neutral-200">{audioTitle}</div>
+      <div className="w-full py-5 px-4">
+        <div className="text-center  text-neutral-600">{audioTitle}</div>
         <div className="w-full flex flex-col items-center gap-2 pt-4 ">
           <input
             type="range"
@@ -164,41 +165,49 @@ const WaveformWithAudio: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) =>
             step="0.1"
             value={currentTime}
             onChange={handleSeek}
-            className="w-full h-1.5 bg-[#f3f3f3] appearance-none cursor-pointer"
+            className="w-full h-1.5 bg-neutral-200  appearance-none cursor-pointer"
           />
           <div className="w-full flex justify-between">
-            <span className="text-xs text-gray-500">{formatTime(currentTime)}</span>
-            <span className="text-xs text-gray-500">{formatTime(duration)}</span>
+            <span className="text-xs text-neutral-600">
+              {formatTime(currentTime)}
+            </span>
+            <span className="text-xs text-neutral-600">
+              {formatTime(duration)}
+            </span>
           </div>
         </div>
-        <div className="w-full flex justify-center pl-18 gap-4">
+        <div className="w-full flex justify-center pl-25 gap-4">
           {/* 뒤로 10초 */}
           <button onClick={() => handleSkip(-10)}>
-            <MdReplay10 size={25} color="#f3f3f3" />
+            <MdReplay10 size={25} className="text-neutral-500" />
           </button>
           {/* 재생/일시정지 */}
           <button onClick={handlePlayPause}>
             {isPlaying ? (
-              <TbPlayerPauseFilled size={25} color="#f3f3f3" />
+              <TbPlayerPauseFilled size={25} className="text-neutral-500" />
             ) : (
-              <TbPlayerPlayFilled size={25} color="#f3f3f3" />
+              <TbPlayerPlayFilled size={25} className="text-neutral-500" />
             )}
           </button>
           {/* 정지 */}
           <button onClick={handleStop} className="p-2 ">
-            <TbPlayerStopFilled size={25} color="#f3f3f3" />
+            <TbPlayerStopFilled size={25} className="text-neutral-500" />
           </button>
           {/* 앞으로 10초 */}
           <button onClick={() => handleSkip(10)}>
-            <MdForward10 size={25} color="#f3f3f3" />
+            <MdForward10 size={25} className="text-neutral-500" />
           </button>
           {/* 음소거 */}
           <div className=" flex justify-end items-center">
             <button onClick={toggleMute} className="p-2 ">
-              {isMuted ? <VscMute size={18} color="#f3f3f3" /> : <VscUnmute size={18} color="#f3f3f3" />}
+              {isMuted ? (
+                <VscMute size={18} className="text-neutral-500" />
+              ) : (
+                <VscUnmute size={18} className="text-neutral-500" />
+              )}
             </button>
 
-            <div className=" w-[35%] flex flex-col items-center gap-2 py-1">
+            <div className=" w-[50%] flex flex-col items-center gap-2 py-1">
               <input
                 type="range"
                 min="0"
@@ -224,4 +233,4 @@ const formatTime = (time: number) => {
   return `${minutes}:${seconds}`;
 };
 
-export default WaveformWithAudio;
+export default WaveformWithAudioLight;

@@ -17,6 +17,7 @@ import NotFoundPage from "./pages/NotFound";
 import InitPage from "./pages/Init";
 import UserRoomItemEditorPage from "./pages/User/UserRoomItemEditor";
 import UniverseListPage from "./pages/Universe/UniverseListPage";
+import UniverseEditPage from "./pages/Universe/UniverseEditPage";
 
 function App() {
   return (
@@ -74,6 +75,12 @@ function App() {
 
           {/* 유니버스 메인화면 */}
           <Route path="/universe" element={<UniverseListPage />} />
+
+          {/* 유니버스 메인화면 */}
+          <Route
+            path="/universe/edit/:universeId"
+            element={<UniverseEditPage />}
+          />
 
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />

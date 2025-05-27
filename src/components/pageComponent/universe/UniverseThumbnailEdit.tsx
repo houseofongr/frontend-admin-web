@@ -56,13 +56,13 @@ export default function UniverseThumbnailEdit({universeId}: ThumbnailEditProps) 
 
     if (img.width > img.height) {
       setFile(null);
-      setWarning("이미지가 정방향이 아닙니다.");
+      setWarning("이미지가 정방형이 아닙니다.");
       return;
     }
 
     img.onload = () => {
       setFile(selected);
-      setWarning(""); // 정방향이면 경고 메시지 없음
+      setWarning(""); // 정방형이면 경고 메시지 없음
 
       URL.revokeObjectURL(objectUrl);
     };
@@ -139,7 +139,7 @@ export default function UniverseThumbnailEdit({universeId}: ThumbnailEditProps) 
 
           <p>이미지 파일을 이곳에 드래그하거나 클릭해서 업로드하세요.</p>
           <p className="mb-6 text-gray-400 text-sm">
-            이미지는 정방향 크기에 2MB 이하만 가능합니다.
+            이미지는 정방형 크기에 2MB 이하만 가능합니다.
           </p>
         </label>
 
@@ -158,7 +158,7 @@ export default function UniverseThumbnailEdit({universeId}: ThumbnailEditProps) 
 
       {/* 저장 버튼 (우측 하단 고정) */}
       {file && (
-        <div className="flex justify-end mt-4 px-5">
+        <div className="flex justify-end mt-4">
           <button
             className={`flex bg-primary flex-row items-center hover:opacity-90 cursor-pointer text-white px-4 py-2 rounded-lg shadow-sm gap-2`}
             onClick={saveThumbnailHandler}

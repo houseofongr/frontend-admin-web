@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tailwindcss/forms": "^0.5.10",
     "@tailwindcss/vite": "4.0.0",
     "@tanstack/react-query": "5.66.0",
     "@types/react-router-dom": "5.3.3",

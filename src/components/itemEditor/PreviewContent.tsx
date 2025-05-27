@@ -1,7 +1,7 @@
 import API_CONFIG from "../../config/api";
 import { SoundSource } from "../../types/sound";
 import { formatDate } from "../../utils/formatDate";
-import WaveformWithAudio from "../Waveform";
+import WaveformWithAudioDark from "../Sound/WaveformWithAudioDark";
 
 type NotepadContentProps = {
   data: SoundSource;
@@ -57,7 +57,7 @@ export default function ModalContent({ data }: NotepadContentProps) {
         </div>
         {/* 파형 섹션 */}
         <div className="w-full lg:w-1/2 flex-center sm:mt-14 md:mt-10 lg:mt-0">
-          <WaveformWithAudio audioUrl={`${API_CONFIG.PRIVATE_AUDIO_LOAD_API}/${audioFileId}`} audioTitle={name} />
+          <WaveformWithAudioDark audioUrl={`${API_CONFIG.PRIVATE_AUDIO_LOAD_API}/${audioFileId}`} audioTitle={name} />
         </div>
       </div>
     </div>

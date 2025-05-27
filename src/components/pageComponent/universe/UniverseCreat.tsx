@@ -1,10 +1,9 @@
 import { useState, useEffect } from "react";
-import { PiImagesThin } from "react-icons/pi";
-import { IoArrowForwardCircleOutline } from "react-icons/io5";
-import { PiMusicNotesPlusDuotone } from "react-icons/pi";
-import { PiMusicNotesPlusThin } from "react-icons/pi";
-import { PiMusicNotesPlusLight } from "react-icons/pi";
-
+import {
+  IoArrowForwardCircleOutline,
+  IoArrowBackCircleOutline,
+} from "react-icons/io5";
+import { BiSave } from "react-icons/bi";
 import ThumbnailStep from "./universeCreate/ThumbnailStep";
 import ThumbMusicStep from "./universeCreate/ThumbMusicStep";
 import InnerImgStep from "./universeCreate/InnerImgStep";
@@ -27,21 +26,94 @@ export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
   const [step, setStep] = useState<CreateStep>(CreateStep.Thumbnail);
 
   const [thumbnail, setThumbnail] = useState<File | null>(null);
-  const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(null);
-
   const [thumbMusic, setThumbMusic] = useState<File | null>(null);
-  const [previewMusic, setPreviewMusic] = useState<string | null>(null);
-
   const [innerImg, setInnerImg] = useState<File | null>(null);
+  const [detailInfo, setDetailInfo] = useState<{
+    title: string;
+    description: string;
+    isPublic: boolean;
+    tags: string[];
+  }>({
+    title: "",
+    description: "",
+    isPublic: true,
+    tags: [],
+  });
+
+  const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(null);
+  const [previewMusic, setPreviewMusic] = useState<string | null>(null);
   const [previewInnerImg, setPreviewInnerImg] = useState<string | null>(null);
 
+  const handleFileProcess = async (file: File, step: CreateStep) => {
+    switch (step) {
+      // 썸네일 추가
+      case CreateStep.Thumbnail:
+        if (!checkFileSize(file, 2)) {
+          setWarning("이미지 크기가 2MB를 초과했습니다.");
+          setThumbnail(null);
+          return;
+        }
+
+        try {
+          const isSquare = await checkImageIsSquare(file);
+          if (!isSquare) {
+            setWarning("이미지가 정방형이 아닙니다.");
+            setThumbnail(null);
+            return;
+          }
+          setThumbnail(file);
+          setWarning("");
+        } catch {
+          setWarning("이미지를 확인하는 중 오류가 발생했습니다.");
+          setThumbnail(null);
+        }
+        break;
+
+      // 썸뮤직 추가
+      case CreateStep.ThumbMusic:
+        if (!checkFileSize(file, 2)) {
+          setWarning("2MB 이하 음원만 업로드할 수 있습니다.");
+          setThumbMusic(null);
+        } else {
+          setThumbMusic(file);
+          setWarning("");
+        }
+        break;
+
+      // 내부 이미지 추가
+      case CreateStep.InnerImg:
+        if (!checkFileSize(file, 5)) {
+          setWarning("이미지 크기가 5MB를 초과했습니다.");
+          setInnerImg(null);
+          return;
+        }
+
+        try {
+          const isSquare = await checkImageIsSquare(file);
+          if (!isSquare) {
+            setWarning("이미지가 정방형이 아닙니다.");
+            setInnerImg(null);
+            return;
+          }
+          setInnerImg(file);
+          setWarning("");
+        } catch {
+          setWarning("이미지를 확인하는 중 오류가 발생했습니다.");
+          setInnerImg(null);
+        }
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  // ✅ 드래그 앤 드롭 핸들러
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
-    const droppedFiles = e.dataTransfer.files;
-    if (droppedFiles && droppedFiles[0]) {
-      handleImgFile(droppedFiles[0]);
-    }
+    const file = e.dataTransfer.files?.[0];
+    if (file) handleFileProcess(file, step);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -53,47 +125,38 @@ export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
     setDragOver(false);
   };
 
-  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.[0];
-    console.log(selected);
-
-    if (selected) handleImgFile(selected);
-  };
-  const handleThumbMusicChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.[0];
-    console.log(selected);
-
-    if (selected) handleImgFile(selected);
+  // ✅ input[type="file"] 핸들러
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) handleFileProcess(file, step);
   };
 
-  const handleImgFile = (selected: File) => {
-    if (selected.size > 2 * 1024 * 1024) {
-      setThumbnail(null);
-      setWarning(
-        "이미지 크기가 2MB를 초과했습니다. 2MB 이하 이미지를 업로드하세요."
-      );
-      return;
-    }
-
-    const img = new Image();
-    const objectUrl = URL.createObjectURL(selected);
-    img.src = objectUrl;
-
-    if (img.width > img.height) {
-      setThumbnail(null);
-      setWarning("이미지가 정방향이 아닙니다.");
-      return;
-    }
-
-    img.onload = () => {
-      setThumbnail(selected);
-      setWarning(""); // 정방향이면 경고 메시지 없음
-
-      URL.revokeObjectURL(objectUrl);
-    };
+  // 파일 사이즈 체크
+  const checkFileSize = (file: File, maxSizeMB: number): boolean => {
+    const maxSizeBytes = maxSizeMB * 1024 * 1024;
+    return file.size <= maxSizeBytes;
   };
 
-  const saveThumbnailHandler = async () => {
+  const checkImageIsSquare = (file: File): Promise<boolean> => {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const objectUrl = URL.createObjectURL(file);
+
+      img.onload = () => {
+        URL.revokeObjectURL(objectUrl);
+        resolve(img.width === img.height);
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(objectUrl);
+        reject(new Error("이미지 로드 실패"));
+      };
+
+      img.src = objectUrl;
+    });
+  };
+
+  const onNextClick = async () => {
     if (step === CreateStep.Thumbnail) setStep(CreateStep.ThumbMusic);
     else if (step === CreateStep.ThumbMusic) setStep(CreateStep.InnerImg);
     else if (step === CreateStep.InnerImg) setStep(CreateStep.DetailInfo);
@@ -119,26 +182,67 @@ export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
     //     }
     //   );
   };
+  const onBackClick = () => {
+    if (step === CreateStep.ThumbMusic) setStep(CreateStep.Thumbnail);
+    else if (step === CreateStep.InnerImg) setStep(CreateStep.ThumbMusic);
+    else if (step === CreateStep.DetailInfo) setStep(CreateStep.InnerImg);
+  };
 
   // 미리보기 URL 생성
   useEffect(() => {
+    const urlsToRevoke: string[] = [];
+
     if (thumbnail) {
       const url = URL.createObjectURL(thumbnail);
       setPreviewThumbnail(url);
-
-      return () => {
-        URL.revokeObjectURL(url); // 메모리 해제
-      };
+      urlsToRevoke.push(url);
     } else {
       setPreviewThumbnail(null);
     }
-  }, [thumbnail]);
+
+    if (thumbMusic) {
+      const url = URL.createObjectURL(thumbMusic);
+      setPreviewMusic(url);
+      urlsToRevoke.push(url);
+    } else {
+      setPreviewMusic(null);
+    }
+
+    if (innerImg) {
+      const url = URL.createObjectURL(innerImg);
+      setPreviewInnerImg(url);
+      urlsToRevoke.push(url);
+    } else {
+      setPreviewInnerImg(null);
+    }
+
+    return () => {
+      urlsToRevoke.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [thumbnail, thumbMusic, innerImg]);
+
+  const handleDetailChange = (data: {
+    title: string;
+    description: string;
+    isPublic: boolean;
+    tags: string[];
+  }) => {
+    setDetailInfo(data);
+  };
+
+  const handleSubmit = () => {
+    console.log("저장 데이터:", detailInfo);
+    console.log("썸네일 ", thumbnail);
+    console.log("썸뮤직 ", thumbMusic);
+    console.log("내부 이미지", innerImg);
+
+  };
 
   return (
     <div className="flex flex-col">
       {step !== CreateStep.DetailInfo && (
         <div
-          className={`border-2 border-dashed rounded-md p-10 text-center transition-all duration-200 ${
+          className={`w-130 h-100 flex justify-center items-center border-2 border-dashed rounded-md p-10 text-center transition-all duration-200 ${
             dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
           }`}
           onDrop={handleDrop}
@@ -150,7 +254,7 @@ export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
               thumbnail={thumbnail}
               previewUrl={previewThumbnail}
               warning={warning}
-              onFileChange={handleThumbnailChange}
+              onFileChange={handleFileChange}
             />
           )}
 
@@ -158,17 +262,9 @@ export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
             <>
               <ThumbMusicStep
                 thumbMusic={thumbMusic}
+                previewMusic={previewMusic}
                 warning={warning}
-                onFileChange={(e) => {
-                  const selected = e.target.files?.[0];
-                  if (selected && selected.size <= 2 * 1024 * 1024) {
-                    setThumbMusic(selected);
-                    setWarning("");
-                  } else {
-                    setThumbMusic(null);
-                    setWarning("2MB 이하 음원만 업로드할 수 있습니다.");
-                  }
-                }}
+                onFileChange={handleFileChange}
               />
             </>
           )}
@@ -179,7 +275,7 @@ export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
                 innerImg={innerImg}
                 previewInnerImg={previewInnerImg}
                 warning={warning}
-                onFileChange={(e) => {}}
+                onFileChange={handleFileChange}
               />
             </>
           )}
@@ -187,19 +283,62 @@ export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
       )}
       {step === CreateStep.DetailInfo && (
         <>
-          <DetailInfoStep />
+          <DetailInfoStep
+            innerImg={innerImg}
+            thumbMusic={thumbMusic}
+            thumbnail={thumbnail}
+            onChange={handleDetailChange}
+          />
         </>
       )}
 
       {/* 저장 버튼 (우측 하단 고정) */}
-      <div className="flex justify-end mt-4 px-5">
-        <button
-          className={`hover:opacity-80 cursor-pointer text-primary`}
-          onClick={saveThumbnailHandler}
-        >
-          <IoArrowForwardCircleOutline size={30} />
-        </button>
+      <div
+        className={`flex mt-4 px-5 ${
+          step !== CreateStep.Thumbnail ? "justify-between" : "justify-end"
+        }`}
+      >
+        {step !== CreateStep.Thumbnail && (
+          <button
+            className="hover:opacity-80 cursor-pointer text-primary"
+            onClick={onBackClick}
+          >
+            <IoArrowBackCircleOutline size={30} />
+          </button>
+        )}
+        {((step === CreateStep.Thumbnail && thumbnail) ||
+          (step === CreateStep.ThumbMusic && thumbMusic) ||
+          (step === CreateStep.InnerImg && innerImg)) && (
+          <button
+            className="hover:opacity-80 cursor-pointer text-primary"
+            onClick={onNextClick}
+          >
+            <IoArrowForwardCircleOutline size={30} />
+          </button>
+        )}
+
+        {thumbnail && thumbMusic && innerImg && detailInfo.title != "" && (
+          <button
+            className="border-2 rounded-full p-1 hover:opacity-80 cursor-pointer text-primary"
+            onClick={handleSubmit}
+          >
+            <BiSave size={30} />
+          </button>
+
+          // <button
+          // className="flex flex-row items-center gap-2"
+          // // className="border-2 rounded-full p-1 bg-primary hover:opacity-80 cursor-pointer text-white"
+          // onClick={handleSubmit}
+          // >
+          // <BiSave
+          //   size={30}
+          //   className="border-2 rounded-full p-1 hover:opacity-80 cursor-pointer text-primary"
+          // />
+          // <p className="text-lg text-primary">SAVE</p>
+          // </button>
+        )}
       </div>
     </div>
   );
 }
+

@@ -1,18 +1,22 @@
 import { PiMusicNotesPlusLight } from "react-icons/pi";
+import WaveformWithAudioDark from "../../../Sound/WaveformWithAudioDark";
+import WaveformWithAudioLight from "../../../Sound/AudioLight";
 
 interface Props {
   thumbMusic: File | null;
+  previewMusic: string | null;
   warning: string;
   onFileChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 export default function ThumbMusicStep({
   thumbMusic,
+  previewMusic,
   warning,
   onFileChange,
 }: Props) {
   return (
-    <>
+    <div className="flex flex-col items-center">
       <input
         type="file"
         accept="audio/*"
@@ -21,7 +25,7 @@ export default function ThumbMusicStep({
         onChange={onFileChange}
       />
 
-      <label htmlFor="thumbMusicUpload" className="cursor-pointer block">
+      <label htmlFor="thumbMusicUpload" className=" cursor-pointer">
         <PiMusicNotesPlusLight
           className="inline-flex mb-7.5 text-gray-500"
           size={40}
@@ -37,14 +41,23 @@ export default function ThumbMusicStep({
       </label>
 
       {/* 업로드 메시지 */}
-      {thumbMusic && (
+      {/* {thumbMusic && (
         <div className="mt-2 text-green-700 text-sm font-medium">
           {thumbMusic.name} 업로드됨
         </div>
+      )} */}
+
+      {/* 이 부분은 label 바깥에 둬야 클릭 이벤트 방지됨 */}
+      {previewMusic && (
+        <WaveformWithAudioLight
+          audioUrl={previewMusic}
+          audioTitle={thumbMusic?.name || "썸네일 음악 미리듣기"}
+        />
       )}
+
       {warning && (
         <div className="mt-1 text-sm text-warning font-normal">{warning}</div>
       )}
-    </>
+    </div>
   );
 }
