@@ -4,16 +4,20 @@ import {
   IoArrowBackCircleOutline,
 } from "react-icons/io5";
 import { BiSave } from "react-icons/bi";
+
 import ThumbnailStep from "./universeCreate/ThumbnailStep";
 import ThumbMusicStep from "./universeCreate/ThumbMusicStep";
 import InnerImgStep from "./universeCreate/InnerImgStep";
 import DetailInfoStep from "./universeCreate/DetailInfoStep";
+
 import API_CONFIG from "../../../config/api";
 import ModalAlertMessage, { AlertType } from "../../modal/ModalAlertMessage";
 import Button from "../../common/buttons/Button";
+import { checkFileSize, checkImageIsSquare } from "../../../utils/fileValidator";
+import { UserV2 } from "../../../types/user";
 
 interface ThumbnailEditProps {
-  universeId: number;
+  onClose:() => void;
 }
 
 enum CreateStep {
@@ -23,29 +27,30 @@ enum CreateStep {
   DetailInfo,
 }
 
-export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
+export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
+  // 상태 관리
   const [dragOver, setDragOver] = useState(false);
   const [warning, setWarning] = useState("");
   const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(
     null
   );
-
-  const [step, setStep] = useState<CreateStep>(CreateStep.DetailInfo);
+  const [step, setStep] = useState<CreateStep>(CreateStep.Thumbnail);
 
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [thumbMusic, setThumbMusic] = useState<File | null>(null);
   const [innerImg, setInnerImg] = useState<File | null>(null);
+
   const [detailInfo, setDetailInfo] = useState<{
     title: string;
     description: string;
-    authorId: number;
+    author: UserV2 | null;
     category: string;
     publicStatus: string;
     tags: string[];
   }>({
     title: "",
     description: "",
-    authorId: 1,
+    author: null,
     category: "",
     publicStatus: "",
     tags: [],
@@ -55,16 +60,34 @@ export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
   const [previewMusic, setPreviewMusic] = useState<string | null>(null);
   const [previewInnerImg, setPreviewInnerImg] = useState<string | null>(null);
 
+  // 필수 데이터 체크 함수
+  const hasRequiredData = () => {
+    if (!thumbnail || !thumbMusic || !innerImg) return false;
+
+    const { title, description, author, category, publicStatus } = detailInfo;
+
+    if (
+      !title.trim() ||
+      !description.trim() ||
+      !author ||
+      !category.trim() ||
+      !publicStatus.trim()
+    ) {
+      return false;
+    }
+
+    return true;
+  };
+
+  // 파일 처리 함수
   const handleFileProcess = async (file: File, step: CreateStep) => {
     switch (step) {
-      // 썸네일 추가
       case CreateStep.Thumbnail:
         if (!checkFileSize(file, 2)) {
           setWarning("이미지 크기가 2MB를 초과했습니다.");
           setThumbnail(null);
           return;
         }
-
         try {
           const isSquare = await checkImageIsSquare(file);
           if (!isSquare) {
@@ -80,7 +103,6 @@ export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
         }
         break;
 
-      // 썸뮤직 추가
       case CreateStep.ThumbMusic:
         if (!checkFileSize(file, 2)) {
           setWarning("2MB 이하 음원만 업로드할 수 있습니다.");
@@ -91,14 +113,12 @@ export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
         }
         break;
 
-      // 내부 이미지 추가
       case CreateStep.InnerImg:
         if (!checkFileSize(file, 5)) {
           setWarning("이미지 크기가 5MB를 초과했습니다.");
           setInnerImg(null);
           return;
         }
-
         try {
           const isSquare = await checkImageIsSquare(file);
           if (!isSquare) {
@@ -119,7 +139,7 @@ export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
     }
   };
 
-  // ✅ 드래그 앤 드롭 핸들러
+  // 드래그 앤 드롭 핸들러
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     setDragOver(false);
@@ -136,106 +156,17 @@ export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
     setDragOver(false);
   };
 
-  // ✅ input[type="file"] 핸들러
+  // input[type="file"] 핸들러
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) handleFileProcess(file, step);
   };
 
-  // 파일 사이즈 체크
-  const checkFileSize = (file: File, maxSizeMB: number): boolean => {
-    const maxSizeBytes = maxSizeMB * 1024 * 1024;
-    return file.size <= maxSizeBytes;
-  };
-
-  const checkImageIsSquare = (file: File): Promise<boolean> => {
-    return new Promise((resolve, reject) => {
-      const img = new Image();
-      const objectUrl = URL.createObjectURL(file);
-
-      img.onload = () => {
-        URL.revokeObjectURL(objectUrl);
-        resolve(img.width === img.height);
-      };
-
-      img.onerror = () => {
-        URL.revokeObjectURL(objectUrl);
-        reject(new Error("이미지 로드 실패"));
-      };
-
-      img.src = objectUrl;
-    });
-  };
-
-  const onNextClick = async () => {
-    if (step === CreateStep.Thumbnail) setStep(CreateStep.ThumbMusic);
-    else if (step === CreateStep.ThumbMusic) setStep(CreateStep.InnerImg);
-    else if (step === CreateStep.InnerImg) setStep(CreateStep.DetailInfo);
-    else if (step === CreateStep.DetailInfo) console.log("저장!");
-
-    // console.log("universeId ", universeId, "fileName ", file?.name);
-
-    // if (!file) {
-    //   console.log("업로드할 이미지 파일을 선택해주세요.", "fail");
-    //   return;
-    // }
-    // try {
-    //   const formData = new FormData();
-    //   formData.append("thumbnail", file);
-
-    //   const response = await fetch(
-    //     `${API_CONFIG.BACK_API}/admin/universes/thumbnail/${universeId}`,
-    //     {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //     }
-    //   );
-  };
-  const onBackClick = () => {
-    if (step === CreateStep.ThumbMusic) setStep(CreateStep.Thumbnail);
-    else if (step === CreateStep.InnerImg) setStep(CreateStep.ThumbMusic);
-    else if (step === CreateStep.DetailInfo) setStep(CreateStep.InnerImg);
-  };
-
-  // 미리보기 URL 생성
-  useEffect(() => {
-    const urlsToRevoke: string[] = [];
-
-    if (thumbnail) {
-      const url = URL.createObjectURL(thumbnail);
-      setPreviewThumbnail(url);
-      urlsToRevoke.push(url);
-    } else {
-      setPreviewThumbnail(null);
-    }
-
-    if (thumbMusic) {
-      const url = URL.createObjectURL(thumbMusic);
-      setPreviewMusic(url);
-      urlsToRevoke.push(url);
-    } else {
-      setPreviewMusic(null);
-    }
-
-    if (innerImg) {
-      const url = URL.createObjectURL(innerImg);
-      setPreviewInnerImg(url);
-      urlsToRevoke.push(url);
-    } else {
-      setPreviewInnerImg(null);
-    }
-
-    return () => {
-      urlsToRevoke.forEach((url) => URL.revokeObjectURL(url));
-    };
-  }, [thumbnail, thumbMusic, innerImg]);
-
+  // detailInfo 변경 핸들러
   const handleDetailChange = (data: {
     title: string;
     description: string;
-    authorId: number;
+    author: UserV2;
     category: string;
     publicStatus: string;
     tags: string[];
@@ -243,27 +174,86 @@ export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
     setDetailInfo(data);
   };
 
+  // 다음 단계 버튼
+  const onNextClick = () => {
+    switch (step) {
+      case CreateStep.Thumbnail:
+        setStep(CreateStep.ThumbMusic);
+        break;
+      case CreateStep.ThumbMusic:
+        setStep(CreateStep.InnerImg);
+        break;
+      case CreateStep.InnerImg:
+        setStep(CreateStep.DetailInfo);
+        break;
+    }
+  };
+
+  // 이전 단계 버튼
+  const onBackClick = () => {
+    switch (step) {
+      case CreateStep.ThumbMusic:
+        setStep(CreateStep.Thumbnail);
+        break;
+      case CreateStep.InnerImg:
+        setStep(CreateStep.ThumbMusic);
+        break;
+      case CreateStep.DetailInfo:
+        setStep(CreateStep.InnerImg);
+        break;
+    }
+  };
+
+  // 미리보기 URL 생성 및 정리
+  useEffect(() => {
+    const urlsToRevoke: string[] = [];
+
+    if (thumbnail) {
+      const url = URL.createObjectURL(thumbnail);
+      setPreviewThumbnail(url);
+      urlsToRevoke.push(url);
+    } else setPreviewThumbnail(null);
+
+    if (thumbMusic) {
+      const url = URL.createObjectURL(thumbMusic);
+      setPreviewMusic(url);
+      urlsToRevoke.push(url);
+    } else setPreviewMusic(null);
+
+    if (innerImg) {
+      const url = URL.createObjectURL(innerImg);
+      setPreviewInnerImg(url);
+      urlsToRevoke.push(url);
+    } else setPreviewInnerImg(null);
+
+    return () => {
+      urlsToRevoke.forEach((url) => URL.revokeObjectURL(url));
+    };
+  }, [thumbnail, thumbMusic, innerImg]);
+
+  // 제출 함수
   const handleSubmit = async () => {
-    console.log("test");
+    if (!hasRequiredData()) {
+      showAlert("모든 필수 항목을 입력해주세요.", "fail");
+      return;
+    }
+
+    if (!thumbnail || !thumbMusic || !innerImg) return;
+
     const formData = new FormData();
 
     const metadata = {
       title: detailInfo.title,
       description: detailInfo.description,
-      authorId: detailInfo.authorId,
+      authorId: detailInfo.author?.id,
       category: detailInfo.category,
       publicStatus: detailInfo.publicStatus,
       tags: detailInfo.tags,
     };
 
-    console.log("metadata", metadata);
-    console.log("metadata", innerImg);
-    console.log("metadata", thumbnail);
-    console.log("metadata", thumbMusic);
-
-    formData.append("innerImage", innerImg!);
-    formData.append("thumbnail", thumbnail!);
-    formData.append("thumbMusic", thumbMusic!);
+    formData.append("innerImage", innerImg);
+    formData.append("thumbnail", thumbnail);
+    formData.append("thumbMusic", thumbMusic);
     formData.append("metadata", JSON.stringify(metadata));
 
     try {
@@ -281,14 +271,16 @@ export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
         } catch (jsonError) {
           console.error("JSON 파싱 오류:", jsonError);
         }
-
         showAlert(errorMessage, "fail");
         return;
       }
 
-      showAlert(`새로운 유니버스가 성공적으로 저장되었습니다.`, "success");
+      showAlert("새로운 유니버스가 성공적으로 저장되었습니다.", "success");
     } catch (error) {
-      showAlert(`데이터 저장 중 오류가 발생하였습니다. error:${error}`, "fail");
+      showAlert(
+        `데이터 저장 중 오류가 발생하였습니다. error: ${error}`,
+        "fail"
+      );
     }
   };
 
@@ -303,7 +295,7 @@ export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
           text={alert.text}
           type={alert.type}
           onClose={() => setAlert(null)}
-          okButton={<Button label="확인" onClick={() => setAlert(null)} />}
+          okButton={<Button label="확인" onClick={() => {setAlert(null); onClose();}} />}
         />
       )}
 
@@ -348,12 +340,13 @@ export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
           )}
         </div>
       )}
+
       {step === CreateStep.DetailInfo && (
         <>
           <DetailInfoStep
             innerImg={innerImg}
             thumbMusic={thumbMusic}
-            thumbnail={thumbnail}
+            detailInfo={detailInfo}
             onChange={handleDetailChange}
           />
         </>
@@ -385,25 +378,13 @@ export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
           </button>
         )}
 
-        {thumbnail && thumbMusic && innerImg && detailInfo.title != "" && (
+        {step === CreateStep.DetailInfo && hasRequiredData() && (
           <button
             className="border-2 rounded-full p-1 hover:opacity-80 cursor-pointer text-primary"
             onClick={handleSubmit}
           >
             <BiSave size={30} />
           </button>
-
-          // <button
-          // className="flex flex-row items-center gap-2"
-          // // className="border-2 rounded-full p-1 bg-primary hover:opacity-80 cursor-pointer text-white"
-          // onClick={handleSubmit}
-          // >
-          // <BiSave
-          //   size={30}
-          //   className="border-2 rounded-full p-1 hover:opacity-80 cursor-pointer text-primary"
-          // />
-          // <p className="text-lg text-primary">SAVE</p>
-          // </button>
         )}
       </div>
     </div>

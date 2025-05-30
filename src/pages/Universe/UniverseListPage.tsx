@@ -64,30 +64,6 @@ export default function UniverseListPage() {
     fetchUniverse();
   }, [currentPage]);
 
-  // if (!users) return <SpinnerIcon />;
-
-  // const universe
-
-  // const searchHandler = (filter: string, query: string) => {
-  //   let results = houses;
-  //   if (filter === "house-title") {
-  //     results = houses.filter((house) =>
-  //       house.title.toLowerCase().includes(query.toLowerCase())
-  //     );
-  //   } else if (filter === "author") {
-  //     results = houses.filter((house) =>
-  //       house?.author?.toLowerCase().includes(query.toLowerCase())
-  //     );
-  //   } else if (filter === "all") {
-  //     results = houses.filter(
-  //       (house) =>
-  //         house.title.toLowerCase().includes(query.toLowerCase()) ||
-  //         house?.author?.toLowerCase().includes(query.toLowerCase())
-  //     );
-  //   }
-
-  //   setFilteredHouses(results);
-  // };
   const onEdit = (id: number) => {
     var uni = universeList.find((x) => x.id == id);
 
@@ -96,6 +72,11 @@ export default function UniverseListPage() {
     
     navigate(`/universe/edit/${id}`);
   };
+
+  function closeCreateModal(): void {
+    setShowCreateModal(false);
+    fetchUniverse();
+  }
 
   return (
     <PageLayout>
@@ -188,7 +169,7 @@ export default function UniverseListPage() {
           icon={<IoCloudUploadOutline size={20} />}
           bgColor="white"
         >
-          <UniverseCreate universeId={3} />
+          <UniverseCreate onClose={closeCreateModal} />
         </UniverseModal>
       )}
     </PageLayout>

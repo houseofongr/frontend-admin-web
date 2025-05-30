@@ -6,14 +6,13 @@ import API_CONFIG from "../../../config/api";
 import GridHeader from "../../GridHeader";
 import { searchUserListHeaderTitles } from "../../../constants/headerList";
 import { userSearchOptions } from "../../../constants/searchOptions";
-import UserListItem from "../../user/UserListItem";
 import Pagination from "../../Pagination";
 import SearchUserListItem from "../../user/SearchUserListItem";
 
 interface AuthorSearchModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSelect: (authorName: string) => void;
+  onSelect: (user: UserV2) => void;
 }
 
 export default function UserSearch({
@@ -44,7 +43,6 @@ export default function UserSearch({
         searchParams.append("searchType", filter);
         searchParams.append("keyword", query);
       }
-      console.log(`${API_CONFIG.BACK_API}/users/v2?${searchParams}`);
       
       const response = await fetch(
         `${API_CONFIG.BACK_API}/users/v2?${searchParams}`
@@ -66,7 +64,7 @@ export default function UserSearch({
   if (!users) return <SpinnerIcon />;
 
   const onSelectUser = (selectedUser: UserV2) => {
-    onSelect(selectedUser.name + " #"+ selectedUser.nickname); // 필요에 따라 nickName 등도 함께 넘겨도 됨
+    onSelect(selectedUser); // 필요에 따라 nickName 등도 함께 넘겨도 됨
     onClose(); // 모달 닫기
   };
 

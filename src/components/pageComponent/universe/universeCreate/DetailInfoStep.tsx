@@ -6,15 +6,23 @@ import { UniverseCategory } from "../../../../constants/universeData";
 import { FiSearch } from "react-icons/fi";
 import UserSearch from "../UserSearch";
 import Modal from "../../../modal/Modal";
+import { UserV2 } from "../../../../types/user";
 
 interface DetailInfoStepProps {
   innerImg: File | null;
   thumbMusic: File | null;
-  thumbnail: File | null;
+  detailInfo: {
+    title: string;
+    description: string;
+    author: UserV2 | null;
+    category: string;
+    publicStatus: string;
+    tags: string[];
+  };
   onChange: (data: {
     title: string;
     description: string;
-    authorId: number;
+    author: UserV2;
     category: string;
     publicStatus: string;
     tags: string[];
@@ -29,176 +37,173 @@ enum PublicStatusOption {
 export default function DetailInfoStep({
   innerImg,
   thumbMusic,
-  thumbnail,
+  detailInfo,
   onChange,
 }: DetailInfoStepProps) {
+  // 미리보기
   const [previewInnerImg, setPreviewInnerImg] = useState<string | null>(null);
   const [previewMusic, setPreviewMusic] = useState<string | null>(null);
-  const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(null);
 
-  // 입력 상태
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
+  // 입력값 상태
+  const [title, setTitle] = useState(detailInfo.title);
+  const [description, setDescription] = useState(detailInfo.description);
   const [publicStatus, setPublicStatus] = useState<PublicStatusOption>(
-    PublicStatusOption.PUBLIC
+    detailInfo.publicStatus == PublicStatusOption.PUBLIC
+      ? PublicStatusOption.PUBLIC
+      : PublicStatusOption.PRIVATE
   );
-  const [tags, setTags] = useState<string>("");
-  const [category, setCategory] = useState("");
+  const [tags, setTags] = useState<string>(detailInfo.tags.join(" "));
+  const [tagList, setTagList] = useState<string[]>([]);
+  const [category, setCategory] = useState(detailInfo.category);
+  const [author, setAuthor] = useState<UserV2 | null>(detailInfo.author);
 
+  // 작성자 선택 모달
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedAuthor, setSelectedAuthor] = useState<string>("");
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  // 모달 내에서 회원 선택하면 호출할 함수 (예시)
-  const handleAuthorSelect = (authorName: string) => {
-    setSelectedAuthor(authorName);
+  const handleAuthorSelect = (user: UserV2) => {
+    setAuthor(user);
     closeModal();
   };
 
-  // 태그 상태 (배열로 관리)
-  const [tagList, setTagList] = useState<string[]>([]);
+  // 태그 입력 처리
+  const normalizeTagsAndUpdateState = (raw: string) => {
+    // 스페이스 기준 분리, 공백 제거
+    const parts = raw.trim().split(/\s+/).filter(Boolean);
 
+    // 각 파트에 # 붙이기
+    const normalized = parts.map((part) =>
+      part.startsWith("#") ? part : `#${part}`
+    );
+
+    // 다시 문자열로, 원래 공백 유지
+    const result = normalized.join(" ") + (raw.endsWith(" ") ? " " : "");
+
+    // 상태 저장
+    setTags(result);
+
+    // 태그 리스트 저장 (# 제거)
+    const validTags = normalized
+      .filter((t) => t.length > 1)
+      .map((t) => t.replace(/^#/, ""));
+    setTagList(validTags);
+  };
+
+  const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+
+    // 스페이스 포함됐을 때만 정리 실행
+    if (val.endsWith(" ")) {
+      normalizeTagsAndUpdateState(val);
+    } else {
+      setTags(val); // 그냥 입력 중 상태 반영
+    }
+  };
+
+  const handleTagBlur = () => {
+    normalizeTagsAndUpdateState(tags);
+  };
+
+  // 미리보기 처리
   useEffect(() => {
     if (innerImg) {
       const url = URL.createObjectURL(innerImg);
       setPreviewInnerImg(url);
       return () => URL.revokeObjectURL(url);
-    } else {
-      setPreviewInnerImg(null);
     }
+    setPreviewInnerImg(null);
   }, [innerImg]);
 
   useEffect(() => {
     if (thumbMusic) {
-      console.log(thumbMusic);
-
       const url = URL.createObjectURL(thumbMusic);
       setPreviewMusic(url);
       return () => URL.revokeObjectURL(url);
-    } else {
-      setPreviewMusic(null);
     }
+    setPreviewMusic(null);
   }, [thumbMusic]);
 
   useEffect(() => {
-    if (thumbnail) {
-      const url = URL.createObjectURL(thumbnail);
-      setPreviewThumbnail(url);
-      return () => URL.revokeObjectURL(url);
-    } else {
-      setPreviewThumbnail(null);
-    }
-  }, [thumbnail]);
+    normalizeTagsAndUpdateState(tags);
+  }, []);
 
-  // 태그 입력 처리: 스페이스 입력 시 자동 # 붙이기
-  const handleTagInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    let val = e.target.value;
-
-    // 스페이스바 입력 시 자동으로 # 붙이기
-    if (val.endsWith(" ")) {
-      val = val.trimEnd();
-      if (val.length === 0) {
-        val = "#";
-      } else {
-        // 태그가 #로 시작하지 않는 단어가 있다면 붙이기
-        const parts = val.split(" ");
-        val = parts
-          .map((part) => (part.startsWith("#") ? part : `#${part}`))
-          .join(" ");
-        val += " ";
-      }
-    }
-    setTags(val);
-
-    // 태그 리스트로 업데이트 (#만 있는 태그 제외)
-    const arr = val
-      .split(" ")
-      .map((t) => t.trim())
-      .filter((t) => t.startsWith("#") && t.length > 1);
-    setTagList(arr);
-  };
-
-  // 상위 컴포넌트로 데이터 전달
+  // 상위 컴포넌트로 값 전달
   useEffect(() => {
-    var authorId = 2;
-    onChange({
-      title,
-      description,
-      authorId,
-      category,
-      publicStatus,
-      tags: tagList,
-    });
-  }, [title, description, category, publicStatus, tagList]);
+    if (author !== null) {
+      onChange({
+        title,
+        description,
+        author,
+        category,
+        publicStatus,
+        tags: tagList,
+      });
+    }
+  }, [title, description, author, category, publicStatus, tagList]);
 
   return (
     <div className="w-full max-w-[1000px] mx-auto">
-      <div className="flex flex-row my-auto justify-between">
-        <div className="text-xl font-semibold mb-5">세부정보 작성</div>
-        {/* 공개여부 설정 */}
-        <div className="flex space-x-5 items-end mb-1.5">
-          <label className="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="radio"
-              name="publicStatus"
-              checked={publicStatus === PublicStatusOption.PUBLIC}
-              onChange={() => setPublicStatus(PublicStatusOption.PUBLIC)}
-              className="hidden"
-            />
-            <span className="h-5 w-5 border border-neutral-500 rounded-full flex items-center justify-center">
-              {publicStatus === PublicStatusOption.PUBLIC && (
-                <span className="h-3 w-3 bg-neutral-400 rounded-full"></span>
-              )}
-            </span>
-            <span className="flex items-center gap-1 text-neutral-600">
-              <HiGlobeAsiaAustralia
-                className="text-neutral-500 mb-0.5"
-                size={17}
-              />
-              공개
-            </span>
-          </label>
-          <label className="flex items-center space-x-2 cursor-pointer">
-            <input
-              type="radio"
-              name="publicStatus"
-              checked={publicStatus === PublicStatusOption.PRIVATE}
-              onChange={() => setPublicStatus(PublicStatusOption.PRIVATE)}
-              className="hidden"
-            />
-            <span className="h-5 w-5 border border-neutral-500 rounded-full flex items-center justify-center">
-              {publicStatus === PublicStatusOption.PRIVATE && (
-                <span className="h-3 w-3 bg-neutral-400 rounded-full"></span>
-              )}
-            </span>
-            <span className="flex items-center gap-1 text-neutral-600">
-              <TbShieldLock className="text-neutral-500 mb-0.5" size={17} />
-              비공개
-            </span>
-          </label>
+      {/* 헤더 + 공개여부 */}
+      <div className="flex justify-between items-end mb-4">
+        <div className="text-xl font-semibold">세부정보 작성</div>
+        <div className="flex space-x-5">
+          {[PublicStatusOption.PUBLIC, PublicStatusOption.PRIVATE].map(
+            (option) => (
+              <label
+                key={option}
+                className="flex items-center space-x-2 cursor-pointer"
+              >
+                <input
+                  type="radio"
+                  name="publicStatus"
+                  checked={publicStatus === option}
+                  onChange={() => setPublicStatus(option)}
+                  className="hidden"
+                />
+                <span className="h-5 w-5 border border-neutral-500 rounded-full flex items-center justify-center">
+                  {publicStatus === option && (
+                    <span className="h-3 w-3 bg-neutral-400 rounded-full" />
+                  )}
+                </span>
+                <span className="flex items-center gap-1 text-neutral-600">
+                  {option === PublicStatusOption.PUBLIC ? (
+                    <>
+                      <HiGlobeAsiaAustralia
+                        className="text-neutral-500"
+                        size={17}
+                      />{" "}
+                      공개
+                    </>
+                  ) : (
+                    <>
+                      <TbShieldLock className="text-neutral-500" size={17} />{" "}
+                      비공개
+                    </>
+                  )}
+                </span>
+              </label>
+            )
+          )}
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row h-full lg:h-[500px] gap-4">
-        {/* 좌측 영역 */}
-        <div className="flex flex-col flex-shrink-0 gap-3 w-full lg:w-[500px]">
-          {/* 내부 이미지 미리보기 */}
-          <div className="min-w-[300px] min-h-[300px] flex items-center justify-center border border-gray-300 rounded-xl bg-transparent p-5">
+      <div className="flex flex-col lg:flex-row gap-4 lg:h-[500px]">
+        {/* 좌측 미리보기 영역 */}
+        <div className="flex flex-col gap-3 w-full lg:w-[500px]">
+          <div className="min-w-[300px] min-h-[300px] flex justify-center items-center border border-gray-300 rounded-xl p-5">
             {previewInnerImg ? (
               <img
                 src={previewInnerImg}
-                alt="내부 이미지 미리보기"
-                className="object-contain max-h-full max-w-full"
+                alt="내부 이미지"
+                className="object-contain max-h-full"
               />
             ) : (
               "내부이미지"
             )}
           </div>
-
-          {/* 썸뮤직 미리듣기 */}
-          <div className="min-w-[490px] min-h-[150px] flex items-center justify-center border border-gray-300 rounded-xl bg-transparent p-1">
+          <div className="min-w-[490px] min-h-[150px] flex justify-center items-center border border-gray-300 rounded-xl p-1">
             {previewMusic && (
               <WaveformWithAudioLight
                 audioUrl={previewMusic}
@@ -208,55 +213,38 @@ export default function DetailInfoStep({
           </div>
         </div>
 
-        {/* 우측 영역 */}
+        {/* 우측 입력 영역 */}
         <div className="flex flex-col flex-1 gap-3 min-w-[450px]">
           {/* 제목 */}
-          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px]">
-            <label className="text-neutral-500 mb-0.5">제목</label>
-            <input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              className="outline-none bg-transparent w-full text-gray-900 pr-13"
-              maxLength={100}
-              placeholder="제목을 입력하세요"
-            />
-            <div className="absolute bottom-2 right-4 text-xs text-gray-500">
-              {title.length} / 100
-            </div>
-          </div>
+          <InputField
+            label="제목"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            maxLength={100}
+          />
 
           {/* 설명 */}
-          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px] flex-grow">
-            <label className="text-neutral-500 mb-0.5">설명</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              className="outline-none bg-transparent w-full h-full text-gray-900 mb-5"
-              maxLength={500}
-              placeholder="설명을 입력하세요"
-            />
-            <div className="absolute bottom-2 right-4 text-xs text-gray-500">
-              {description.length} / 500
-            </div>
-          </div>
+          <TextareaField
+            label="설명"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            maxLength={500}
+          />
 
           {/* 태그 */}
-          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px]">
-            <label className="text-neutral-500 mb-0.5">태그</label>
-            <input
-              value={tags}
-              onChange={handleTagInput}
-              placeholder="#태그를 입력하고 스페이스바로 구분"
-              className="outline-none bg-transparent w-full text-gray-900"
-            />
-            <div className="absolute bottom-2 right-4 text-xs text-gray-500">
-              {tagList.length} / 10
-            </div>
-          </div>
+          <InputField
+            label="태그"
+            value={tags}
+            onChange={handleTagChange}
+            onBlur={handleTagBlur}
+            maxLength={100}
+            placeholder="#태그를 입력하고 스페이스바로 구분"
+            extra={`${tagList.length} / 10`}
+          />
 
           <div className="flex flex-row gap-3">
             {/* 카테고리 */}
-            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px]">
+            <div className="flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-1">
               <label className="text-neutral-500 mb-0.5">카테고리</label>
               <select
                 value={category}
@@ -274,41 +262,103 @@ export default function DetailInfoStep({
               </select>
             </div>
 
-            {/* 작성자 */}
-            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px]">
+            {/* 작성자 선택 */}
+            <div className="flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-1">
               <label className="text-neutral-500 mb-1">작성자</label>
-              <div
-                className="relative w-full"
-                // 텍스트박스, 아이콘 영역 클릭 시 모달 열기
-                onClick={openModal}
-              >
+              <div className="relative w-full" onClick={openModal}>
                 <input
                   type="text"
-                  value={selectedAuthor}
+                  value={
+                    author == null ? "" : `${author.name}  #${author.nickname}`
+                  }
                   readOnly
                   placeholder="작성자를 검색해서 선택하세요"
                   className="w-full pr-10 cursor-pointer bg-transparent outline-none text-gray-900"
                 />
                 <FiSearch
                   size={20}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
-                  onClick={openModal} // 아이콘도 클릭 가능하게
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
                 />
               </div>
             </div>
-
-            {/* 모달 */}
-            {isModalOpen && (
-                        <Modal onClose={closeModal} bgColor="white">
-                <UserSearch
-                  isOpen={isModalOpen}
-                  onClose={closeModal}
-                  onSelect={handleAuthorSelect}
-                />
-                      </Modal>
-            )}
           </div>
         </div>
+      </div>
+
+      {/* 작성자 검색 모달 */}
+      {isModalOpen && (
+        <Modal onClose={closeModal} bgColor="white">
+          <UserSearch
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            onSelect={handleAuthorSelect}
+          />
+        </Modal>
+      )}
+    </div>
+  );
+}
+
+// 공통 입력 필드 컴포넌트
+function InputField({
+  label,
+  value,
+  onChange,
+  onBlur,
+  maxLength,
+  placeholder = "",
+  extra,
+}: {
+  label: string;
+  value: string;
+  onChange: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>; // ← 추가
+  maxLength: number;
+  placeholder?: string;
+  extra?: string;
+}) {
+  return (
+    <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2">
+      <label className="text-neutral-500 mb-0.5">{label}</label>
+      <input
+        value={value}
+        onChange={onChange}
+        onBlur={onBlur} // ← 연결
+        maxLength={maxLength}
+        placeholder={placeholder}
+        className="outline-none bg-transparent w-full text-gray-900 pr-13"
+      />
+      <div className="absolute bottom-2 right-4 text-xs text-gray-500">
+        {extra ?? `${value.length} / ${maxLength}`}
+      </div>
+    </div>
+  );
+}
+
+
+function TextareaField({
+  label,
+  value,
+  onChange,
+  maxLength,
+}: {
+  label: string;
+  value: string;
+  onChange: React.ChangeEventHandler<HTMLTextAreaElement>;
+  maxLength: number;
+}) {
+  return (
+    <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-grow">
+      <label className="text-neutral-500 mb-0.5">{label}</label>
+      <textarea
+        value={value}
+        onChange={onChange}
+        maxLength={maxLength}
+        className="outline-none bg-transparent w-full h-full text-gray-900 mb-5"
+        placeholder="설명을 입력하세요"
+      />
+      <div className="absolute bottom-2 right-4 text-xs text-gray-500">
+        {value.length} / {maxLength}
       </div>
     </div>
   );
