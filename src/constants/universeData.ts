@@ -4,3 +4,15 @@ export const UniverseCategory = {
   LIFE: "라이프",
   FASHION_AND_BEAUTY: "패션/뷰티",
 };
+
+type Option = {
+  value: string;
+  label: string;
+};
+
+export const UniverseCategoryOptions: Option[] = Object.entries(
+  UniverseCategory
+).map(([value, label]) => ({
+  value,
+  label,
+}));

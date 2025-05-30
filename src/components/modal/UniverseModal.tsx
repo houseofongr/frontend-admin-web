@@ -22,7 +22,6 @@ const UniverseModal: React.FC<ModalProps> = ({
   return (
     <div
       className="fixed inset-0 bg-black/70 flex-center z-10"
-      onClick={onClose}
     >
       <div
         className={clsx(

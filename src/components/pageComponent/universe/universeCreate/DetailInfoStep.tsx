@@ -2,8 +2,10 @@ import { useState, useEffect } from "react";
 import WaveformWithAudioLight from "../../../Sound/AudioLight";
 import { HiGlobeAsiaAustralia } from "react-icons/hi2";
 import { TbShieldLock } from "react-icons/tb";
-
-
+import { UniverseCategory } from "../../../../constants/universeData";
+import { FiSearch } from "react-icons/fi";
+import UserSearch from "../UserSearch";
+import Modal from "../../../modal/Modal";
 
 interface DetailInfoStepProps {
   innerImg: File | null;
@@ -12,9 +14,16 @@ interface DetailInfoStepProps {
   onChange: (data: {
     title: string;
     description: string;
-    isPublic: boolean;
+    authorId: number;
+    category: string;
+    publicStatus: string;
     tags: string[];
   }) => void;
+}
+
+enum PublicStatusOption {
+  PUBLIC = "PUBLIC",
+  PRIVATE = "PRIVATE",
 }
 
 export default function DetailInfoStep({
@@ -30,8 +39,23 @@ export default function DetailInfoStep({
   // 입력 상태
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [isPublic, setIsPublic] = useState(true);
+  const [publicStatus, setPublicStatus] = useState<PublicStatusOption>(
+    PublicStatusOption.PUBLIC
+  );
   const [tags, setTags] = useState<string>("");
+  const [category, setCategory] = useState("");
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedAuthor, setSelectedAuthor] = useState<string>("");
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
+  // 모달 내에서 회원 선택하면 호출할 함수 (예시)
+  const handleAuthorSelect = (authorName: string) => {
+    setSelectedAuthor(authorName);
+    closeModal();
+  };
 
   // 태그 상태 (배열로 관리)
   const [tagList, setTagList] = useState<string[]>([]);
@@ -98,12 +122,64 @@ export default function DetailInfoStep({
 
   // 상위 컴포넌트로 데이터 전달
   useEffect(() => {
-    onChange({ title, description, isPublic, tags: tagList });
-  }, [title, description, isPublic, tagList]);
+    var authorId = 2;
+    onChange({
+      title,
+      description,
+      authorId,
+      category,
+      publicStatus,
+      tags: tagList,
+    });
+  }, [title, description, category, publicStatus, tagList]);
 
   return (
     <div className="w-full max-w-[1000px] mx-auto">
-      <div className="text-xl font-semibold mb-4">세부정보 작성</div>
+      <div className="flex flex-row my-auto justify-between">
+        <div className="text-xl font-semibold mb-5">세부정보 작성</div>
+        {/* 공개여부 설정 */}
+        <div className="flex space-x-5 items-end mb-1.5">
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="radio"
+              name="publicStatus"
+              checked={publicStatus === PublicStatusOption.PUBLIC}
+              onChange={() => setPublicStatus(PublicStatusOption.PUBLIC)}
+              className="hidden"
+            />
+            <span className="h-5 w-5 border border-neutral-500 rounded-full flex items-center justify-center">
+              {publicStatus === PublicStatusOption.PUBLIC && (
+                <span className="h-3 w-3 bg-neutral-400 rounded-full"></span>
+              )}
+            </span>
+            <span className="flex items-center gap-1 text-neutral-600">
+              <HiGlobeAsiaAustralia
+                className="text-neutral-500 mb-0.5"
+                size={17}
+              />
+              공개
+            </span>
+          </label>
+          <label className="flex items-center space-x-2 cursor-pointer">
+            <input
+              type="radio"
+              name="publicStatus"
+              checked={publicStatus === PublicStatusOption.PRIVATE}
+              onChange={() => setPublicStatus(PublicStatusOption.PRIVATE)}
+              className="hidden"
+            />
+            <span className="h-5 w-5 border border-neutral-500 rounded-full flex items-center justify-center">
+              {publicStatus === PublicStatusOption.PRIVATE && (
+                <span className="h-3 w-3 bg-neutral-400 rounded-full"></span>
+              )}
+            </span>
+            <span className="flex items-center gap-1 text-neutral-600">
+              <TbShieldLock className="text-neutral-500 mb-0.5" size={17} />
+              비공개
+            </span>
+          </label>
+        </div>
+      </div>
 
       <div className="flex flex-col lg:flex-row h-full lg:h-[500px] gap-4">
         {/* 좌측 영역 */}
@@ -140,7 +216,7 @@ export default function DetailInfoStep({
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="outline-none bg-transparent w-full text-gray-900"
+              className="outline-none bg-transparent w-full text-gray-900 pr-13"
               maxLength={100}
               placeholder="제목을 입력하세요"
             />
@@ -155,58 +231,12 @@ export default function DetailInfoStep({
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="outline-none bg-transparent w-full h-full text-gray-900"
+              className="outline-none bg-transparent w-full h-full text-gray-900 mb-5"
               maxLength={500}
               placeholder="설명을 입력하세요"
             />
             <div className="absolute bottom-2 right-4 text-xs text-gray-500">
               {description.length} / 500
-            </div>
-          </div>
-
-          {/* 공개여부 */}
-          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px]">
-            <label className="text-neutral-500 mb-0.5">공개여부</label>
-            <div className="flex space-x-10 justify-center">
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="isPublic"
-                  checked={isPublic}
-                  onChange={() => setIsPublic(true)}
-                  className="hidden"
-                />
-                <span className="h-5 w-5 border border-neutral-500 rounded-full flex items-center justify-center">
-                  {isPublic && (
-                    <span className="h-3 w-3 bg-neutral-400 rounded-full"></span>
-                  )}
-                </span>
-                <span className="flex items-center gap-2 text-neutral-600">
-                  <HiGlobeAsiaAustralia
-                    className="text-neutral-500"
-                    size={20}
-                  />
-                  공개
-                </span>
-              </label>
-              <label className="flex items-center space-x-2 cursor-pointer">
-                <input
-                  type="radio"
-                  name="isPublic"
-                  checked={!isPublic}
-                  onChange={() => setIsPublic(false)}
-                  className="hidden"
-                />
-                <span className="h-5 w-5 border border-neutral-500 rounded-full flex items-center justify-center">
-                  {!isPublic && (
-                    <span className="h-3 w-3 bg-neutral-400 rounded-full"></span>
-                  )}
-                </span>
-                <span className="flex items-center gap-2 text-neutral-600">
-                  <TbShieldLock className="text-neutral-500" size={20} />
-                  비공개
-                </span>
-              </label>
             </div>
           </div>
 
@@ -222,6 +252,61 @@ export default function DetailInfoStep({
             <div className="absolute bottom-2 right-4 text-xs text-gray-500">
               {tagList.length} / 10
             </div>
+          </div>
+
+          <div className="flex flex-row gap-3">
+            {/* 카테고리 */}
+            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px]">
+              <label className="text-neutral-500 mb-0.5">카테고리</label>
+              <select
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
+                className="outline-none bg-transparent w-full text-gray-900"
+              >
+                <option value="" disabled>
+                  카테고리를 선택하세요
+                </option>
+                {Object.entries(UniverseCategory).map(([key, label]) => (
+                  <option key={key} value={key}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* 작성자 */}
+            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px]">
+              <label className="text-neutral-500 mb-1">작성자</label>
+              <div
+                className="relative w-full"
+                // 텍스트박스, 아이콘 영역 클릭 시 모달 열기
+                onClick={openModal}
+              >
+                <input
+                  type="text"
+                  value={selectedAuthor}
+                  readOnly
+                  placeholder="작성자를 검색해서 선택하세요"
+                  className="w-full pr-10 cursor-pointer bg-transparent outline-none text-gray-900"
+                />
+                <FiSearch
+                  size={20}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 cursor-pointer"
+                  onClick={openModal} // 아이콘도 클릭 가능하게
+                />
+              </div>
+            </div>
+
+            {/* 모달 */}
+            {isModalOpen && (
+                        <Modal onClose={closeModal} bgColor="white">
+                <UserSearch
+                  isOpen={isModalOpen}
+                  onClose={closeModal}
+                  onSelect={handleAuthorSelect}
+                />
+                      </Modal>
+            )}
           </div>
         </div>
       </div>

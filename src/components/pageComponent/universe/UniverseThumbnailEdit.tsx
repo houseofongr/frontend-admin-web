@@ -1,20 +1,26 @@
 import { useState, useEffect } from "react";
-import { IoCloudUploadOutline } from "react-icons/io5";
 import { PiImagesThin } from "react-icons/pi";
-import { AOO_COLOR } from "../../../constants/color";
 import API_CONFIG from "../../../config/api";
 import { FaRegSave } from "react-icons/fa";
-
+import ModalAlertMessage, { AlertType } from "../../modal/ModalAlertMessage";
+import Button from "../../common/buttons/Button";
 
 interface ThumbnailEditProps {
   universeId: number;
+  onClose: () => void;
 }
 
-export default function UniverseThumbnailEdit({universeId}: ThumbnailEditProps) {
+export default function UniverseThumbnailEdit({
+  universeId,
+  onClose,
+}: ThumbnailEditProps) {
   const [dragOver, setDragOver] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [warning, setWarning] = useState("");
+  const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(
+    null
+  );
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -69,26 +75,46 @@ export default function UniverseThumbnailEdit({universeId}: ThumbnailEditProps) 
   };
 
   const saveThumbnailHandler = async () => {
-    console.log("universeId ", universeId, "fileName ", file?.name);
-    
-    // if (!file) {
-    //   console.log("업로드할 이미지 파일을 선택해주세요.", "fail");
-    //   return;
-    // }
-    // try {
-    //   const formData = new FormData();
-    //   formData.append("thumbnail", file);
+    if (!file) {
+      setAlert({
+        text: "업로드할 이미지 파일을 선택해주세요.",
+        type: "warning",
+      });
+      return;
+    }
 
-    //   const response = await fetch(
-    //     `${API_CONFIG.BACK_API}/admin/universes/thumbnail/${universeId}`,
-    //     {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-Type": "application/json",
-    //       },
-    //     }
-    //   );
+    try {
+      const formData = new FormData();
+      formData.append("thumbnail", file);
 
+      const response = await fetch(
+        `${API_CONFIG.BACK_API}/universes/thumbnail/${universeId}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (response.ok) {
+        setAlert({
+          text: "썸네일 저장이 완료되었습니다.",
+          type: "success",
+        });
+      } else {
+        const errorText = await response.text();
+        setAlert({
+          text: "썸네일 저장에 실패했습니다.",
+          type: "fail",
+        });
+        console.error("썸네일 저장 실패:", errorText);
+      }
+    } catch (e) {
+      console.error("에러 발생:", e);
+      setAlert({
+        text: "에러가 발생했습니다.",
+        type: "fail",
+      });
+    }
   };
 
   // 미리보기 URL 생성
@@ -106,67 +132,92 @@ export default function UniverseThumbnailEdit({universeId}: ThumbnailEditProps) 
   }, [file]);
 
   return (
-    <div className="flex flex-col">
-      <div
-        className={`border-2 border-dashed rounded-md p-10 text-center transition-all duration-200 ${
-          dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
-        }`}
-        onDrop={handleDrop}
-        onDragOver={handleDragOver}
-        onDragLeave={handleDragLeave}
-      >
-        <input
-          type="file"
-          accept="image/*"
-          className="hidden"
-          id="fileUpload"
-          onChange={handleFileChange}
+    <>
+      {alert && (
+        <ModalAlertMessage
+          text={alert.text}
+          type={alert.type}
+          onClose={() => {
+            setAlert(null);
+            onClose();
+          }}
+          okButton={
+            <Button
+              label="확인"
+              onClick={() => {
+                setAlert(null);
+                onClose();
+              }}
+            />
+          }
         />
+      )}
+      <div className="flex flex-col">
+        <div
+          className={`w-130 h-100 flex flex-col justify-center items-center border-2 border-dashed rounded-md p-10 text-center transition-all duration-200 ${
+            dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
+          }`}
+          onDrop={handleDrop}
+          onDragOver={handleDragOver}
+          onDragLeave={handleDragLeave}
+        >
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            id="fileUpload"
+            onChange={handleFileChange}
+          />
 
-        <label htmlFor="fileUpload" className="cursor-pointer block">
-          {previewUrl ? (
-            <img
-              src={previewUrl}
-              alt="미리보기"
-              className="mx-auto max-h-60 rounded-md mb-4"
-            />
-          ) : (
-            <PiImagesThin
-              className="inline-flex mb-5 text-gray-500"
-              size={50}
-            />
-          )}
+          <label
+            htmlFor="fileUpload"
+            className="flex flex-col justify-center items-center cursor-pointer"
+          >
+            {previewUrl ? (
+              <img
+                src={previewUrl}
+                alt="미리보기"
+                className="w-40 h-40 rounded-md mb-10"
+              />
+            ) : (
+              <PiImagesThin
+                className="inline-flex mb-5 text-gray-500"
+                size={50}
+              />
+            )}
 
-          <p>이미지 파일을 이곳에 드래그하거나 클릭해서 업로드하세요.</p>
-          <p className="mb-6 text-gray-400 text-sm">
-            이미지는 정방형 크기에 2MB 이하만 가능합니다.
-          </p>
-        </label>
+            <p>이미지 파일을 이곳에 드래그하거나 클릭해서 업로드하세요.</p>
+            <p className="mb-6 text-gray-400 text-sm">
+              이미지는 정방형 크기에 2MB 이하만 가능합니다.
+            </p>
 
-        {/* 업로드 메시지 */}
+            {/* 업로드 메시지 */}
+            {file && (
+              <div className={`mt-2 text-green-700 text-sm font-medium`}>
+                {file.name} 업로드됨
+              </div>
+            )}
+
+            {warning && (
+              <div className={`mt-1 text-sm text-warning font-normal`}>
+                {warning}
+              </div>
+            )}
+          </label>
+        </div>
+
+        {/* 저장 버튼 (우측 하단 고정) */}
         {file && (
-          <div className={`mt-2 text-green-700 text-sm font-medium`}>
-            {file.name} 업로드됨
-          </div>
-        )}
-        {warning && (
-          <div className={`mt-1 text-sm text-warning font-normal`}>
-            {warning}
+          <div className="flex justify-end mt-4">
+            <button
+              className={`flex bg-primary flex-row items-center hover:opacity-90 cursor-pointer text-white px-4 py-2 rounded-lg shadow-sm gap-2`}
+              onClick={saveThumbnailHandler}
+            >
+              <FaRegSave /> 저장
+            </button>
           </div>
         )}
       </div>
-
-      {/* 저장 버튼 (우측 하단 고정) */}
-      {file && (
-        <div className="flex justify-end mt-4">
-          <button
-            className={`flex bg-primary flex-row items-center hover:opacity-90 cursor-pointer text-white px-4 py-2 rounded-lg shadow-sm gap-2`}
-            onClick={saveThumbnailHandler}
-          >
-            <FaRegSave /> 저장
-          </button>
-        </div>
-      )}
-    </div>
+    </>
   );
 }

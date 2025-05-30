@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Universe } from "../../../types/universe";
 import { UniverseCategory } from "../../../constants/universeData";
 import { universeListHeaderTitles } from "../../../constants/headerList";
@@ -11,13 +10,12 @@ import Thumbnail from "../../Thumbnail";
 import { AOO_COLOR } from "../../../constants/color";
 import { PiEyesFill } from "react-icons/pi";
 import { IoHeart } from "react-icons/io5";
-
-
+import { convertUnixToDate } from "../../../utils/formatDate";
 
 interface UniverseListItemProps {
   universe: Universe;
   onDelete: (id: number) => void;
-  onEditThumbnail: (id: number) => void; // 썸네일 편집 버튼 클릭
+  onEditThumbnail: () => void; // 썸네일 편집 버튼 클릭
   onPlayMusic: (id: number) => void; // 썸뮤직 클릭
   onEdit: (id: number) => void; // 편집 클릭
 }
@@ -33,18 +31,16 @@ export default function UniverseListItem({
     id,
     thumbnailId,
     thumbMusicId,
-    createdDate,
-    updatedDate,
-    viewCount,
-    likeCount,
+    createdTime,
+    updatedTime,
+    view,
+    like,
     title,
     description,
     category,
     publicStatus,
     hashtags,
   } = universe;
-
-
   function getCategoryLabel(key?: string): string {
     if (!key) return "";
     return UniverseCategory[key as keyof typeof UniverseCategory] ?? key;
@@ -52,37 +48,36 @@ export default function UniverseListItem({
 
   return (
     <>
-      <li
-        className="hidden lg:flex p-2 items-center text-center rounded-md bg-[#fbfafa] shadow"
-      >
+      <li className="hidden lg:flex p-2 items-center text-center rounded-md bg-[#fbfafa] shadow space-x-1">
         {/* 썸네일 - 편집버튼 */}
-        <span
-          style={{ width: universeListHeaderTitles[0].width }}
-          className="flex justify-center"
-        >
-          <Thumbnail imageUrl="" onEdit={() => onEditThumbnail(thumbnailId)} />
+        <span style={{ width: universeListHeaderTitles[0].width }}>
+          <div className="flex justify-center">
+            <Thumbnail
+              thumbnailId={thumbnailId}
+              onEdit={() => onEditThumbnail()}
+            />
+          </div>
         </span>
 
         {/* 제목 + 설명 */}
-        <div
-          className="flex flex-col items-start"
-          style={{ width: universeListHeaderTitles[1].width }}
-        >
-          <span>{title}</span>
-          <span className="text-gray-500 text-sm break-words">
-            {description}
-          </span>
+        <div style={{ width: universeListHeaderTitles[1].width }}>
+          <div className="flex flex-col items-start pl-1">
+            <span>{title}</span>
+            <span className="text-gray-500 text-sm break-words">
+              {description}
+            </span>
+          </div>
         </div>
 
         {/* 썸뮤직 */}
         <div
           style={{ width: universeListHeaderTitles[2].width }}
-          className="flex justify-center hover:"
+          className="flex items-center justify-center"
         >
           <RiPlayCircleLine
             size={22}
             onClick={() => onPlayMusic(thumbMusicId)}
-            className={`cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
+            className={` cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
           />
         </div>
 
@@ -98,7 +93,7 @@ export default function UniverseListItem({
 
         {/* 생성일 */}
         <div style={{ width: universeListHeaderTitles[5].width }}>
-          {createdDate}
+          {convertUnixToDate(createdTime).default}
         </div>
 
         {/* 조회수 */}
@@ -106,7 +101,7 @@ export default function UniverseListItem({
           className="flex justify-center"
           style={{ width: universeListHeaderTitles[6].width }}
         >
-          {viewCount}
+          {view}
         </div>
 
         {/* 좋아요 */}
@@ -114,7 +109,7 @@ export default function UniverseListItem({
           className="flex justify-center"
           style={{ width: universeListHeaderTitles[7].width }}
         >
-          {likeCount}
+          {like}
         </div>
 
         {/* 편집 아이콘 */}
@@ -142,74 +137,77 @@ export default function UniverseListItem({
         </div>
       </li>
 
-      <li
-        className="hidden sm:flex md:flex lg:hidden flex-col p-2 text-center rounded-md bg-[#fbfafa] shadow  space-y-3 "
-      >
+      <li className="hidden sm:flex md:flex lg:hidden flex-col p-2 text-center rounded-md bg-[#fbfafa] shadow  space-y-3 ">
         {/* 1. 썸네일, 제목/설명, 카테고리, 공개여부*/}
         <div className="flex flex-row mb-2 items-center justify-around">
-          <span className="flex justify-center">
+          {/* 썸네일 */}
+          <span className="w-[20%] flex justify-center">
             <Thumbnail
-              imageUrl=""
-              onEdit={() => onEditThumbnail(thumbnailId)}
+              thumbnailId={thumbnailId}
+              onEdit={() => onEditThumbnail()}
             />
           </span>
-          <div className="flex flex-col items-start ml-2">
+          {/* 제목 | 설명 */}
+          <div className="w-[40%] flex flex-col items-start ml-2">
             <span>{title}</span>
             <span className="text-gray-500 text-sm break-words">
               {description}
             </span>
           </div>
-          <div className="flex items-center">
+          {/* 썸뮤직 */}
+          <div className="w-[10%] flex items-center">
             <RiPlayCircleLine
               size={20}
               onClick={() => onPlayMusic(thumbMusicId)}
               className={`cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
             />
           </div>
-          <div>{publicStatus}</div>
-          <div>{getCategoryLabel(category)}</div>
+          {/* 공개여부 */}
+          <div className="w-[15%]">{publicStatus}</div>
+          {/* 카테고리 */}
+          <div className="w-[15%]">{getCategoryLabel(category)}</div>
         </div>
 
         {/* ✅ 3. 생성일, 조회수, 좋아요, 편집, 삭제 → 다음줄에 분리 */}
-        <div className="flex flex-row items-center text-sm gap-5 justify-end">
-          <div className="mt-1">{createdDate}</div>
-          <div className="flex flex-row gap-2 mt-1">
-            <PiEyesFill size={15} /> {viewCount}
+        <div className="flex flex-row items-center text-sm gap-3 justify-end mr-1">
+          <div className="w-[100px] mt-1">
+            {convertUnixToDate(createdTime).default}
           </div>
-          <div className="flex flex-row gap-2 mt-1">
-            <IoHeart size={15} /> {likeCount}
+          <div className="w-[50px] flex flex-row gap-2 mt-1">
+            <PiEyesFill size={15} /> {view}
+          </div>
+          <div className="w-[50px] flex flex-row gap-2 mt-1">
+            <IoHeart size={15} /> {like}
           </div>
           <RiPencilLine
             size={18}
             onClick={() => onEdit(id as number)}
-            className={`cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
+            className={`w-[30px] cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
           />
           <RiDeleteBin6Line
             size={18}
             onClick={() => onDelete(id as number)}
-            className={`cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
+            className={`w-[30px] cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
           />
         </div>
       </li>
 
-      <li
-        className="flex sm:hidden md:hidden lg:hidden flex-col p-2 text-center rounded-md bg-[#fbfafa] shadow "
-      >
+      <li className="flex sm:hidden md:hidden lg:hidden flex-col p-2 text-center rounded-md bg-[#fbfafa] shadow ">
         {/* 1. 썸네일, 제목/설명, 카테고리, 공개여부*/}
-        <div className="flex flex-row mb-2 items-center justify-between">
-          <span className="flex justify-center">
+        <div className="flex flex-row mb-2 items-center justify-around">
+          <span className="w-[30%] flex justify-center">
             <Thumbnail
-              imageUrl=""
-              onEdit={() => onEditThumbnail(thumbnailId)}
+              thumbnailId={thumbnailId}
+              onEdit={() => onEditThumbnail()}
             />
           </span>
-          <div className="flex flex-col items-start ml-2">
+          <div className="w-[60%] flex flex-col items-start ml-2">
             <span>{title}</span>
             <span className="text-gray-500 text-sm break-words">
               {description}
             </span>
           </div>
-          <div className="flex items-center">
+          <div className="w-[10%] flex items-center">
             <RiPlayCircleLine
               size={20}
               onClick={() => onPlayMusic(thumbMusicId)}
@@ -219,29 +217,31 @@ export default function UniverseListItem({
         </div>
 
         {/* 2. 카테고리, 공개여부*/}
-        <div className="flex flex-row items-center text-sm gap-5 justify-end mb-1">
-          <div>{publicStatus}</div>
-          <div>{getCategoryLabel(category)}</div>
+        <div className="flex flex-row items-center text-sm gap-3 justify-end mb-1">
+          <div className="w-[20%]">{publicStatus}</div>
+          <div className="w-[20%]">{getCategoryLabel(category)}</div>
         </div>
 
         {/* ✅ 3. 생성일, 조회수, 좋아요, 편집, 삭제 → 다음줄에 분리 */}
-        <div className="flex flex-row items-center text-sm gap-5 justify-end">
-          <div className="mt-1">{createdDate}</div>
-          <div className="flex flex-row gap-2 mt-1">
-            <PiEyesFill size={15} /> {viewCount}
+        <div className="flex flex-row items-center text-sm gap-1 justify-end">
+          <div className="w-[18%] mt-1">
+            {convertUnixToDate(createdTime).default}
           </div>
-          <div className="flex flex-row gap-2 mt-1">
-            <IoHeart size={15} /> {likeCount}
+          <div className="w-[18%] flex flex-row gap-2 mt-1">
+            <PiEyesFill size={15} /> {view}
+          </div>
+          <div className="w-[18%] flex flex-row gap-2 mt-1">
+            <IoHeart size={15} /> {like}
           </div>
           <RiPencilLine
             size={18}
             onClick={() => onEdit(id as number)}
-            className={`cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
+            className={`w-[30px] cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
           />
           <RiDeleteBin6Line
             size={18}
             onClick={() => onDelete(id as number)}
-            className={`cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
+            className={`w-[30px] cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
           />
         </div>
       </li>

@@ -8,6 +8,9 @@ import ThumbnailStep from "./universeCreate/ThumbnailStep";
 import ThumbMusicStep from "./universeCreate/ThumbMusicStep";
 import InnerImgStep from "./universeCreate/InnerImgStep";
 import DetailInfoStep from "./universeCreate/DetailInfoStep";
+import API_CONFIG from "../../../config/api";
+import ModalAlertMessage, { AlertType } from "../../modal/ModalAlertMessage";
+import Button from "../../common/buttons/Button";
 
 interface ThumbnailEditProps {
   universeId: number;
@@ -20,10 +23,14 @@ enum CreateStep {
   DetailInfo,
 }
 
-export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
+export default function UniverseCreate({ universeId }: ThumbnailEditProps) {
   const [dragOver, setDragOver] = useState(false);
   const [warning, setWarning] = useState("");
-  const [step, setStep] = useState<CreateStep>(CreateStep.Thumbnail);
+  const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(
+    null
+  );
+
+  const [step, setStep] = useState<CreateStep>(CreateStep.DetailInfo);
 
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [thumbMusic, setThumbMusic] = useState<File | null>(null);
@@ -31,12 +38,16 @@ export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
   const [detailInfo, setDetailInfo] = useState<{
     title: string;
     description: string;
-    isPublic: boolean;
+    authorId: number;
+    category: string;
+    publicStatus: string;
     tags: string[];
   }>({
     title: "",
     description: "",
-    isPublic: true,
+    authorId: 1,
+    category: "",
+    publicStatus: "",
     tags: [],
   });
 
@@ -224,22 +235,78 @@ export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
   const handleDetailChange = (data: {
     title: string;
     description: string;
-    isPublic: boolean;
+    authorId: number;
+    category: string;
+    publicStatus: string;
     tags: string[];
   }) => {
     setDetailInfo(data);
   };
 
-  const handleSubmit = () => {
-    console.log("저장 데이터:", detailInfo);
-    console.log("썸네일 ", thumbnail);
-    console.log("썸뮤직 ", thumbMusic);
-    console.log("내부 이미지", innerImg);
+  const handleSubmit = async () => {
+    console.log("test");
+    const formData = new FormData();
 
+    const metadata = {
+      title: detailInfo.title,
+      description: detailInfo.description,
+      authorId: detailInfo.authorId,
+      category: detailInfo.category,
+      publicStatus: detailInfo.publicStatus,
+      tags: detailInfo.tags,
+    };
+
+    console.log("metadata", metadata);
+    console.log("metadata", innerImg);
+    console.log("metadata", thumbnail);
+    console.log("metadata", thumbMusic);
+
+    formData.append("innerImage", innerImg!);
+    formData.append("thumbnail", thumbnail!);
+    formData.append("thumbMusic", thumbMusic!);
+    formData.append("metadata", JSON.stringify(metadata));
+
+    try {
+      const response = await fetch(`${API_CONFIG.BACK_API}/universes`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        let errorMessage =
+          "새로운 유니버스 데이터를 생성하는데 실패하였습니다.";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || errorMessage;
+        } catch (jsonError) {
+          console.error("JSON 파싱 오류:", jsonError);
+        }
+
+        showAlert(errorMessage, "fail");
+        return;
+      }
+
+      showAlert(`새로운 유니버스가 성공적으로 저장되었습니다.`, "success");
+    } catch (error) {
+      showAlert(`데이터 저장 중 오류가 발생하였습니다. error:${error}`, "fail");
+    }
+  };
+
+  const showAlert = (text: string, type: AlertType) => {
+    setAlert({ text, type });
   };
 
   return (
     <div className="flex flex-col">
+      {alert && (
+        <ModalAlertMessage
+          text={alert.text}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+          okButton={<Button label="확인" onClick={() => setAlert(null)} />}
+        />
+      )}
+
       {step !== CreateStep.DetailInfo && (
         <div
           className={`w-130 h-100 flex justify-center items-center border-2 border-dashed rounded-md p-10 text-center transition-all duration-200 ${
@@ -306,6 +373,7 @@ export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
             <IoArrowBackCircleOutline size={30} />
           </button>
         )}
+
         {((step === CreateStep.Thumbnail && thumbnail) ||
           (step === CreateStep.ThumbMusic && thumbMusic) ||
           (step === CreateStep.InnerImg && innerImg)) && (
@@ -341,4 +409,3 @@ export default function UniverseCreat({ universeId }: ThumbnailEditProps) {
     </div>
   );
 }
-

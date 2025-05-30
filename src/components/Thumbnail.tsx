@@ -1,24 +1,22 @@
 import { RiPencilLine } from "react-icons/ri";
-import { AOO_COLOR } from "../constants/color";
+import API_CONFIG from "../config/api";
 
 type ThumbnailProps = {
-  imageUrl: string;
+  thumbnailId: number;
   onEdit: () => void;
 };
 
-export default function Thumbnail({ imageUrl, onEdit }: ThumbnailProps) {
-  if (imageUrl === "") imageUrl = "/images/house/AOO_INIT_HOUSE_GRAY.png";
-
+export default function Thumbnail({ thumbnailId, onEdit }: ThumbnailProps) {
   return (
-    <div className="relative flex justify-center w-25 h-20 group">
+    <div className="relative flex justify-center items-center w-20 h-20  group rounded-lg overflow-hidden">
       <img
-        src={imageUrl}
+        src={`${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${thumbnailId}`}
         alt="thumbnail"
-        className="rounded-lg object-cover w-20 h-20"
+        className="max-w-full max-h-full object-contain"
       />
       <button
         onClick={onEdit}
-        className="absolute top-1 right-1 w-7 h-7 flex items-center justify-center bg-black/10 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+        className="absolute cursor-pointer top-1 right-1 w-7 h-7 flex items-center justify-center bg-black/10 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
       >
         <RiPencilLine size={20} />
       </button>

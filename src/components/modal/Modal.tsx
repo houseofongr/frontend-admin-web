@@ -10,7 +10,7 @@ interface ModalProps {
 
 const Modal: React.FC<ModalProps> = ({ onClose, children, bgColor }) => {
   return (
-    <div className="fixed inset-0 bg-black/70 flex-center z-10" onClick={onClose}>
+    <div className="fixed inset-0 bg-black/70 flex-center z-20" onClick={onClose}>
       <div
         className={clsx("rounded-lg shadow-lg p-4 relative max-w-[1100px]   max-h-[80vh] overflow-auto", {
           "bg-white": bgColor === "white",

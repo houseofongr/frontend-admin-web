@@ -4,12 +4,13 @@ export interface Universe {
   id?: number;
   thumbnailId: number;
   thumbMusicId: number;
-  createdDate: number;
-  updatedDate?: number;
-  viewCount?: number;
-  likeCount: number;
+  createdTime: number;
+  updatedTime?: number;
+  view?: number;
+  like: number;
   title: string;
   description?: string;
+  author: string;
   category?: string;
   publicStatus?: string;
   hashtags?: Array;

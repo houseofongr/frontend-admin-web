@@ -20,3 +20,15 @@ export interface UserHome {
   createdDate: string;
   updatedDate: string;
 }
+
+export interface UserV2 {
+  id: number;
+  name: string;
+  nickname: string;
+  phoneNumber: string;
+  email: string;
+  registeredDate: number;
+  termsOfUseAgreement: string;
+  personalInformationAgreement: boolean;
+  snsAccounts: UserSNSInfo[];
+}

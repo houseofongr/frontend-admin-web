@@ -28,7 +28,6 @@ export default function GridHeader({ headerTitles }: HeaderProps) {
               : "pt-5 flex-center gap-[1px]"
           }
         >
-
           <span> {item.name}</span>
           <div>{item.name === "홈" && <GoHome />}</div>
           <div>{item.name === "룸" && <MdOutlineBedroomChild />}</div>

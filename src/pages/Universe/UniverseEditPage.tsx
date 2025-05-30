@@ -4,10 +4,11 @@ import WaveformWithAudioLight from "../../components/Sound/AudioLight";
 import { HiGlobeAsiaAustralia } from "react-icons/hi2";
 import { TbShieldLock } from "react-icons/tb";
 import PageLayout from "../../components/layout/PageLayout";
+import { UniverseCategory } from "../../constants/universeData";
 
 export default function UniverseEditPage() {
-  const { id } = useParams(); // id는 문자열로 들어옴
-  const universeId = parseInt(id || "", 10); // 숫자로 변환
+  const { universeId } = useParams(); // id는 문자열로 들어옴
+  const universe = parseInt(universeId || "", 10); // 숫자로 변환
 
   // 내부 이미지 미리보기
   const [previewInnerImg, setPreviewInnerImg] = useState<string | null>(null);
@@ -20,6 +21,9 @@ export default function UniverseEditPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
 
+  // 카테고리
+  const [category, setCategory] = useState("");
+
   // 공개 여부
   const [isPublic, setIsPublic] = useState(true); // 기본값: 공개
 
@@ -28,11 +32,14 @@ export default function UniverseEditPage() {
   const [tagList, setTagList] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!isNaN(universeId)) {
-      // fetch나 상태에서 universeId를 기반으로 데이터 불러오기
-      console.log("편집할 ID:", universeId);
+    if (!isNaN(universe)) {
+
+
+
+
+
     }
-  }, [universeId]);
+  }, [universe]);
 
   const handleTagInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const input = e.target.value;
@@ -79,7 +86,7 @@ export default function UniverseEditPage() {
         {/* 우측 영역 */}
         <div className="flex flex-col flex-1 gap-3 min-w-[300px]">
           {/* 제목 */}
-          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px]">
+          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[80px]">
             <label className="text-neutral-500 mb-0.5">제목</label>
             <input
               value={title}
@@ -94,12 +101,12 @@ export default function UniverseEditPage() {
           </div>
 
           {/* 설명 */}
-          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px] flex-grow">
+          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[80px] flex-grow">
             <label className="text-neutral-500 mb-0.5">설명</label>
             <textarea
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="outline-none bg-transparent w-full h-full text-gray-900"
+              className="outline-none bg-transparent w-full h-full text-gray-900 mb-5"
               maxLength={500}
               placeholder="설명을 입력하세요"
             />
@@ -108,8 +115,26 @@ export default function UniverseEditPage() {
             </div>
           </div>
 
+          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[80px]">
+            <label className="text-neutral-500 mb-0.5">카테고리</label>
+            <select
+              value={category}
+              onChange={(e) => setCategory(e.target.value)}
+              className="outline-none bg-transparent w-full text-gray-900"
+            >
+              <option value="" disabled>
+                카테고리를 선택하세요
+              </option>
+              {Object.entries(UniverseCategory).map(([key, label]) => (
+                <option key={key} value={key}>
+                  {label}
+                </option>
+              ))}
+            </select>
+          </div>
+
           {/* 공개여부 */}
-          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px]">
+          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[80px]">
             <label className="text-neutral-500 mb-0.5">공개여부</label>
             <div className="flex space-x-10 justify-center">
               <label className="flex items-center space-x-2 cursor-pointer">
@@ -155,7 +180,7 @@ export default function UniverseEditPage() {
           </div>
 
           {/* 태그 */}
-          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[60px]">
+          <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[80px]">
             <label className="text-neutral-500 mb-0.5">태그</label>
             <input
               value={tags}

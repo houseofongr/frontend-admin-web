@@ -12,7 +12,7 @@ type SearchProp = {
 };
 
 export default function SearchComponent({ onSearch, options }: SearchProp) {
-  const [filter, setFilter] = useState<string>(options[0]?.value || "all");
+  const [filter, setFilter] = useState<string>(options[0]?.value || "NAME");
   const [query, setQuery] = useState<string>("");
 
   const searchHandler = () => {

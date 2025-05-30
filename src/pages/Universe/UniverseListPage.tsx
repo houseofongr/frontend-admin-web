@@ -4,21 +4,19 @@ import { Universe } from "../../types/universe";
 import GridHeader from "../../components/GridHeader";
 import { universeListHeaderTitles } from "../../constants/headerList";
 import { userSearchOptions as universeOptions } from "../../constants/searchOptions";
-import { categoryOptions as categoryOptions } from "../../constants/searchOptions";
 import Pagination from "../../components/Pagination";
 import SearchComponent from "../../components/SearchComponent";
 import PageLayout from "../../components/layout/PageLayout";
-import { UNIVERSE_DATA } from "../../mocks/universe-data";
 import UniverseListItem from "../../components/pageComponent/universe/UniverseListItem";
 import { GoPlusCircle } from "react-icons/go";
 import CategorySelect from "../../components/pageComponent/universe/CategorySelect";
 import { AOO_COLOR } from "../../constants/color";
-import Modal from "../../components/modal/Modal";
 import UniverseThumbnailEdit from "../../components/pageComponent/universe/UniverseThumbnailEdit";
 import UniverseModal from "../../components/modal/UniverseModal";
 import { IoCloudUploadOutline } from "react-icons/io5";
-import UniverseCreat from "../../components/pageComponent/universe/UniverseCreat";
+import UniverseCreate from "../../components/pageComponent/universe/UniverseCreate";
 import API_CONFIG from "../../config/api";
+import { UniverseCategoryOptions } from "../../constants/universeData";
 
 export default function UniverseListPage() {
   const navigate = useNavigate();
@@ -36,13 +34,13 @@ export default function UniverseListPage() {
 
   const fetchUniverse = async () => {
     try {
-      // const response = await fetch(
-      //   `${API_CONFIG.BACK_API}/universes?page=${currentPage}&size=${size}`
-      // );
-      // const { universes, pagination } = await response.json();
-      const response = UNIVERSE_DATA;
-      const universes = response.universes;
-      const pagination = response.pagination;
+      const response = await fetch(
+        `${API_CONFIG.BACK_API}/universes?page=${currentPage}&size=${size}`
+      );
+      const { universes, pagination } = await response.json();
+      // const response = UNIVERSE_DATA;
+      // const universes = response.universes;
+      // const pagination = response.pagination;
 
       setUniverseList(universes);
       setTotalPages(pagination.totalPages);
@@ -58,6 +56,7 @@ export default function UniverseListPage() {
   }
 
   function handleCloseModal() {
+    fetchUniverse();
     setEditThumbnailUniverseId(null);
   }
 
@@ -120,7 +119,10 @@ export default function UniverseListPage() {
 
           {/* 카테고리 선택 & 검색 */}
           <div className="flex items-center mb-3">
-            <CategorySelect onSearch={() => {}} options={categoryOptions} />
+            <CategorySelect
+              onSearch={() => {}}
+              options={UniverseCategoryOptions}
+            />
             <SearchComponent onSearch={() => {}} options={universeOptions} />
           </div>
         </div>
@@ -142,8 +144,8 @@ export default function UniverseListPage() {
                       console.log(id + " Delete");
                     }}
                     onEdit={onEdit}
-                    onEditThumbnail={(id: number) =>
-                      handleOpenEditThumbnail(id)
+                    onEditThumbnail={() =>
+                      handleOpenEditThumbnail(universe.id!)
                     }
                     onPlayMusic={(id: number) => {
                       console.log(id + " Play Music");
@@ -171,7 +173,10 @@ export default function UniverseListPage() {
           icon={<IoCloudUploadOutline size={20} />}
           bgColor="white"
         >
-          <UniverseThumbnailEdit universeId={editThumbnailUniverseId} />
+          <UniverseThumbnailEdit
+            universeId={editThumbnailUniverseId}
+            onClose={handleCloseModal}
+          />
         </UniverseModal>
       )}
 
@@ -183,8 +188,7 @@ export default function UniverseListPage() {
           icon={<IoCloudUploadOutline size={20} />}
           bgColor="white"
         >
-          <UniverseCreat universeId={3} />
-          {/* <UniverseCreat onClose={() => setShowCreateModal(false)} /> */}
+          <UniverseCreate universeId={3} />
         </UniverseModal>
       )}
     </PageLayout>
