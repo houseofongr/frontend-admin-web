@@ -76,7 +76,7 @@ function App() {
           {/* 유니버스 메인화면 */}
           <Route path="/universe" element={<UniverseListPage />} />
 
-          {/* 유니버스 메인화면 */}
+          {/* 유니버스 수정화면 */}
           <Route
             path="/universe/edit/:universeId"
             element={<UniverseEditPage />}

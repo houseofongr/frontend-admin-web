@@ -39,7 +39,7 @@ export default function UniverseListItem({
     description,
     category,
     publicStatus,
-    tags,
+    hashtags,
   } = universe;
   function getCategoryLabel(key?: string): string {
     if (!key) return "";

@@ -1,18 +1,33 @@
-import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useEffect, useState, ChangeEvent, DragEvent, useRef } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { HiGlobeAsiaAustralia } from "react-icons/hi2";
 import { TbShieldLock } from "react-icons/tb";
+import { BiSave } from "react-icons/bi";
+import { IoCloudUploadOutline } from "react-icons/io5";
+
 import PageLayout from "../../components/layout/PageLayout";
+import WaveformWithAudioLightRow from "../../components/Sound/WaveformWithAudioLightRow";
+import UniverseEditInnerImg from "../../components/pageComponent/universe/universeEdit/UniverseEditInnerImg";
+import InnerImgStep from "../../components/pageComponent/universe/universeCreate/InnerImgStep";
+import UniverseModal from "../../components/modal/UniverseModal";
+
 import { PublicStatusOption, UniverseCategory } from "../../constants/universeData";
 import API_CONFIG from "../../config/api";
-import WaveformWithAudioLightRow from "../../components/Sound/WaveformWithAudioLightRow";
+import { checkFileSize, checkImageIsSquare } from "../../utils/fileValidator";
 import { Universe } from "../../types/universe";
-import UniverseEditInnerImg from "../../components/pageComponent/universe/UniverseEditInnerImg";
+import UniverseEditMusic from "../../components/pageComponent/universe/universeEdit/UniverseEditMusic";
+import InnerImageEditModal from "../../components/pageComponent/universe/universeEdit/InnerImgEditModal";
+import ThumbMusicEditModal from "../../components/pageComponent/universe/universeEdit/ThumbMusicEditModal";
+
 
 export default function UniverseEditPage() {
-  const { universeId } = useParams(); // id는 문자열로 들어옴
-  const universeIdParsed = parseInt(universeId || "", 10); // 숫자로 변환
+  // 🔁 라우팅
+  const { universeId } = useParams();
+  const universeIdParsed = parseInt(universeId || "", 10);
+  const navigate = useNavigate();
 
+
+  // 🧠 상태 관리
   const [universe, setUniverse] = useState<Universe>({
     id: 0,
     thumbnailId: 0,
@@ -23,62 +38,114 @@ export default function UniverseEditPage() {
     like: 0,
     title: "",
     description: "",
-    author: "",
+    authorId: "",
     category: "",
-    publicStatus: "PRIVATE", // 또는 "PUBLIC"
-    tags: [],
+    publicStatus: "PRIVATE",
+    hashtags: [],
   });
 
-  const fetchUniverse = async () => {
-    const response = await fetch(
-      `${API_CONFIG.BACK_API}/universes/${universeId}`
-    );
-    if (!response.ok) {
-      throw new Error(`Failed to fetch universe: ${response.statusText}`);
-    }
+  const [innerImg, setInnerImg] = useState<File | null>(null);
+  const [thumbMusic, setThumbMusic] = useState<File | null>(null);
+  const [showInnerImgEdit, setShowInnerImgEdit] = useState(false);
+  const [showThumbMusicEdit, setShowThumbMusicEdit] = useState(false);
 
-    const universeData: Universe = await response.json();
-    setUniverse(universeData);
-    console.log(universe);
-    
+  const [tags, setTags] = useState("");
+
+  // 유니버스 데이터 불러오기
+  const fetchUniverse = async () => {
+    try {
+      const response = await fetch(`${API_CONFIG.BACK_API}/universes/${universeId}`);
+      if (!response.ok) throw new Error(`Failed to fetch universe: ${response.statusText}`);
+      const universeData: Universe = await response.json();
+      setUniverse(universeData);
+
+    } catch (error) {
+      console.error(error);
+    }
   };
 
-  useEffect(() => {
-    console.log(universeIdParsed);
+  // const fetchPreviewInnerImg = async () => {
 
+  //   // 지금은 썸네일 아이디로 되어있는데 나중에 inner 이미지로 바꿔야함 !!!!!!!!!------------------------------------------------------------------------------------------
+  //   if (!universe.thumbnailId) return;
+  //   try {
+  //     const imageUrl = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${universe.thumbnailId}`;
+  //     const response = await fetch(imageUrl);
+  //     const blob = await response.blob();
+  //     const innerImgUrl = window.URL.createObjectURL(blob);
+
+  //     setPreviewInnerImg(innerImgUrl);
+
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // };
+
+  // 초기 데이터 로딩
+  useEffect(() => {
     if (!isNaN(universeIdParsed)) {
       fetchUniverse();
     }
-  }, [universeIdParsed]);
+  }, []);
+
+  // 저장 처리
+  const handleSave = async () => {
+    const jsonData = {
+      title: universe.title,
+      description: universe.description,
+      category: universe.category,
+      publicStatus: universe.publicStatus,
+      hashtags: universe.hashtags,
+    };
+
+    try {
+      const response = await fetch(`${API_CONFIG.BACK_API}/universes/${universe.id}`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(jsonData),
+      });
+
+      if (!response.ok) throw new Error("저장에 실패했습니다.");
+
+      const result = await response.json();
+      console.log("저장 성공:", result);
+      alert("변경사항이 저장되었습니다.");
+      navigate(-1);
+    } catch (error) {
+      console.error("저장 에러:", error);
+      alert("저장 중 오류가 발생했습니다.");
+    }
+  };
+
+  // 취소 처리
+  const handleCancel = () => {
+    if (confirm("저장하지 않은 변경사항이 사라집니다. 취소하시겠습니까?")) {
+      navigate(-1);
+    }
+  };
 
 
 
 
-  // 태그 입력 상태 (문자열)
-  const [tags, setTags] = useState("");
-
-  // universe 상태 (이미 선언됐다고 가정)
-
+  // 🏷 태그 처리
   const normalizeTagsAndUpdateState = (raw: string) => {
     const parts = raw.trim().split(/\s+/).filter(Boolean);
-    const normalized = parts.map((part) =>
-      part.startsWith("#") ? part : `#${part}`
-    );
+    const normalized = parts.map((part) => (part.startsWith("#") ? part : `#${part}`));
     const result = normalized.join(" ") + (raw.endsWith(" ") ? " " : "");
     const validTags = normalized
       .filter((t) => t.length > 1)
       .map((t) => t.replace(/^#/, ""));
 
-    // 우선 tags 상태도 같이 업데이트 (input 값 유지용)
     setTags(result);
-
     setUniverse((prev) => ({
       ...prev!,
-      tags: validTags,
+      hashtags: validTags,
     }));
   };
 
-  const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleTagChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     if (val.endsWith(" ")) {
       normalizeTagsAndUpdateState(val);
@@ -87,39 +154,47 @@ export default function UniverseEditPage() {
     }
   };
 
+
+
+  const handleSaveInnerImage = (file: File) => {
+    setInnerImg(file);
+  }
+  const handleSaveThumbMusic = (file: File) => {
+    setThumbMusic(file)
+  }
+
+
   return (
     <PageLayout>
       <section className="w-full mx-8 py-20 md:py-10 p-3 lg:w-[80%]">
-        <div className="px-3 flex flex-row">
+        <div className="px-3 flex flex-row justify-between">
           <h1 className="font-bold text-base lg:text-lg">유니버스 상세 정보</h1>
-          <button>버튼</button>
+          <div className="w-[35%] mr-1 flex justify-end gap-2">
+            <button
+              onClick={handleSave}
+              className="flex flex-row items-center gap-3 px-4 py-1.5 text-sm rounded-xl border-2 border-primary text-primary hover:opacity-70 transition"
+            >
+              <BiSave size={18} /> 변경내역 저장
+            </button>
+            <button
+              onClick={handleCancel}
+              className="px-4 py-1.5 border-2 border-gray-300 text-sm text-gray-400 rounded-xl hover:opacity-70 transition"
+            >
+              취소
+            </button>
+          </div>
+
         </div>
 
         <div className="flex flex-col lg:flex-row gap-4 p-3 w-[100%]">
           {/* 좌측 영역 */}
           <div className="flex flex-2 flex-col gap-3 h-[100%]">
-            {universe && universe.thumbnailId != null && (
-              <UniverseEditInnerImg universe={universe} onEdit={() => { }} />
-            )}
-
-            {/* 내부 이미지 미리보기 */}
-            {/* <div className="relative flex grow items-center justify-center border border-gray-300 rounded-xl bg-transparent p-5">
-              <img
-                src={`${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${
-                  universe!.thumbnailId
-                }`}
-                alt=""
-                className="object-contain"
-              />
-            </div> */}
+            <div className="h-min-[200px]">
+              <UniverseEditInnerImg thumbnailId={universe.thumbnailId} onEdit={() => setShowInnerImgEdit(true)} />
+            </div>
             <div className="h-[30%] flex-col">
               {/* 썸뮤직 미리듣기 */}
-              {universe && universe.thumbMusicId != null && (
-                <WaveformWithAudioLightRow
-                  audioUrl={`${API_CONFIG.VITE_AUDIO_LOAD_PUBLIC}/${universe?.thumbMusicId}`}
-                  audioTitle={universe.thumbMusicId == null ? "" : ""}
-                />
-              )}
+              <UniverseEditMusic thumbMusicId={universe.thumbMusicId} onEdit={() => setShowThumbMusicEdit(true)} />
             </div>
           </div>
           {/* 우측 영역 */}
@@ -218,7 +293,7 @@ export default function UniverseEditPage() {
                     type="radio"
                     name="isPublic"
                     checked={
-                      universe?.publicStatus == PublicStatusOption.PUBLIC
+                      universe?.publicStatus === PublicStatusOption.PRIVATE
                     }
                     onChange={() =>
                       setUniverse((prev) => ({
@@ -246,17 +321,31 @@ export default function UniverseEditPage() {
               <input
                 value={tags}
                 onChange={handleTagChange}
-                onBlur={() => normalizeTagsAndUpdateState(tags)} 
+                onBlur={() => normalizeTagsAndUpdateState(tags)}
                 placeholder="#태그를 입력하고 스페이스바로 구분"
                 className="outline-none bg-transparent w-full text-gray-900"
               />
               <div className="absolute bottom-2 right-4 text-xs text-gray-500">
-                {universe.tags?.length || 0} / 10
+                {universe.hashtags?.length || 0} / 10
               </div>
             </div>
           </div>
         </div>
       </section>
+      {showInnerImgEdit && (
+        <InnerImageEditModal
+          onClose={() => setShowInnerImgEdit(false)}
+          handleSaveInnerImage={handleSaveInnerImage}
+        />
+      )}
+
+      {showThumbMusicEdit && (
+        <ThumbMusicEditModal
+          onClose={() => setShowThumbMusicEdit(false)}
+          handleSaveThumbMusicImage={handleSaveThumbMusic}
+        />
+      )}
+
     </PageLayout>
   );
 }

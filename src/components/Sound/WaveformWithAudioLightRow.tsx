@@ -27,6 +27,10 @@ const WaveformWithAudioLightRow: React.FC<WaveformProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
+    console.log("audioUrl", audioUrl);
+
+
+
     if (!waveformRef.current || !audioRef.current) return;
     console.log("wavesurfer", waveSurfer);
     const waveSurferInstance = WaveSurfer.create({
@@ -35,7 +39,7 @@ const WaveformWithAudioLightRow: React.FC<WaveformProps> = ({
       progressColor: "#ff6347", // bg light version
       // progressColor: "#F5946D", // bg dark version
       cursorColor: "#F5946D",
-      height: 150,
+      height: 120,
       // barHeight: 20,
       barWidth: 0.5,
       cursorWidth: 1,

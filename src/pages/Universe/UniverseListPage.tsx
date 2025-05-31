@@ -65,11 +65,6 @@ export default function UniverseListPage() {
   }, [currentPage]);
 
   const onEdit = (id: number) => {
-    var uni = universeList.find((x) => x.id == id);
-
-    console.log(id + " Edit");
-    console.log(uni);
-    
     navigate(`/universe/edit/${id}`);
   };
 
@@ -116,7 +111,7 @@ export default function UniverseListPage() {
           )}
           {universeList && (
             <ul className="w-full flex flex-col gap-5 ">
-              {universeList.map((universe, index) => {
+              {universeList.map((universe) => {
                 return (
                   <UniverseListItem
                     key={universe.id}

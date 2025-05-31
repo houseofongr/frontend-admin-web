@@ -8,8 +8,8 @@ export interface Universe {
   like: number;
   title: string;
   description?: string;
-  author: string;
+  authorId: string;
   category?: string;
   publicStatus?: string;
-  tags?: Array;
+  hashtags?: Array;
 }

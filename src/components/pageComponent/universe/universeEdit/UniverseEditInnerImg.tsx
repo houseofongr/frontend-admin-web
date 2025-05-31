@@ -1,30 +1,25 @@
 import { useState, useRef, useEffect } from "react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
-import API_CONFIG from "../../../config/api";
-import { Universe } from "../../../types/universe";
+import API_CONFIG from "../../../../config/api";
 import { RiImageEditFill, RiFileDownloadLine } from "react-icons/ri";
 
 
 
 interface UniverseEditInnerImgProps {
-  universe: Universe;
-  onEdit: (id: number) => void;
+  thumbnailId: number;
+  onEdit: () => void;
 }
 
 export default function UniverseEditInnerImg({
-  universe,
+  thumbnailId,
   onEdit,
 }: UniverseEditInnerImgProps) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
-  const handleEditImage = () => {
-    console.log("이미지 수정 로직 실행");
-  };
-
   const handleDownloadImage = async () => {
     try {
-      const imageUrl = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${universe.thumbnailId}`;
+      const imageUrl = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${thumbnailId}`;
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
@@ -56,7 +51,7 @@ export default function UniverseEditInnerImg({
   return (
     <div
       ref={menuRef}
-      className="relative inline-block text-left group flex justify-center"
+      className="h-full relative text-left group flex justify-center"
       onMouseLeave={() => setOpen(false)}
     >
       <button
@@ -73,7 +68,7 @@ export default function UniverseEditInnerImg({
         >
           <ul className="py-1 text-sm text-gray-700">
             <li
-              onClick={handleEditImage}
+              onClick={onEdit}
               className="flex flex-row px-4 py-2 hover:bg-gray-100 cursor-pointer "
             >
               <RiImageEditFill size={20} className="text-gray-500 mr-5" />
@@ -91,7 +86,7 @@ export default function UniverseEditInnerImg({
       )}
 
       <img
-        src={`${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${universe.thumbnailId}`}
+        src={`${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${thumbnailId}`}
         alt=""
         className="object-contain block mx-auto"
       />

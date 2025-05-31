@@ -15,18 +15,18 @@ interface DetailInfoStepProps {
   detailInfo: {
     title: string;
     description: string;
-    author: UserV2 | null;
+    authorId: UserV2 | null;
     category: string;
     publicStatus: string;
-    tags: string[];
+    hashtags: string[];
   };
   onChange: (data: {
     title: string;
     description: string;
-    author: UserV2;
+    authorId: UserV2;
     category: string;
     publicStatus: string;
-    tags: string[];
+    hashtags: string[];
   }) => void;
 }
 
@@ -50,10 +50,10 @@ export default function DetailInfoStep({
       ? PublicStatusOption.PUBLIC
       : PublicStatusOption.PRIVATE
   );
-  const [tags, setTags] = useState<string>(detailInfo.tags.join(" "));
+  const [tags, setTags] = useState<string>(detailInfo.hashtags.join(" "));
   const [tagList, setTagList] = useState<string[]>([]);
   const [category, setCategory] = useState(detailInfo.category);
-  const [author, setAuthor] = useState<UserV2 | null>(detailInfo.author);
+  const [authorId, setAuthorId] = useState<UserV2 | null>(detailInfo.authorId);
 
   // 작성자 선택 모달
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -62,7 +62,7 @@ export default function DetailInfoStep({
   const closeModal = () => setIsModalOpen(false);
 
   const handleAuthorSelect = (user: UserV2) => {
-    setAuthor(user);
+    setAuthorId(user);
     closeModal();
   };
 
@@ -129,17 +129,17 @@ export default function DetailInfoStep({
 
   // 상위 컴포넌트로 값 전달
   useEffect(() => {
-    if (author !== null) {
+    if (authorId !== null) {
       onChange({
         title,
         description,
-        author,
+        authorId,
         category,
         publicStatus,
-        tags: tagList,
+        hashtags: tagList,
       });
     }
-  }, [title, description, author, category, publicStatus, tagList]);
+  }, [title, description, authorId, category, publicStatus, tagList]);
 
   return (
     <div className="w-full max-w-[1000px] mx-auto">
@@ -269,7 +269,7 @@ export default function DetailInfoStep({
                 <input
                   type="text"
                   value={
-                    author == null ? "" : `${author.name}  #${author.nickname}`
+                    authorId == null ? "" : `${authorId.name}  #${authorId.nickname}`
                   }
                   readOnly
                   placeholder="작성자를 검색해서 선택하세요"

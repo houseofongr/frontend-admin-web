@@ -43,17 +43,17 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
   const [detailInfo, setDetailInfo] = useState<{
     title: string;
     description: string;
-    author: UserV2 | null;
+    authorId: UserV2 | null;
     category: string;
     publicStatus: string;
-    tags: string[];
+    hashtags: string[];
   }>({
     title: "",
     description: "",
-    author: null,
+    authorId: null,
     category: "",
     publicStatus: "",
-    tags: [],
+    hashtags: [],
   });
 
   const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(null);
@@ -64,12 +64,12 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
   const hasRequiredData = () => {
     if (!thumbnail || !thumbMusic || !innerImg) return false;
 
-    const { title, description, author, category, publicStatus } = detailInfo;
+    const { title, description, authorId, category, publicStatus } = detailInfo;
 
     if (
       !title.trim() ||
       !description.trim() ||
-      !author ||
+      !authorId ||
       !category.trim() ||
       !publicStatus.trim()
     ) {
@@ -166,10 +166,10 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
   const handleDetailChange = (data: {
     title: string;
     description: string;
-    author: UserV2;
+    authorId: UserV2;
     category: string;
     publicStatus: string;
-    tags: string[];
+    hashtags: string[];
   }) => {
     setDetailInfo(data);
   };
@@ -245,10 +245,10 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
     const metadata = {
       title: detailInfo.title,
       description: detailInfo.description,
-      authorId: detailInfo.author?.id,
+      authorId: detailInfo.authorId?.id,
       category: detailInfo.category,
       publicStatus: detailInfo.publicStatus,
-      tags: detailInfo.tags,
+      hashtags: detailInfo.hashtags,
     };
 
     formData.append("innerImage", innerImg);
