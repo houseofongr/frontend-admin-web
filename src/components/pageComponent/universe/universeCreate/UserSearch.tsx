@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
-import SpinnerIcon from "../../icons/SpinnerIcon";
-import SearchComponent from "../../SearchComponent";
-import { UserV2 } from "../../../types/user";
-import API_CONFIG from "../../../config/api";
-import GridHeader from "../../GridHeader";
-import { searchUserListHeaderTitles } from "../../../constants/headerList";
-import { userSearchOptions } from "../../../constants/searchOptions";
-import Pagination from "../../Pagination";
-import SearchUserListItem from "../../user/SearchUserListItem";
+import SpinnerIcon from "../../../icons/SpinnerIcon";
+import SearchComponent from "../../../SearchComponent";
+import { UserV2 } from "../../../../types/user";
+import API_CONFIG from "../../../../config/api";
+import GridHeader from "../../../GridHeader";
+import { searchUserListHeaderTitles } from "../../../../constants/headerList";
+import { userSearchOptions } from "../../../../constants/searchOptions";
+import Pagination from "../../../Pagination";
+import SearchUserListItem from "../../../user/SearchUserListItem";
 
 interface AuthorSearchModalProps {
   isOpen: boolean;

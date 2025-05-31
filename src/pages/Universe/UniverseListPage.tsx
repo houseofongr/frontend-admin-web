@@ -80,7 +80,7 @@ export default function UniverseListPage() {
 
   return (
     <PageLayout>
-      <section className="w-full sm:w-[90%] md:w-[90%] lg:w-[70%] py-10 px-3 mx-auto">
+      <section className="w-full mx-8 py-10 md:py-20 sm:w-[90%] md:w-[90%] lg:w-[70%] ">
         <div className="flex flex-col lg:flex-row lg:items-center lg:pb-3 justify-between">
           <div className="flex items-center space-x-5 mb-3">
             <h1 className="font-bold text-base lg:text-lg">

@@ -16,3 +16,11 @@ export interface Universe {
   hashtags?: Array;
 }
 
+
+export const PublicStatusOption = {
+  PUBLIC: "PUBLIC",
+  PRIVATE: "PRIVATE",
+} as const;
+
+export type PublicStatusOption =
+  (typeof PublicStatusOption)[keyof typeof PublicStatusOption];

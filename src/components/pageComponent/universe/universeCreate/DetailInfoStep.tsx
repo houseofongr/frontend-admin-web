@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
-import WaveformWithAudioLight from "../../../Sound/AudioLight";
 import { HiGlobeAsiaAustralia } from "react-icons/hi2";
 import { TbShieldLock } from "react-icons/tb";
 import { UniverseCategory } from "../../../../constants/universeData";
 import { FiSearch } from "react-icons/fi";
-import UserSearch from "../UserSearch";
+import UserSearch from "./UserSearch";
 import Modal from "../../../modal/Modal";
 import { UserV2 } from "../../../../types/user";
+import AudioLight from "../../../Sound/AudioLight";
+import { PublicStatusOption } from "../../../../types/universe";
 
 interface DetailInfoStepProps {
   innerImg: File | null;
@@ -29,10 +30,7 @@ interface DetailInfoStepProps {
   }) => void;
 }
 
-enum PublicStatusOption {
-  PUBLIC = "PUBLIC",
-  PRIVATE = "PRIVATE",
-}
+
 
 export default function DetailInfoStep({
   innerImg,
@@ -203,12 +201,14 @@ export default function DetailInfoStep({
               "내부이미지"
             )}
           </div>
-          <div className="min-w-[490px] min-h-[150px] flex justify-center items-center border border-gray-300 rounded-xl p-1">
+          <div className="min-w-[300px] min-h-[150px] flex justify-center center items-center border border-gray-300 rounded-xl p-1">
             {previewMusic && (
-              <WaveformWithAudioLight
-                audioUrl={previewMusic}
-                audioTitle={thumbMusic?.name || "썸네일 음악 미리듣기"}
-              />
+              <div className="flex w-[100%]">
+                <AudioLight
+                  audioUrl={previewMusic}
+                  audioTitle={thumbMusic?.name || "썸네일 음악 미리듣기"}
+                />
+              </div>
             )}
           </div>
         </div>

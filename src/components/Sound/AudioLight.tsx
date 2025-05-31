@@ -1,68 +1,24 @@
 import React, { useRef, useEffect, useState } from "react";
-import WaveSurfer from "wavesurfer.js";
-import { TbPlayerPlayFilled } from "react-icons/tb";
-import { TbPlayerPauseFilled } from "react-icons/tb";
-import { TbPlayerStopFilled } from "react-icons/tb";
-import { MdReplay10 } from "react-icons/md";
-import { MdForward10 } from "react-icons/md";
-import { VscMute } from "react-icons/vsc";
-import { VscUnmute } from "react-icons/vsc";
+import {
+  TbPlayerPlayFilled,
+  TbPlayerPauseFilled,
+  TbPlayerStopFilled,
+} from "react-icons/tb";
+import { MdReplay10, MdForward10 } from "react-icons/md";
+import { VscMute, VscUnmute } from "react-icons/vsc";
 
-interface WaveformProps {
+interface AudioProps {
   audioUrl: string;
   audioTitle: string;
 }
 
-const WaveformWithAudioLight: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) => {
-  const waveformRef = useRef<HTMLDivElement>(null);
+const AudioLight: React.FC<AudioProps> = ({ audioUrl, audioTitle }) => {
   const audioRef = useRef<HTMLAudioElement>(null);
-  const [waveSurfer, setWaveSurfer] = useState<WaveSurfer | null>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(0.3);
   const [isPlaying, setIsPlaying] = useState(false);
-
-  useEffect(() => {
-    if (!waveformRef.current || !audioRef.current) return;
-    console.log("wavesurfer", waveSurfer);
-    const waveSurferInstance = WaveSurfer.create({
-      container: waveformRef.current,
-      waveColor: "gray",
-      progressColor: "#ff6347", // bg light version
-      // progressColor: "#F5946D", // bg dark version
-      cursorColor: "#F5946D",
-      height: 150,
-      // barHeight: 20,
-      barWidth: 0.5,
-      cursorWidth: 1,
-      barGap: 0.5,
-      // barGap: 0,
-      // barGap: 1, //default
-      backend: "MediaElement",
-      // crossOrigin: "use-credentials",
-      mediaControls: true,
-      media: audioRef.current, // Sync with audio element
-    });
-
-    waveSurferInstance.load(audioUrl);
-    setWaveSurfer(waveSurferInstance);
-
-    waveSurferInstance.on("error", (error) => {
-      console.error("WaveSurfer error:", error);
-    });
-
-    waveSurferInstance.on("ready", () => {
-      console.log("WaveSurfer is ready");
-    });
-
-    waveSurferInstance.on("error", (error) => {
-      console.error("WaveSurfer error:", error);
-    });
-    console.log(audioUrl);
-    
-    return () => waveSurferInstance.destroy();
-  }, [audioUrl]);
 
   useEffect(() => {
     const audio = audioRef.current;
@@ -73,6 +29,8 @@ const WaveformWithAudioLight: React.FC<WaveformProps> = ({ audioUrl, audioTitle 
       setDuration(audio.duration || 0);
     };
 
+    audio.volume = volume;
+
     audio.addEventListener("timeupdate", updateProgress);
     audio.addEventListener("loadedmetadata", updateProgress);
 
@@ -80,7 +38,7 @@ const WaveformWithAudioLight: React.FC<WaveformProps> = ({ audioUrl, audioTitle 
       audio.removeEventListener("timeupdate", updateProgress);
       audio.removeEventListener("loadedmetadata", updateProgress);
     };
-  }, []);
+  }, [volume]);
 
   const handleSeek = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (audioRef.current) {
@@ -99,6 +57,7 @@ const WaveformWithAudioLight: React.FC<WaveformProps> = ({ audioUrl, audioTitle 
       setIsPlaying(false);
     }
   };
+
   const handleStop = () => {
     if (audioRef.current) {
       audioRef.current.pause();
@@ -112,7 +71,8 @@ const WaveformWithAudioLight: React.FC<WaveformProps> = ({ audioUrl, audioTitle 
       let newTime = audioRef.current.currentTime + seconds;
 
       if (newTime < 0) newTime = 0;
-      if (newTime > audioRef.current.duration) newTime = audioRef.current.duration;
+      if (newTime > audioRef.current.duration)
+        newTime = audioRef.current.duration;
 
       audioRef.current.currentTime = newTime;
     }
@@ -139,25 +99,18 @@ const WaveformWithAudioLight: React.FC<WaveformProps> = ({ audioUrl, audioTitle 
     }
 
     setVolume(newVolume);
-    if (newVolume === 0) {
-      setIsMuted(true);
-    } else {
-      setIsMuted(false);
-    }
+    setIsMuted(newVolume === 0);
   };
 
   return (
-    <div className="flex flex-col px-5 max-w-[450px]">
-      {/* 파형/오디오 */}
-      <div className="hidden" ref={waveformRef} />
-      <div className="hidden mb-8">
-        <audio ref={audioRef} controls src={audioUrl} className="hidden" />
-      </div>
+    <div className="flex flex-col px-5 min-w-[230px] w-full">
+      {/* 오디오 엘리먼트 추가 */}
+      <audio ref={audioRef} src={audioUrl} className="hidden" />
 
       {/* 컨트롤러 */}
-      <div className="w-full py-5 px-4">
-        <div className="text-center  text-neutral-600">{audioTitle}</div>
-        <div className="w-full flex flex-col items-center gap-2 pt-4 ">
+      <div className="w-full py-5 px-4 min-w-[230px]">
+        <div className="text-center text-neutral-600">{audioTitle}</div>
+        <div className="w-full flex flex-col items-center gap-2 pt-4">
           <input
             type="range"
             min="0"
@@ -165,7 +118,7 @@ const WaveformWithAudioLight: React.FC<WaveformProps> = ({ audioUrl, audioTitle 
             step="0.1"
             value={currentTime}
             onChange={handleSeek}
-            className="w-full h-1.5 bg-neutral-200  appearance-none cursor-pointer"
+            className="w-full h-1.5 bg-neutral-200 appearance-none cursor-pointer"
           />
           <div className="w-full flex justify-between">
             <span className="text-xs text-neutral-600">
@@ -176,38 +129,42 @@ const WaveformWithAudioLight: React.FC<WaveformProps> = ({ audioUrl, audioTitle 
             </span>
           </div>
         </div>
-        <div className="w-full flex justify-center pl-25 gap-4">
-          {/* 뒤로 10초 */}
-          <button onClick={() => handleSkip(-10)}>
-            <MdReplay10 size={25} className="text-neutral-500" />
-          </button>
-          {/* 재생/일시정지 */}
-          <button onClick={handlePlayPause}>
-            {isPlaying ? (
-              <TbPlayerPauseFilled size={25} className="text-neutral-500" />
-            ) : (
-              <TbPlayerPlayFilled size={25} className="text-neutral-500" />
-            )}
-          </button>
-          {/* 정지 */}
-          <button onClick={handleStop} className="p-2 ">
-            <TbPlayerStopFilled size={25} className="text-neutral-500" />
-          </button>
-          {/* 앞으로 10초 */}
-          <button onClick={() => handleSkip(10)}>
-            <MdForward10 size={25} className="text-neutral-500" />
-          </button>
+
+        <div className="w-full flex flex-row justify-between">
+          <div className=" lg:flex-2"></div>
+          <div className="flex flex-5 justify-between">
+            {/* 뒤로 10초 */}
+            <button onClick={() => handleSkip(-10)}>
+              <MdReplay10 size={25} className="text-neutral-500" />
+            </button>
+            {/* 재생/일시정지 */}
+            <button onClick={handlePlayPause}>
+              {isPlaying ? (
+                <TbPlayerPauseFilled size={25} className="text-neutral-500" />
+              ) : (
+                <TbPlayerPlayFilled size={25} className="text-neutral-500" />
+              )}
+            </button>
+            {/* 정지 */}
+            <button onClick={handleStop} className="p-2">
+              <TbPlayerStopFilled size={25} className="text-neutral-500" />
+            </button>
+            {/* 앞으로 10초 */}
+            <button onClick={() => handleSkip(10)}>
+              <MdForward10 size={25} className="text-neutral-500" />
+            </button>
+          </div>
+
           {/* 음소거 */}
-          <div className=" flex justify-end items-center">
-            <button onClick={toggleMute} className="p-2 ">
+          <div className="flex flex-3 justify-end items-center">
+            <button onClick={toggleMute} className="pr-2">
               {isMuted ? (
                 <VscMute size={18} className="text-neutral-500" />
               ) : (
                 <VscUnmute size={18} className="text-neutral-500" />
               )}
             </button>
-
-            <div className=" w-[50%] flex flex-col items-center gap-2 py-1">
+            <div className="w-[50%] flex flex-col items-center gap-2 py-1">
               <input
                 type="range"
                 min="0"
@@ -215,7 +172,7 @@ const WaveformWithAudioLight: React.FC<WaveformProps> = ({ audioUrl, audioTitle 
                 step="0.01"
                 value={volume}
                 onChange={handleVolumeChange}
-                className="w-full h-1.5 bg-gray-300 rounded-lg appearance-none cursor-pointer "
+                className="w-full h-1.5 bg-gray-300 rounded-lg appearance-none cursor-pointer"
               />
             </div>
           </div>
@@ -233,4 +190,4 @@ const formatTime = (time: number) => {
   return `${minutes}:${seconds}`;
 };
 
-export default WaveformWithAudioLight;
+export default AudioLight;

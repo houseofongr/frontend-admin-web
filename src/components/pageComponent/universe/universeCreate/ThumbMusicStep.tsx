@@ -1,6 +1,5 @@
 import { PiMusicNotesPlusLight } from "react-icons/pi";
-import WaveformWithAudioDark from "../../../Sound/WaveformWithAudioDark";
-import WaveformWithAudioLight from "../../../Sound/AudioLight";
+import AudioLight from "../../../Sound/AudioLight";
 
 interface Props {
   thumbMusic: File | null;
@@ -16,7 +15,7 @@ export default function ThumbMusicStep({
   onFileChange,
 }: Props) {
   return (
-    <div className="flex flex-col items-center">
+    <div className="flex flex-col items-center w-full">
       <input
         type="file"
         accept="audio/*"
@@ -49,10 +48,12 @@ export default function ThumbMusicStep({
 
       {/* 이 부분은 label 바깥에 둬야 클릭 이벤트 방지됨 */}
       {previewMusic && (
-        <WaveformWithAudioLight
-          audioUrl={previewMusic}
-          audioTitle={thumbMusic?.name || "썸네일 음악 미리듣기"}
-        />
+        <div className="w-[80%] w-min-[300px]">
+          <AudioLight
+            audioUrl={previewMusic}
+            audioTitle={thumbMusic?.name || "썸네일 음악 미리듣기"}
+          />
+        </div>
       )}
 
       {warning && (
