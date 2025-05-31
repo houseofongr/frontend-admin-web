@@ -7,7 +7,7 @@ import UserSearch from "./UserSearch";
 import Modal from "../../../modal/Modal";
 import { UserV2 } from "../../../../types/user";
 import AudioLight from "../../../Sound/AudioLight";
-import { PublicStatusOption } from "../../../../types/universe";
+import { PublicStatusOption } from "../../../../constants/universeData";
 
 interface DetailInfoStepProps {
   innerImg: File | null;

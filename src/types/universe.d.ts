@@ -1,5 +1,3 @@
-import { publicStatus } from "./common";
-
 export interface Universe {
   id?: number;
   thumbnailId: number;
@@ -13,14 +11,5 @@ export interface Universe {
   author: string;
   category?: string;
   publicStatus?: string;
-  hashtags?: Array;
+  tags?: Array;
 }
-
-
-export const PublicStatusOption = {
-  PUBLIC: "PUBLIC",
-  PRIVATE: "PRIVATE",
-} as const;
-
-export type PublicStatusOption =
-  (typeof PublicStatusOption)[keyof typeof PublicStatusOption];

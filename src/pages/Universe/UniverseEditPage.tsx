@@ -3,30 +3,31 @@ import { useParams } from "react-router-dom";
 import { HiGlobeAsiaAustralia } from "react-icons/hi2";
 import { TbShieldLock } from "react-icons/tb";
 import PageLayout from "../../components/layout/PageLayout";
-import { UniverseCategory } from "../../constants/universeData";
+import { PublicStatusOption, UniverseCategory } from "../../constants/universeData";
 import API_CONFIG from "../../config/api";
 import WaveformWithAudioLightRow from "../../components/Sound/WaveformWithAudioLightRow";
-import { PublicStatusOption, Universe } from "../../types/universe";
+import { Universe } from "../../types/universe";
 import UniverseEditInnerImg from "../../components/pageComponent/universe/UniverseEditInnerImg";
 
 export default function UniverseEditPage() {
   const { universeId } = useParams(); // id는 문자열로 들어옴
   const universeIdParsed = parseInt(universeId || "", 10); // 숫자로 변환
 
-  const [universe, setUniverse] = useState<Universe>();
-  // 내부 이미지 미리보기
-  const [previewInnerImg, setPreviewInnerImg] = useState<string | null>(null);
-
-  // 음악 미리듣기
-  const [previewMusic, setPreviewMusic] = useState<string | null>(null);
-  const [thumbMusic, setThumbMusic] = useState<File | null>(null); // 또는 해당 음악의 이름 등
-
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [category, setCategory] = useState("");
-  const [isPublic, setIsPublic] = useState(true); // 기본값: 공개
-  const [tags, setTags] = useState("");
-  const [tagList, setTagList] = useState<string[]>([]);
+  const [universe, setUniverse] = useState<Universe>({
+    id: 0,
+    thumbnailId: 0,
+    thumbMusicId: 0,
+    createdTime: Date.now(),
+    updatedTime: Date.now(),
+    view: 0,
+    like: 0,
+    title: "",
+    description: "",
+    author: "",
+    category: "",
+    publicStatus: "PRIVATE", // 또는 "PUBLIC"
+    tags: [],
+  });
 
   const fetchUniverse = async () => {
     const response = await fetch(
@@ -38,6 +39,8 @@ export default function UniverseEditPage() {
 
     const universeData: Universe = await response.json();
     setUniverse(universeData);
+    console.log(universe);
+    
   };
 
   useEffect(() => {
@@ -48,16 +51,39 @@ export default function UniverseEditPage() {
     }
   }, [universeIdParsed]);
 
-  const handleTagInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const input = e.target.value;
-    setTags(input);
 
-    if (input.endsWith(" ")) {
-      const newTag = input.trim();
-      if (newTag && !tagList.includes(newTag) && tagList.length < 10) {
-        setTagList([...tagList, newTag]);
-      }
-      setTags(""); // 입력창 초기화
+
+
+  // 태그 입력 상태 (문자열)
+  const [tags, setTags] = useState("");
+
+  // universe 상태 (이미 선언됐다고 가정)
+
+  const normalizeTagsAndUpdateState = (raw: string) => {
+    const parts = raw.trim().split(/\s+/).filter(Boolean);
+    const normalized = parts.map((part) =>
+      part.startsWith("#") ? part : `#${part}`
+    );
+    const result = normalized.join(" ") + (raw.endsWith(" ") ? " " : "");
+    const validTags = normalized
+      .filter((t) => t.length > 1)
+      .map((t) => t.replace(/^#/, ""));
+
+    // 우선 tags 상태도 같이 업데이트 (input 값 유지용)
+    setTags(result);
+
+    setUniverse((prev) => ({
+      ...prev!,
+      tags: validTags,
+    }));
+  };
+
+  const handleTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val.endsWith(" ")) {
+      normalizeTagsAndUpdateState(val);
+    } else {
+      setTags(val);
     }
   };
 
@@ -73,7 +99,7 @@ export default function UniverseEditPage() {
           {/* 좌측 영역 */}
           <div className="flex flex-2 flex-col gap-3 h-[100%]">
             {universe && universe.thumbnailId != null && (
-              <UniverseEditInnerImg universe={universe} onEdit={() => {}} />
+              <UniverseEditInnerImg universe={universe} onEdit={() => { }} />
             )}
 
             {/* 내부 이미지 미리보기 */}
@@ -91,7 +117,7 @@ export default function UniverseEditPage() {
               {universe && universe.thumbMusicId != null && (
                 <WaveformWithAudioLightRow
                   audioUrl={`${API_CONFIG.VITE_AUDIO_LOAD_PUBLIC}/${universe?.thumbMusicId}`}
-                  audioTitle={thumbMusic == null ? "" : thumbMusic?.name}
+                  audioTitle={universe.thumbMusicId == null ? "" : ""}
                 />
               )}
             </div>
@@ -103,13 +129,16 @@ export default function UniverseEditPage() {
               <label className="text-neutral-500 mb-0.5">제목</label>
               <input
                 value={universe?.title}
-                onChange={(e) => setTitle(e.target.value)}
+                onChange={(e) => setUniverse((prev) => ({
+                  ...prev!,
+                  title: e.target.value
+                }))}
                 className="outline-none bg-transparent w-full text-gray-900"
                 maxLength={100}
                 placeholder="제목을 입력하세요"
               />
               <div className="absolute bottom-2 right-4 text-xs text-gray-500">
-                {title.length} / 100
+                {universe?.title.length} / 100
               </div>
             </div>
 
@@ -118,13 +147,16 @@ export default function UniverseEditPage() {
               <label className="text-neutral-500 mb-0.5">설명</label>
               <textarea
                 value={universe?.description}
-                onChange={(e) => setDescription(e.target.value)}
+                onChange={(e) => setUniverse((prev) => ({
+                  ...prev!,
+                  description: e.target.value
+                }))}
                 className="outline-none bg-transparent w-full h-full text-gray-900 mb-5"
                 maxLength={500}
                 placeholder="설명을 입력하세요"
               />
               <div className="absolute bottom-2 right-4 text-xs text-gray-500">
-                {description.length} / 500
+                {universe?.description!.length} / 500
               </div>
             </div>
 
@@ -132,7 +164,10 @@ export default function UniverseEditPage() {
               <label className="text-neutral-500 mb-0.5">카테고리</label>
               <select
                 value={universe?.category}
-                onChange={(e) => setCategory(e.target.value)}
+                onChange={(e) => setUniverse((prev) => ({
+                  ...prev!,
+                  category: e.target.value
+                }))}
                 className="outline-none bg-transparent w-full text-gray-900"
               >
                 <option value="" disabled>
@@ -166,7 +201,7 @@ export default function UniverseEditPage() {
                     className="hidden"
                   />
                   <span className="h-5 w-5 border border-neutral-500 rounded-full flex items-center justify-center">
-                    {isPublic && (
+                    {universe?.publicStatus == PublicStatusOption.PUBLIC && (
                       <span className="h-3 w-3 bg-neutral-400 rounded-full"></span>
                     )}
                   </span>
@@ -194,7 +229,7 @@ export default function UniverseEditPage() {
                     className="hidden"
                   />
                   <span className="h-5 w-5 border border-neutral-500 rounded-full flex items-center justify-center">
-                    {!isPublic && (
+                    {universe?.publicStatus == PublicStatusOption.PRIVATE && (
                       <span className="h-3 w-3 bg-neutral-400 rounded-full"></span>
                     )}
                   </span>
@@ -206,17 +241,17 @@ export default function UniverseEditPage() {
               </div>
             </div>
 
-            {/* 태그 */}
             <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[80px]">
               <label className="text-neutral-500 mb-0.5">태그</label>
               <input
                 value={tags}
-                onChange={handleTagInput}
+                onChange={handleTagChange}
+                onBlur={() => normalizeTagsAndUpdateState(tags)} 
                 placeholder="#태그를 입력하고 스페이스바로 구분"
                 className="outline-none bg-transparent w-full text-gray-900"
               />
               <div className="absolute bottom-2 right-4 text-xs text-gray-500">
-                {tagList.length} / 10
+                {universe.tags?.length || 0} / 10
               </div>
             </div>
           </div>

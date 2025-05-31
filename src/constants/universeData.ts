@@ -5,6 +5,11 @@ export const UniverseCategory = {
   FASHION_AND_BEAUTY: "패션/뷰티",
 };
 
+export enum PublicStatusOption {
+  PUBLIC = "PUBLIC",
+  PRIVATE = "PRIVATE",
+}
+
 type Option = {
   value: string;
   label: string;
