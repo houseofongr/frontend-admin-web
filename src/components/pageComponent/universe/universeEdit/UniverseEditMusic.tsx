@@ -18,16 +18,14 @@ export default function UniverseEditMusic({
 
   const handleDownloadMusic = async () => {
     try {
-
-
-      const imageUrl = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${thumbMusicId}`;
+      const imageUrl = `${API_CONFIG.PUBLIC_AUDIO_LOAD_API}/${thumbMusicId}`;
       const response = await fetch(imageUrl);
       const blob = await response.blob();
       const url = window.URL.createObjectURL(blob);
 
       const link = document.createElement("a");
       link.href = url;
-      link.download = "image.jpg";
+      link.download = "audio.mp3";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -52,12 +50,12 @@ export default function UniverseEditMusic({
   return (
     <div
       ref={menuRef}
-      className="h-full relative text-left group flex justify-center"
+      className="h-full w-full relative text-left group flex justify-center bg-amber-100"
       onMouseLeave={() => setOpen(false)}
     >
       <button
         onClick={() => setOpen(!open)}
-        className="absolute cursor-pointer top-1 right-1 w-7 h-7 flex items-center justify-center bg-black/10 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+        className="z-50 absolute cursor-pointer top-1 right-1 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
       >
         <BiDotsVerticalRounded size={20} />
       </button>
@@ -86,10 +84,10 @@ export default function UniverseEditMusic({
         </div>
       )}
 
-      <WaveformWithAudioLightRow
+      <div className="w-full">      <WaveformWithAudioLightRow
         audioUrl={`${API_CONFIG.PUBLIC_AUDIO_LOAD_API}/${thumbMusicId}`}
         audioTitle={thumbMusicId == null ? "" : ""}
-      />
+      /></div>
     </div>
   );
 }
