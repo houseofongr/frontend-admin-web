@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { soundListHeaderTitles } from "../constants/headerList";
 import { SoundListItem as SoundItem } from "../types/sound";
-import CircleButton from "./common/buttons/CircleButton";
+import CircleButton from "./buttons/CircleButton";
 import API_CONFIG from "../config/api";
 import { BiToggleLeft, BiToggleRight } from "react-icons/bi";
 import { IoIosArrowForward } from "react-icons/io";

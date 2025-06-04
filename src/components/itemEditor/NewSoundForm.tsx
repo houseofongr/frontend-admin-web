@@ -1,10 +1,10 @@
 import { BiToggleLeft, BiToggleRight } from "react-icons/bi";
 import CustomInput from "../CustomInput";
 import CardLabel from "../label/CardLabel";
-import FileName from "../pageComponent/houseEditor/FileName";
+import FileName from "../../features/house/editor/FileName";
 import { useEffect, useState } from "react";
-import FileUploadButton from "../common/buttons/FileUploadButton";
-import Button from "../common/buttons/Button";
+import FileUploadButton from "../buttons/FileUploadButton";
+import Button from "../buttons/Button";
 import { SoundMetadata, SoundSource } from "../../types/sound";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { createSound, deleteSound, updateSound } from "../../service/soundService";

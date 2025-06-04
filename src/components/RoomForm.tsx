@@ -1,5 +1,5 @@
 import { EditableRoomData } from "../types/house";
-import CircleButton from "./common/buttons/CircleButton";
+import CircleButton from "./buttons/CircleButton";
 
 import ContainerTitle from "./ContainerTitle";
 import InputField from "./InputField";

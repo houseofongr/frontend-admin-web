@@ -27,12 +27,7 @@ const WaveformWithAudioLightRow: React.FC<WaveformProps> = ({
   const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
-    console.log("audioUrl", audioUrl);
-
-
-
     if (!waveformRef.current || !audioRef.current) return;
-    console.log("wavesurfer", waveSurfer);
     const waveSurferInstance = WaveSurfer.create({
       container: waveformRef.current,
       waveColor: "gray",
@@ -66,7 +61,6 @@ const WaveformWithAudioLightRow: React.FC<WaveformProps> = ({
     waveSurferInstance.on("error", (error) => {
       console.error("WaveSurfer error:", error);
     });
-    console.log(audioUrl);
 
     return () => waveSurferInstance.destroy();
   }, [audioUrl]);

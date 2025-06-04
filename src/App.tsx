@@ -2,22 +2,22 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ImageProvider } from "./context/ImageContext";
 import { RoomProvider } from "./context/RoomsContext";
 import RootLayout from "./components/layout/RootLayout";
-import HouseList from "./pages/House/Houses";
-import HouseEditorPage from "./pages/House/HouseEditor";
-import HouseDetail from "./pages/House/HouseDetail";
-import RoomDetail from "./pages/House/RoomDetail";
-import UserList from "./pages/User/UserList";
-import UserHomeList from "./pages/User/UserHomeList";
-import UserHomeDetail from "./pages/User/UserHomeDetail";
-import SoundSources from "./pages/Sound/SoundSources";
-import FirstAuthenticationLogin from "./pages/Login/FirstAuthenticationLogin";
-import SecondAuthenticationLogin from "./pages/Login/SecondAuthenticationLogin";
-import ThirdAuthenticationLogin from "./pages/Login/ThirdAuthenticationLogin";
+import HouseList from "./features/house/pages/Houses";
+import HouseEditorPage from "./features/house/pages/HouseEditor";
+import HouseDetail from "./features/house/pages/HouseDetail";
+import RoomDetail from "./features/house/pages/RoomDetail";
+import UserList from "./features/user/pages/UserList";
+import UserHomeList from "./features/user/pages/UserHomeList";
+import UserHomeDetail from "./features/user/pages/UserHomeDetail";
+import SoundSources from "./features/sound/pages/SoundSources";
+import FirstAuthenticationLogin from "./features/auth/pages/FirstAuthenticationLogin";
+import SecondAuthenticationLogin from "./features/auth/pages/SecondAuthenticationLogin";
+import ThirdAuthenticationLogin from "./features/auth/pages/ThirdAuthenticationLogin";
 import NotFoundPage from "./pages/NotFound";
 import InitPage from "./pages/Init";
-import UserRoomItemEditorPage from "./pages/User/UserRoomItemEditor";
-import UniverseListPage from "./pages/Universe/UniverseListPage";
-import UniverseEditPage from "./pages/Universe/UniverseEditPage";
+import UserRoomItemEditorPage from "./features/user/pages/UserRoomItemEditor";
+import UniverseListPage from "./features/universe/pages/UniverseListPage";
+import UniverseEditPage from "./features/universe/pages/UniverseEditPage";
 
 function App() {
   return (

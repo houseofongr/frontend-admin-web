@@ -1,6 +1,6 @@
 import { ReactNode } from "react";
 import clsx from "clsx";
-import CircleButton from "../common/buttons/CircleButton";
+import CircleButton from "../buttons/CircleButton";
 import { TbDoorExit } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 

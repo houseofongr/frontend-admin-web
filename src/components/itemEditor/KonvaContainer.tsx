@@ -5,7 +5,7 @@ import Konva from "konva";
 import SpinnerIcon from "../icons/SpinnerIcon";
 import ShapeSelectorTool from "./ShapeSelectorTool";
 import { RectangleShape, CircleShape, EllipseShape } from "../../constants/initialShapeData";
-import CircleButton from "../common/buttons/CircleButton";
+import CircleButton from "../buttons/CircleButton";
 import { BsTrash3 } from "react-icons/bs";
 import { ImageSize } from "../../utils/formatShapeData";
 import RectItem from "./shapes/RectangleItem";

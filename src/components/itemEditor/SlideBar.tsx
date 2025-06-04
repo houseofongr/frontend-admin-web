@@ -3,7 +3,7 @@ import clsx from "clsx";
 import { ShapeData } from "../../types/items";
 import ColorTag from "./ColorTag";
 import { useQuery } from "@tanstack/react-query";
-import CircleButton from "../common/buttons/CircleButton";
+import CircleButton from "../buttons/CircleButton";
 import { fetchItemSounds } from "../../service/soundService";
 import SlideRightSection from "./SlideRightSection";
 import {

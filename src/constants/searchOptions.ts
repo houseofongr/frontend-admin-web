@@ -16,3 +16,9 @@ export const soundSouceSearchOptions = [
   { value: "item-name", label: "아이템네임" },
   { value: "sound-name", label: "소리네임" },
 ];
+
+export const universeSearchOptions = [
+  { value: "ALL", label: "전체" },
+  { value: "AUTHOR", label: "작성자" },
+  { value: "CONTENT", label: "제목 / 내용" },
+];
