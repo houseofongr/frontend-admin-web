@@ -7,22 +7,22 @@ type Option = {
 };
 
 type SearchProp = {
-  onSearch: (filter: string, query: string) => void;
+  onSearch: (searchType: string, keyword: string) => void;
   options: Option[];
 };
 
 export default function SearchComponent({ onSearch, options }: SearchProp) {
-  const [filter, setFilter] = useState<string>(options[0]?.value || "NAME");
-  const [query, setQuery] = useState<string>("");
+  const [searchType, setSearchType] = useState<string>(options[0]?.value || "NAME");
+  const [keyword, setKeyword] = useState<string>("");
 
   const searchHandler = () => {
-    onSearch(filter, query);
+    onSearch(searchType, keyword);
   };
   return (
     <div className="flex items-center gap-2 py-1 px-2">
       <select
-        value={filter}
-        onChange={(e) => setFilter(e.target.value)}
+        value={searchType}
+        onChange={(e) => setSearchType(e.target.value)}
         className="border border-gray-300 rounded text-sm md:px-3 py-2 focus:outline-hidden focus:ring-1 focus:ring-[#f5946d]"
       >
         {options.map((option) => (
@@ -34,8 +34,8 @@ export default function SearchComponent({ onSearch, options }: SearchProp) {
 
       <input
         type="text"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        value={keyword}
+        onChange={(e) => setKeyword(e.target.value)}
         placeholder="검색어를 입력하세요"
         className="flex-1 border border-gray-300 text-sm rounded px-3 py-2 focus:outline-none focus:ring-1 focus:ring-[#f5946d]"
       />

@@ -51,7 +51,7 @@ export default function UniverseListItem({
 
   return (
     <>
-      <li className="hidden lg:flex p-2 items-center text-center rounded-md bg-[#fbfafa] shadow space-x-1">
+      <li className="relative hidden lg:flex p-2 items-center text-center rounded-md bg-[#fbfafa] shadow">
         {/* 썸네일 - 편집버튼 */}
         <span style={{ width: universeListHeaderTitles[0].width }}>
           <div className="flex justify-center">
@@ -64,7 +64,7 @@ export default function UniverseListItem({
 
         {/* 제목 + 설명 */}
         <div style={{ width: universeListHeaderTitles[1].width }}>
-          <div className="flex flex-col items-start pl-1">
+          <div className="flex flex-col items-start pl-2">
             <span>{title}</span>
             <span className="text-gray-500 text-sm break-words">
               {description}
@@ -72,9 +72,17 @@ export default function UniverseListItem({
           </div>
         </div>
 
-        {/* 썸뮤직 */}
+        {/* 작성자 */}
         <div
           style={{ width: universeListHeaderTitles[2].width }}
+          className="flex items-center justify-center"
+        >
+          {author}
+        </div>
+
+        {/* 썸뮤직 */}
+        <div
+          style={{ width: universeListHeaderTitles[3].width }}
           className="flex items-center justify-center"
         >
           <RiPlayCircleLine
@@ -85,18 +93,13 @@ export default function UniverseListItem({
         </div>
 
         {/* 공개 여부 */}
-        <div style={{ width: universeListHeaderTitles[3].width }}>
+        <div style={{ width: universeListHeaderTitles[4].width }}>
           {publicStatus}
         </div>
 
         {/* 카테고리 */}
-        <div style={{ width: universeListHeaderTitles[4].width }}>
-          {getCategoryLabel(category)}
-        </div>
-
-        {/* 생성일 */}
         <div style={{ width: universeListHeaderTitles[5].width }}>
-          {convertUnixToDate(createdTime).default}
+          {getCategoryLabel(category)}
         </div>
 
         {/* 조회수 */}
@@ -138,6 +141,11 @@ export default function UniverseListItem({
             className={`cursor-pointer hover:text-[${AOO_COLOR.Orange}]`}
           />
         </div>
+
+        {/* 생성일 */}
+        <div className="absolute bottom-0 right-3 text-gray-400">
+          {convertUnixToDate(createdTime).default}
+        </div>
       </li>
 
       <li className="hidden sm:flex md:flex lg:hidden flex-col p-2 text-center rounded-md bg-[#fbfafa] shadow  space-y-3 ">
@@ -151,14 +159,16 @@ export default function UniverseListItem({
             />
           </span>
           {/* 제목 | 설명 */}
-          <div className="w-[40%] flex flex-col items-start ml-2">
+          <div className="w-[30%] flex flex-col items-start ml-2">
             <span>{title}</span>
             <span className="text-gray-500 text-sm break-words">
               {description}
             </span>
           </div>
+          {/* 작성자 */}
+          <div className="w-[15%] flex items-center">{author}</div>
           {/* 썸뮤직 */}
-          <div className="w-[10%] flex items-center">
+          <div className="w-[5%] flex items-center">
             <RiPlayCircleLine
               size={20}
               onClick={() => onPlayMusic(thumbMusicId)}
@@ -221,6 +231,7 @@ export default function UniverseListItem({
 
         {/* 2. 카테고리, 공개여부*/}
         <div className="flex flex-row items-center text-sm gap-3 justify-end mb-1">
+          <div className="w-[20%]">{author}</div>
           <div className="w-[20%]">{publicStatus}</div>
           <div className="w-[20%]">{getCategoryLabel(category)}</div>
         </div>

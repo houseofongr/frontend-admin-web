@@ -65,14 +65,10 @@ export default function UniverseListPage() {
         query.append("keyword", word);
       }
 
-      console.log(keyword, query.toString());
-
       const response = await fetch(
         `${API_CONFIG.BACK_API}/universes?${query.toString()}`
       );
       const { universes, pagination } = await response.json();
-
-      console.log(universes);
 
       setUniverseList(universes);
       setTotalPages(pagination.totalPages);

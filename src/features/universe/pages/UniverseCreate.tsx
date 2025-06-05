@@ -256,6 +256,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
     formData.append("thumbMusic", thumbMusic);
     formData.append("metadata", JSON.stringify(metadata));
 
+    
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/universes`, {
         method: "POST",

@@ -20,6 +20,10 @@ import Modal from "../../../components/modal/Modal";
 import UserSearch from "../create/UserSearch";
 import { FiSearch } from "react-icons/fi";
 import { UserV2 } from "../../../types/user";
+import ModalAlertMessage, {
+  AlertType,
+} from "../../../components/modal/ModalAlertMessage";
+import Button from "../../../components/buttons/Button";
 
 export default function UniverseEditPage() {
   const { universeId } = useParams();
@@ -48,7 +52,9 @@ export default function UniverseEditPage() {
   const [showInnerImgEdit, setShowInnerImgEdit] = useState(false);
   const [showThumbMusicEdit, setShowThumbMusicEdit] = useState(false);
   const [showAuthorEdit, setShowAuthorEdit] = useState(false);
-
+  const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(
+    null
+  );
 
   const [innerImageId, setInnerImageId] = useState<number>(0);
   const [thumbMusicId, setThumbMusicId] = useState<number>(0);
@@ -87,8 +93,6 @@ export default function UniverseEditPage() {
       publicStatus: universe.publicStatus,
       hashtags: universe.hashtags,
     };
-    console.log(payload);
-    
 
     try {
       const response = await fetch(
@@ -104,12 +108,16 @@ export default function UniverseEditPage() {
 
       if (!response.ok) throw new Error("저장에 실패했습니다.");
 
-      alert("변경사항이 저장되었습니다.");
+      showAlert("변경사항이 저장되었습니다.", "success");
       navigate(-1);
     } catch (error) {
       console.error("저장 에러:", error);
-      alert("저장 중 오류가 발생했습니다.");
+      showAlert("저장 중 오류가 발생했습니다.", "fail");
     }
+  };
+
+  const showAlert = (text: string, type: AlertType) => {
+    setAlert({ text, type });
   };
 
   const saveInnerImg = async (file: File) => {
@@ -127,14 +135,10 @@ export default function UniverseEditPage() {
 
       if (!response.ok) throw new Error("저장에 실패했습니다.");
 
-      alert("변경사항이 저장되었습니다.");
-
-      // var
-      // setUniverse((prev) => ({ ...prev, innerImageId: 0 }));
-      // setUniverse((prev) => ({ ...prev, innerImageId:  }));
+      showAlert("변경사항이 저장되었습니다.", "success");
     } catch (error) {
       console.error("저장 에러:", error);
-      alert("저장 중 오류가 발생했습니다.");
+      showAlert("저장 중 오류가 발생했습니다.", "fail");
     }
   };
 
@@ -153,17 +157,15 @@ export default function UniverseEditPage() {
 
       if (!response.ok) throw new Error("저장에 실패했습니다.");
 
-      alert("변경사항이 저장되었습니다.");
+      showAlert("변경사항이 저장되었습니다.", "success");
     } catch (error) {
       console.error("저장 에러:", error);
-      alert("저장 중 오류가 발생했습니다.");
+      showAlert("저장 중 오류가 발생했습니다.", "fail");
     }
   };
 
   const handleCancel = () => {
-    if (confirm("저장하지 않은 변경사항이 사라집니다. 취소하시겠습니까?")) {
-      navigate(-1);
-    }
+    showAlert("저장하지 않은 변경사항이 사라집니다. 취소하시겠습니까?", "info");
   };
 
   // 태그 처리
@@ -201,6 +203,46 @@ export default function UniverseEditPage() {
 
   return (
     <PageLayout>
+      {alert && alert?.type != "info" && (
+        <ModalAlertMessage
+          text={alert.text}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+          okButton={
+            <Button
+              label="확인"
+              onClick={() => {
+                setAlert(null);
+              }}
+            />
+          }
+        />
+      )}
+      {alert && alert?.type == "info" && (
+        <ModalAlertMessage
+          text={alert.text}
+          type={alert.type}
+          onClose={() => setAlert(null)}
+          okButton={
+            <Button
+              label="취소"
+              variant="gray"
+              onClick={() => {
+                navigate(-1);
+              }}
+            />
+          }
+          cancelButton={
+            <Button
+              label="돌아가기"
+              onClick={() => {
+                setAlert(null);
+              }}
+            />
+          }
+        />
+      )}
+
       <section className="w-full mx-8 py-20 md:py-10 p-3 lg:w-[80%]">
         {/* 상단 버튼 영역 */}
         <div className="px-3 flex justify-between">

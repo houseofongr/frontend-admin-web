@@ -29,10 +29,10 @@ export const soundListHeaderTitles = [
 export const universeListHeaderTitles = [
   { name: "썸네일", width: "10%" },
   { name: "제목 | 내용", width: "25%" },
+  { name: "작성자", width: "10%" },
   { name: "썸뮤직", width: "7%" },
   { name: "공개 여부", width: "10%" },
   { name: "카테고리", width: "10%" },
-  { name: "날짜", width: "10%" },
   { name: "조회수", width: "7%" },
   { name: "좋아요", width: "7%" },
   { name: "수정", width: "7%" },
