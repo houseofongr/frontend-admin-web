@@ -23,7 +23,7 @@ export default function ContextMenu({
 
   return (
     <div
-      className="absolute z-10 bg-white shadow-lg rounded-md"
+      className="absolute z-50 bg-white/90 shadow-lg rounded-md"
       style={{
         top: position.top,
         right: position.right,
@@ -41,7 +41,7 @@ export default function ContextMenu({
               onClick();
               onClose();
             }}
-            className="flex items-center px-4 py-2 hover:bg-gray-100 cursor-pointer"
+            className="flex items-center px-4 py-2 hover:opacity-70 cursor-pointer transition-opacity"
           >
             <span className="text-gray-500 mr-3">{icon}</span>
             <p>{label}</p>

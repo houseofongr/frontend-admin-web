@@ -60,7 +60,7 @@ export default function UniverseEditMusic({
     >
       <button
         onClick={() => setOpen(!open)}
-        className="z-50 absolute cursor-pointer top-1 right-1 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity"
+        className="z-50 absolute cursor-pointer top-2 right-2 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity  duration-300"
       >
         <BiDotsVerticalRounded size={20} />
       </button>

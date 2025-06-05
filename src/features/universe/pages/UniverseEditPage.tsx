@@ -24,6 +24,7 @@ import ModalAlertMessage, {
   AlertType,
 } from "../../../components/modal/ModalAlertMessage";
 import Button from "../../../components/buttons/Button";
+import { FOOTER_HEIGHT, HEADER_HEIGHT } from "../../../constants/size";
 
 export default function UniverseEditPage() {
   const { universeId } = useParams();
@@ -243,7 +244,7 @@ export default function UniverseEditPage() {
         />
       )}
 
-      <section className="w-full mx-8 py-20 md:py-10 p-3 lg:w-[80%]">
+      <section className="w-full mx-8 py-20 md:py-10 p-3 lg:w-[90%]">
         {/* 상단 버튼 영역 */}
         <div className="px-3 flex justify-between">
           <h1 className="font-bold text-base lg:text-lg">유니버스 상세 정보</h1>
@@ -264,16 +265,19 @@ export default function UniverseEditPage() {
         </div>
 
         {/* 본문 영역 */}
-        <div className="flex flex-col lg:flex-row gap-4 p-3 w-full">
+        <div
+          className={`flex flex-col lg:flex-row gap-4 p-3 w-full h-screen min-h-[550px]
+        lg:max-h-[calc(100vh-150px)]`}
+        >
           {/* 왼쪽 - 이미지 & 오디오 */}
           <div className="flex flex-2 flex-col gap-3 h-[100%]">
-            <div className="h-min-[200px]">
+            <div className="h-min-[200px] bg-black rounded-xl">
               <UniverseEditInnerImg
                 innerImageId={universe.innerImageId}
                 onEdit={() => setShowInnerImgEdit(true)}
               />
             </div>
-            <div className="h-[30%] flex-col">
+            <div className="lg:min-h-[130px] flex-col min-h-[280px]">
               {/* 썸뮤직 미리듣기 */}
               <UniverseEditMusic
                 thumbMusicId={universe.thumbMusicId}
@@ -283,7 +287,7 @@ export default function UniverseEditPage() {
           </div>
 
           {/* 오른쪽 - 텍스트 입력 */}
-          <div className="flex flex-1 flex-col gap-3 min-w-[300px]">
+          <div className="flex flex-1 flex-col gap-3 h-[100%]">
             {/* 제목 */}
             <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2">
               <label className="text-neutral-500 mb-0.5">제목</label>
@@ -302,7 +306,7 @@ export default function UniverseEditPage() {
             </div>
 
             {/* 설명 */}
-            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-grow">
+            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 grow">
               <label className="text-neutral-500 mb-0.5">설명</label>
               <textarea
                 value={universe.description}

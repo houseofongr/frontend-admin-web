@@ -149,15 +149,15 @@ const WaveformWithAudioLightRow: React.FC<WaveformProps> = ({
   };
 
   return (
-    <div className="flex flex-row gap-2">
+    <div className="flex lg:flex-row gap-2 flex-col">
       <div>
         <audio ref={audioRef} controls src={audioUrl} className="hidden" />
       </div>
 
       {/* 컨트롤러 */}
-      <div className="flex-1 py-5 px-4 bg-stone-800/90 rounded-xl">
+      <div className="relative flex-1 py-5 px-4 bg-stone-800/90 rounded-xl min-w-[350px]">
         <div className="text-center  text-neutral-200">{audioTitle}</div>
-        <div className="w-full flex flex-col items-center gap-2 pt-4 ">
+        <div className="w-full flex flex-col items-center gap-2 pt-4">
           <input
             type="range"
             min="0"
@@ -176,7 +176,7 @@ const WaveformWithAudioLightRow: React.FC<WaveformProps> = ({
             </span>
           </div>
         </div>
-        <div className="w-full flex justify-center pl-18 gap-4">
+        <div className="flex justify-center gap-4">
           {/* 뒤로 10초 */}
           <button onClick={() => handleSkip(-10)}>
             <MdReplay10 size={25} color="#f3f3f3" />
@@ -198,7 +198,7 @@ const WaveformWithAudioLightRow: React.FC<WaveformProps> = ({
             <MdForward10 size={25} color="#f3f3f3" />
           </button>
           {/* 음소거 */}
-          <div className=" flex justify-end items-center">
+          <div className="absolute bottom-6 right-5 flex justify-end items-center">
             <button onClick={toggleMute} className="p-2 ">
               {isMuted ? (
                 <VscMute size={18} color="#f3f3f3" />
@@ -207,7 +207,7 @@ const WaveformWithAudioLightRow: React.FC<WaveformProps> = ({
               )}
             </button>
 
-            <div className=" w-[35%] flex flex-col items-center gap-2 py-1">
+            <div className="w-[35%] flex flex-col items-center gap-2 py-1">
               <input
                 type="range"
                 min="0"
