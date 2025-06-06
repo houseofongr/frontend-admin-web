@@ -21,7 +21,7 @@ const DraggableIconTitleModal: React.FC<ModalProps> = ({
   bgColor,
 }) => {
   return (
-    <div className="fixed inset-0 flex items-center justify-center z-10 pointer-events-none">
+    <div className="fixed inset-0 flex justify-end items-start m-10 z-10 pointer-events-none">
       <Draggable handle=".modal-header">
         <div
           className={clsx(

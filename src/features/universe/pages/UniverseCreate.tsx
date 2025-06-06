@@ -15,16 +15,10 @@ import ModalAlertMessage, { AlertType } from "../../../components/modal/ModalAle
 import Button from "../../../components/buttons/Button";
 import { checkFileSize, checkImageIsSquare } from "../../../utils/fileValidator";
 import { UserV2 } from "../../../types/user";
+import { UniverseCreateStep } from "../../../constants/ProcessSteps";
 
 interface ThumbnailEditProps {
-  onClose:() => void;
-}
-
-enum CreateStep {
-  Thumbnail,
-  ThumbMusic,
-  InnerImg,
-  DetailInfo,
+  onClose: () => void;
 }
 
 export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
@@ -34,7 +28,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
   const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(
     null
   );
-  const [step, setStep] = useState<CreateStep>(CreateStep.Thumbnail);
+  const [step, setStep] = useState<UniverseCreateStep>(UniverseCreateStep.Thumbnail);
 
   const [thumbnail, setThumbnail] = useState<File | null>(null);
   const [thumbMusic, setThumbMusic] = useState<File | null>(null);
@@ -80,9 +74,9 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
   };
 
   // 파일 처리 함수
-  const handleFileProcess = async (file: File, step: CreateStep) => {
+  const handleFileProcess = async (file: File, step: UniverseCreateStep) => {
     switch (step) {
-      case CreateStep.Thumbnail:
+      case UniverseCreateStep.Thumbnail:
         if (!checkFileSize(file, 2)) {
           setWarning("이미지 크기가 2MB를 초과했습니다.");
           setThumbnail(null);
@@ -103,7 +97,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
         }
         break;
 
-      case CreateStep.ThumbMusic:
+      case UniverseCreateStep.ThumbMusic:
         if (!checkFileSize(file, 2)) {
           setWarning("2MB 이하 음원만 업로드할 수 있습니다.");
           setThumbMusic(null);
@@ -113,7 +107,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
         }
         break;
 
-      case CreateStep.InnerImg:
+      case UniverseCreateStep.InnerImg:
         if (!checkFileSize(file, 100)) {
           setWarning("이미지 크기가 100MB를 초과했습니다.");
           setInnerImg(null);
@@ -177,14 +171,14 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
   // 다음 단계 버튼
   const onNextClick = () => {
     switch (step) {
-      case CreateStep.Thumbnail:
-        setStep(CreateStep.ThumbMusic);
+      case UniverseCreateStep.Thumbnail:
+        setStep(UniverseCreateStep.ThumbMusic);
         break;
-      case CreateStep.ThumbMusic:
-        setStep(CreateStep.InnerImg);
+      case UniverseCreateStep.ThumbMusic:
+        setStep(UniverseCreateStep.InnerImg);
         break;
-      case CreateStep.InnerImg:
-        setStep(CreateStep.DetailInfo);
+      case UniverseCreateStep.InnerImg:
+        setStep(UniverseCreateStep.DetailInfo);
         break;
     }
   };
@@ -192,14 +186,14 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
   // 이전 단계 버튼
   const onBackClick = () => {
     switch (step) {
-      case CreateStep.ThumbMusic:
-        setStep(CreateStep.Thumbnail);
+      case UniverseCreateStep.ThumbMusic:
+        setStep(UniverseCreateStep.Thumbnail);
         break;
-      case CreateStep.InnerImg:
-        setStep(CreateStep.ThumbMusic);
+      case UniverseCreateStep.InnerImg:
+        setStep(UniverseCreateStep.ThumbMusic);
         break;
-      case CreateStep.DetailInfo:
-        setStep(CreateStep.InnerImg);
+      case UniverseCreateStep.DetailInfo:
+        setStep(UniverseCreateStep.InnerImg);
         break;
     }
   };
@@ -256,7 +250,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
     formData.append("thumbMusic", thumbMusic);
     formData.append("metadata", JSON.stringify(metadata));
 
-    
+
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/universes`, {
         method: "POST",
@@ -296,20 +290,19 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
           text={alert.text}
           type={alert.type}
           onClose={() => setAlert(null)}
-          okButton={<Button label="확인" onClick={() => {setAlert(null); onClose();}} />}
+          okButton={<Button label="확인" onClick={() => { setAlert(null); onClose(); }} />}
         />
       )}
 
-      {step !== CreateStep.DetailInfo && (
+      {step !== UniverseCreateStep.DetailInfo && (
         <div
-          className={`w-130 h-100 flex justify-center items-center border-2 border-dashed rounded-md p-10 text-center transition-all duration-200 ${
-            dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
-          }`}
+          className={`w-130 h-100 flex justify-center items-center border-2 border-dashed rounded-md p-10 text-center transition-all duration-200 ${dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
+            }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
         >
-          {step === CreateStep.Thumbnail && (
+          {step === UniverseCreateStep.Thumbnail && (
             <ThumbnailStep
               thumbnail={thumbnail}
               previewUrl={previewThumbnail}
@@ -318,7 +311,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
             />
           )}
 
-          {step === CreateStep.ThumbMusic && (
+          {step === UniverseCreateStep.ThumbMusic && (
             <>
               <ThumbMusicStep
                 thumbMusic={thumbMusic}
@@ -329,7 +322,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
             </>
           )}
 
-          {step === CreateStep.InnerImg && (
+          {step === UniverseCreateStep.InnerImg && (
             <>
               <InnerImgStep
                 innerImg={innerImg}
@@ -342,7 +335,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
         </div>
       )}
 
-      {step === CreateStep.DetailInfo && (
+      {step === UniverseCreateStep.DetailInfo && (
         <>
           <DetailInfoStep
             innerImg={innerImg}
@@ -355,11 +348,10 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
 
       {/* 저장 버튼 (우측 하단 고정) */}
       <div
-        className={`flex mt-4 px-5 ${
-          step !== CreateStep.Thumbnail ? "justify-between" : "justify-end"
-        }`}
+        className={`flex mt-4 px-5 ${step !== UniverseCreateStep.Thumbnail ? "justify-between" : "justify-end"
+          }`}
       >
-        {step !== CreateStep.Thumbnail && (
+        {step !== UniverseCreateStep.Thumbnail && (
           <button
             className="hover:opacity-80 cursor-pointer text-primary"
             onClick={onBackClick}
@@ -368,18 +360,18 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
           </button>
         )}
 
-        {((step === CreateStep.Thumbnail && thumbnail) ||
-          (step === CreateStep.ThumbMusic && thumbMusic) ||
-          (step === CreateStep.InnerImg && innerImg)) && (
-          <button
-            className="hover:opacity-80 cursor-pointer text-primary"
-            onClick={onNextClick}
-          >
-            <IoArrowForwardCircleOutline size={30} />
-          </button>
-        )}
+        {((step === UniverseCreateStep.Thumbnail && thumbnail) ||
+          (step === UniverseCreateStep.ThumbMusic && thumbMusic) ||
+          (step === UniverseCreateStep.InnerImg && innerImg)) && (
+            <button
+              className="hover:opacity-80 cursor-pointer text-primary"
+              onClick={onNextClick}
+            >
+              <IoArrowForwardCircleOutline size={30} />
+            </button>
+          )}
 
-        {step === CreateStep.DetailInfo && hasRequiredData() && (
+        {step === UniverseCreateStep.DetailInfo && hasRequiredData() && (
           <button
             className="border-2 rounded-full p-1 hover:opacity-80 cursor-pointer text-primary"
             onClick={handleSubmit}

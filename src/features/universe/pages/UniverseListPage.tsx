@@ -3,10 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { Universe } from "../../../types/universe";
 import GridHeader from "../../../components/GridHeader";
 import { universeListHeaderTitles } from "../../../constants/headerList";
-import {
-  userSearchOptions as universeOptions,
-  universeSearchOptions,
-} from "../../../constants/searchOptions";
 import Pagination from "../../../components/Pagination";
 import SearchComponent from "../../../components/SearchComponent";
 import PageLayout from "../../../components/layout/PageLayout";
@@ -24,6 +20,7 @@ import ModalAlertMessage, {
   AlertType,
 } from "../../../components/modal/ModalAlertMessage";
 import Button from "../../../components/buttons/Button";
+import { universeSearchOptions } from "../../../constants/searchOptions";
 
 export default function UniverseListPage() {
   const navigate = useNavigate();
@@ -55,7 +52,7 @@ export default function UniverseListPage() {
     word: string = keyword
   ) => {
     try {
-      var query = new URLSearchParams({
+      const query = new URLSearchParams({
         page: page.toString(),
         size: sizeValue.toString(),
       });
@@ -198,7 +195,8 @@ export default function UniverseListPage() {
           {/* 카테고리 선택 & 검색 */}
           <div className="flex items-center mb-3">
             <CategorySelect
-              onSearch={(a, b) => {console.log(a,b);
+              onSearch={(a, b) => {
+                console.log(a, b);
               }}
               options={UniverseCategoryOptions}
             />

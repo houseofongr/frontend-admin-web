@@ -1,14 +1,13 @@
 import React, { useState, useRef } from "react";
 import API_CONFIG from "../../../config/api";
+import { SpaceCreateStep } from "../../../constants/ProcessSteps";
 
 interface Point {
   x: number;
   y: number;
 }
-
-
 interface SpaceSelectorProps {
-  createSpaceModalOpen: boolean;
+  step: SpaceCreateStep | null;
   innerImageId: number;
   startPoint: { x: number; y: number } | null;
   endPoint: { x: number; y: number } | null;
@@ -22,7 +21,7 @@ interface SpaceSelectorProps {
 
 
 export default function SpaceSelector({
-  createSpaceModalOpen,
+  step,
   innerImageId,
   startPoint,
   endPoint,
@@ -48,7 +47,7 @@ export default function SpaceSelector({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!createSpaceModalOpen) {
+    if (step != SpaceCreateStep.SetSize) {
       setHoverPos(null);
       return;
     }
@@ -57,7 +56,7 @@ export default function SpaceSelector({
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    if (!createSpaceModalOpen) return;
+    if (step != SpaceCreateStep.SetSize) return;
 
     const pos = getImageRelativePos(e);
     if (!pos) return; // 이미지 영역 밖은 무시
@@ -71,6 +70,9 @@ export default function SpaceSelector({
       setEndPoint(null);
     }
   };
+
+  const imageWidth = imgRef.current?.width;
+  const imageHeight = imgRef.current?.height;
 
   return (
     <div
@@ -90,36 +92,32 @@ export default function SpaceSelector({
       )}
 
       {/* 마우스 위치 (원 + 십자선) */}
-      {createSpaceModalOpen && hoverPos && !endPoint && (
+      {step == SpaceCreateStep.SetSize && hoverPos && !endPoint && imageWidth && imageHeight && (
         <>
           <div
             className="absolute w-3 h-3 bg-blue-400 rounded-full pointer-events-none"
             style={{
-              left: `calc(50% - ${imgRef.current?.width! / 2}px + ${
-                hoverPos.x - 6
-              }px)`,
-              top: `calc(50% - ${imgRef.current?.height! / 2}px + ${
-                hoverPos.y - 6
-              }px)`,
+              left: `calc(50% - ${imageWidth / 2}px + ${hoverPos.x - 6
+                }px)`,
+              top: `calc(50% - ${imageHeight / 2}px + ${hoverPos.y - 6
+                }px)`,
             }}
           />
           <div
             className="absolute h-[1px] bg-blue-400 pointer-events-none"
             style={{
-              top: `calc(50% - ${imgRef.current?.height! / 2}px + ${
-                hoverPos.y
-              }px)`,
-              left: `calc(50% - ${imgRef.current?.width! / 2}px)`,
+              top: `calc(50% - ${imageHeight / 2}px + ${hoverPos.y
+                }px)`,
+              left: `calc(50% - ${imageWidth / 2}px)`,
               width: imgRef.current?.width,
             }}
           />
           <div
             className="absolute w-[1px] bg-blue-400 pointer-events-none"
             style={{
-              left: `calc(50% - ${imgRef.current?.width! / 2}px + ${
-                hoverPos.x
-              }px)`,
-              top: `calc(50% - ${imgRef.current?.height! / 2}px)`,
+              left: `calc(50% - ${imageWidth / 2}px + ${hoverPos.x
+                }px)`,
+              top: `calc(50% - ${imageHeight / 2}px)`,
               height: imgRef.current?.height,
             }}
           />
@@ -127,45 +125,41 @@ export default function SpaceSelector({
       )}
 
       {/* 시작 점 */}
-      {startPoint && (
+      {startPoint && imageWidth && imageHeight && (
         <div
           className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none"
           style={{
-            left: `calc(50% - ${imgRef.current?.width! / 2}px + ${
-              startPoint.x - 3
-            }px)`,
-            top: `calc(50% - ${imgRef.current?.height! / 2}px + ${
-              startPoint.y - 3
-            }px)`,
+            left: `calc(50% - ${imageWidth / 2}px + ${startPoint.x - 3
+              }px)`,
+            top: `calc(50% - ${imageHeight / 2}px + ${startPoint.y - 3
+              }px)`,
           }}
         />
       )}
 
       {/* 끝 점 */}
-      {endPoint && (
+      {endPoint && imageWidth && imageHeight && (
         <div
           className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none"
           style={{
-            left: `calc(50% - ${imgRef.current?.width! / 2}px + ${
-              endPoint.x - 5
-            }px)`,
-            top: `calc(50% - ${imgRef.current?.height! / 2}px + ${
-              endPoint.y - 5
-            }px)`,
+            left: `calc(50% - ${imageWidth / 2}px + ${endPoint.x - 5
+              }px)`,
+            top: `calc(50% - ${imageHeight / 2}px + ${endPoint.y - 5
+              }px)`,
           }}
         />
       )}
 
       {/* 박스 */}
-      {startPoint && endPoint && (
+      {startPoint && endPoint && imageWidth && imageHeight && (
         <div
           className="absolute border-2 border-amber-400 bg-amber-400/20 pointer-events-none"
           style={{
-            left: `calc(50% - ${imgRef.current?.width! / 2}px + ${Math.min(
+            left: `calc(50% - ${imageWidth / 2}px + ${Math.min(
               startPoint.x,
               endPoint.x
             )}px)`,
-            top: `calc(50% - ${imgRef.current?.height! / 2}px + ${Math.min(
+            top: `calc(50% - ${imageHeight / 2}px + ${Math.min(
               startPoint.y,
               endPoint.y
             )}px)`,

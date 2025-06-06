@@ -4,12 +4,14 @@ import API_CONFIG from "../../../config/api";
 import { RiImageEditFill, RiFileDownloadLine, RiFunctionAddLine } from "react-icons/ri";
 import ContextMenu from "../../../components/ContextMenu";
 import { MdOutlineFullscreen } from "react-icons/md";
-import { PiDownloadSimpleBold, PiPaintBrushBroad, PiPaintBrushBroadDuotone } from "react-icons/pi";
-import { IoPlanetOutline } from "react-icons/io5";
+import { PiDownloadSimpleBold } from "react-icons/pi";
+import { IoCloudUploadOutline, IoPlanetOutline } from "react-icons/io5";
 import DraggableIconTitleModal from "../../../components/modal/DraggableIconTitleModal";
 import SpaceSelector from "../components/SpaceSelector";
-import { HiOutlinePaintBrush } from "react-icons/hi2";
 import { LuPaintbrush } from "react-icons/lu";
+import { SpaceCreateStep } from "../../../constants/ProcessSteps";
+import ImageUploadModal from "../../../components/modal/ImageUploadModal";
+import IconTitleModal from "../../../components/modal/IconTitleModal";
 
 interface UniverseEditInnerImgProps {
   innerImageId: number;
@@ -21,11 +23,12 @@ export default function UniverseEditInnerImg({
   onEdit,
 }: UniverseEditInnerImgProps) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const [createSpaceModalOpen, setCreateSpaceModalOpen] = useState(false);
+
+  const [createStep, setCreateStep] = useState<SpaceCreateStep | null>(null);
 
   const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
   const [endPoint, setEndPoint] = useState<{ x: number; y: number } | null>(null);
-  const [hoverPos, setHoverPos] = useState<{ x: number; y: number } | null>(null);
+  const [innerImg, setInnerImg] = useState<File | null>(null);
 
   const resetSelection = () => {
     setStartPoint(null);
@@ -36,7 +39,7 @@ export default function UniverseEditInnerImg({
 
   const handleDownloadImage = async () => {
     try {
-      if (innerImageId!= -1 ){
+      if (innerImageId != -1) {
         const imageUrl = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/attachment/${innerImageId}`;
         window.location.href = imageUrl;
       }
@@ -69,6 +72,23 @@ export default function UniverseEditInnerImg({
     },
   ];
 
+  const onCreateSpaceModalClose = () => {
+    setCreateStep(null);
+    setStartPoint(null);
+    setEndPoint(null);
+    setInnerImg(null);
+  }
+
+  const onCreateSpaceModalSubmit = () => {
+    setCreateStep(SpaceCreateStep.UploadImage);
+
+  }
+
+  function handleSaveInnerImage(file: File): void {
+    setCreateStep(SpaceCreateStep.FillDetails);
+    setInnerImg(file);
+  }
+
   return (
     <div
       ref={menuRef}
@@ -77,7 +97,7 @@ export default function UniverseEditInnerImg({
     >
       <button
         onClick={() => setMenuOpen(!menuOpen)}
-        className="z-20 absolute cursor-pointer top-2 right-2 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        className="z-10 absolute cursor-pointer top-2 right-2 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <BiDotsVerticalRounded size={20} />
       </button>
@@ -89,28 +109,28 @@ export default function UniverseEditInnerImg({
       />
 
       <button
-        onClick={() => {}}
-        className="z-50 absolute cursor-pointer bottom-3 right-3 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        onClick={() => { }}
+        className="z-10 absolute cursor-pointer bottom-3 right-3 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <PiDownloadSimpleBold size={20} />
       </button>
       <button
-        onClick={() => {}}
-        className="z-50 absolute cursor-pointer bottom-3 right-12 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        onClick={() => { }}
+        className="z-10 absolute cursor-pointer bottom-3 right-12 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <RiFunctionAddLine size={20} />
       </button>
       <button
         onClick={() => {
-          setCreateSpaceModalOpen(true);
+          setCreateStep(SpaceCreateStep.SetSize);
         }}
-        className="z-50 absolute cursor-pointer bottom-3 right-22 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+        className="z-10 absolute cursor-pointer bottom-3 right-22 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <MdOutlineFullscreen size={25} />
       </button>
 
       <SpaceSelector
-        createSpaceModalOpen={createSpaceModalOpen}
+        step={createStep}
         innerImageId={innerImageId}
         startPoint={startPoint}
         endPoint={endPoint}
@@ -118,9 +138,9 @@ export default function UniverseEditInnerImg({
         setEndPoint={setEndPoint}
       />
 
-      {createSpaceModalOpen && (
+      {createStep !== null && createStep === SpaceCreateStep.SetSize && (
         <DraggableIconTitleModal
-          onClose={() => setCreateSpaceModalOpen(false)}
+          onClose={onCreateSpaceModalClose}
           title="스페이스 생성"
           description="새로운 스페이스를 생성합니다."
           icon={<IoPlanetOutline className="text-blue-950" size={20} />}
@@ -144,16 +164,45 @@ export default function UniverseEditInnerImg({
               </div>
             </button>
             <div className="flex gap-3">
-              <button className="px-5 py-2 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 transition cursor-pointer">
+              <button className="px-5 py-2 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 transition cursor-pointer"
+                onClick={onCreateSpaceModalSubmit}>
                 완료
               </button>
-              <button className="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition cursor-pointer">
+              <button className="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition cursor-pointer"
+                onClick={onCreateSpaceModalClose}>
                 취소
               </button>
             </div>
           </div>
         </DraggableIconTitleModal>
       )}
+
+      {createStep !== null && createStep === SpaceCreateStep.UploadImage && (
+        <ImageUploadModal
+          title="스페이스 생성"
+          description="새로운 스페이스를 생성합니다."
+          labelText="스페이스 내부 이미지"
+          maxFileSizeMB={5}
+          onClose={onCreateSpaceModalClose}
+          onConfirm={(file) => handleSaveInnerImage(file)}
+          confirmText="다음"
+          requireSquare={true}
+        />
+      )}
+
+      {createStep !== null && createStep === SpaceCreateStep.FillDetails && (
+        <IconTitleModal
+          onClose={onCreateSpaceModalClose}
+          title="스페이스 생성"
+          description="새로운 스페이스를 생성합니다."
+          icon={<IoPlanetOutline size={20} />}
+          bgColor="white"
+        >
+          123
+        </IconTitleModal>
+      )}
+
+
     </div>
   );
 }
