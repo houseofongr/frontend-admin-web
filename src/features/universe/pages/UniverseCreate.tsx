@@ -7,8 +7,8 @@ import { BiSave } from "react-icons/bi";
 
 import ThumbnailStep from "../create/ThumbnailStep";
 import ThumbMusicStep from "../create/ThumbMusicStep";
-import InnerImgStep from "../create/InnerImgStep";
-import DetailInfoStep from "../create/DetailInfoStep";
+import InnerImgStep from "../create/UniverseInnerImgStep";
+import UniverseDetailInfoStep from "../create/UniverseDetailInfoStep";
 
 import API_CONFIG from "../../../config/api";
 import ModalAlertMessage, { AlertType } from "../../../components/modal/ModalAlertMessage";
@@ -337,7 +337,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
 
       {step === UniverseCreateStep.DetailInfo && (
         <>
-          <DetailInfoStep
+          <UniverseDetailInfoStep
             innerImg={innerImg}
             thumbMusic={thumbMusic}
             detailInfo={detailInfo}

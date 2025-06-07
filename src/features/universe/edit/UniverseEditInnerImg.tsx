@@ -5,17 +5,29 @@ import { RiImageEditFill, RiFileDownloadLine, RiFunctionAddLine } from "react-ic
 import ContextMenu from "../../../components/ContextMenu";
 import { MdOutlineFullscreen } from "react-icons/md";
 import { PiDownloadSimpleBold } from "react-icons/pi";
-import { IoCloudUploadOutline, IoPlanetOutline } from "react-icons/io5";
+import { IoPlanetOutline } from "react-icons/io5";
 import DraggableIconTitleModal from "../../../components/modal/DraggableIconTitleModal";
 import SpaceSelector from "../components/SpaceSelector";
 import { LuPaintbrush } from "react-icons/lu";
 import { SpaceCreateStep } from "../../../constants/ProcessSteps";
 import ImageUploadModal from "../../../components/modal/ImageUploadModal";
 import IconTitleModal from "../../../components/modal/IconTitleModal";
+import { PercentPoint } from "../../../constants/image";
+import SpaceDetailInfoStep from "../../space/create/SpaceDetailInfoStep";
 
 interface UniverseEditInnerImgProps {
   innerImageId: number;
   onEdit: () => void;
+}
+
+interface CreateSpaceParams {
+  startPoint: PercentPoint;
+  endPoint: PercentPoint;
+  title: string;
+  description: string;
+  parentSpaceId: number;
+  universeId: number;
+  innerImg: File;
 }
 
 export default function UniverseEditInnerImg({
@@ -26,9 +38,14 @@ export default function UniverseEditInnerImg({
 
   const [createStep, setCreateStep] = useState<SpaceCreateStep | null>(null);
 
-  const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
-  const [endPoint, setEndPoint] = useState<{ x: number; y: number } | null>(null);
+  const [startPoint, setStartPoint] = useState<PercentPoint | null>(null);
+  const [endPoint, setEndPoint] = useState<PercentPoint | null>(null);
   const [innerImg, setInnerImg] = useState<File | null>(null);
+
+  const [universeId, setUniverseId] = useState<number>(-1);
+  const [parentSpaceId, setParentSpaceId] = useState<number>(-1);
+  const [title, setTitle] = useState<string>("");
+  const [description, setDescription] = useState<string>("");
 
   const resetSelection = () => {
     setStartPoint(null);
@@ -36,6 +53,72 @@ export default function UniverseEditInnerImg({
   };
 
   const menuRef = useRef<HTMLDivElement>(null);
+
+  async function createSpace({
+    startPoint,
+    endPoint,
+    title,
+    description,
+    parentSpaceId,
+    universeId,
+    innerImg,
+  }: CreateSpaceParams): Promise<void> {
+    if (!startPoint || !endPoint) {
+      throw new Error("좌표 정보가 없습니다.");
+    }
+
+    const dx = Math.min(startPoint.xPercent, endPoint.xPercent);
+    const dy = Math.min(startPoint.yPercent, endPoint.yPercent);
+    const scaleX = Math.abs(endPoint.xPercent - startPoint.xPercent);
+    const scaleY = Math.abs(endPoint.yPercent - startPoint.yPercent);
+
+    const formData = new FormData();
+
+    const metadata = {
+      universeId: universeId,
+      parentSpaceId: parentSpaceId,
+      title: title,
+      description: description,
+      dx: dx,
+      dy: dy,
+      scaleX: scaleX,
+      scaleY: scaleY,
+    };
+
+    formData.append("metadata", JSON.stringify(metadata));
+    formData.append("image", innerImg);
+
+    // try {
+    const response = await fetch(`${API_CONFIG.BACK_API}/spaces`, {
+      method: "POST",
+      body: formData,
+    });
+
+    // if (!response.ok) {
+    //   let errorMessage =
+    //     "새로운 스페이스 데이터를 생성하는데 실패하였습니다.";
+    //   try {
+    //     const errorData = await response.json();
+    //     errorMessage = errorData.message || errorMessage;
+    //   } catch (jsonError) {
+    //     console.error("JSON 파싱 오류:", jsonError);
+    //   }
+    //   // alert(errorMessage, "fail");
+    //   return;
+    // }
+
+    if (!response.ok) alert("스페이슷 생성 실패");
+    else alert("스페이스 생성 완료");
+
+    // showAlert("새로운 스페이스가 성공적으로 저장되었습니다.", "success");
+    // } catch (error) {
+    // showAlert(
+    //   `데이터 저장 중 오류가 발생하였습니다. error: ${error}`,
+    //   "fail"
+    // );
+    // }
+  };
+
 
   const handleDownloadImage = async () => {
     try {
@@ -198,11 +281,19 @@ export default function UniverseEditInnerImg({
           icon={<IoPlanetOutline size={20} />}
           bgColor="white"
         >
-          123
+          <SpaceDetailInfoStep
+            innerImg={innerImg}
+            detailInfo={{
+              title: title,
+              description: description
+            }}
+            onSubmit={(newTitle, newDescription) => {
+              setTitle(newTitle);
+              setDescription(newDescription);
+            }}
+          />
         </IconTitleModal>
       )}
-
-
     </div>
   );
 }

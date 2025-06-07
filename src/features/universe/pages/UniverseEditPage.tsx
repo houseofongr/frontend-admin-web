@@ -24,7 +24,6 @@ import ModalAlertMessage, {
   AlertType,
 } from "../../../components/modal/ModalAlertMessage";
 import Button from "../../../components/buttons/Button";
-import { FOOTER_HEIGHT, HEADER_HEIGHT } from "../../../constants/size";
 
 export default function UniverseEditPage() {
   const { universeId } = useParams();
