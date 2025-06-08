@@ -16,7 +16,7 @@ export function InputField({
   extra?: string;
 }) {
   return (
-    <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2">
+    <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[75px]">
       <label className="text-neutral-500 mb-0.5">{label}</label>
       <input
         value={value}

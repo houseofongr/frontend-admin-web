@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { HiGlobeAsiaAustralia } from "react-icons/hi2";
 import { TbShieldLock } from "react-icons/tb";
-import { UniverseCategory } from "../../../constants/universeData";
+import { UniverseCategory } from "../../../constants/UniverseData";
 import { FiSearch } from "react-icons/fi";
 import UserSearch from "../../universe/create/UserSearch";
 import Modal from "../../../components/modal/Modal";
 import { UserV2 } from "../../../types/user";
 import AudioLight from "../../../components/Sound/AudioLight";
-import { PublicStatusOption } from "../../../constants/universeData";
+import { PublicStatusOption } from "../../../constants/UniverseData";
 import { InputField } from "../../../components/Input/InputField";
 import { TextareaField } from "../../../components/Input/TextareaField";
 
@@ -144,9 +144,9 @@ export default function UniverseDetailInfoStep({
   }, [title, description, authorId, category, publicStatus, tagList]);
 
   return (
-    <div className="w-full max-w-[1000px] mx-auto">
+    <div className="flex flex-col w-full max-w-[1000px] mx-auto min-h-[420px] ">
       {/* 헤더 + 공개여부 */}
-      <div className="flex justify-between items-end mb-4">
+      <div className="shrink-0 flex justify-between items-end mb-4">
         <div className="text-xl font-semibold">세부정보 작성</div>
         <div className="flex space-x-5">
           {[PublicStatusOption.PUBLIC, PublicStatusOption.PRIVATE].map(
@@ -191,8 +191,8 @@ export default function UniverseDetailInfoStep({
 
       <div className="flex flex-col lg:flex-row gap-4 lg:h-[500px]">
         {/* 좌측 미리보기 영역 */}
-        <div className="flex flex-col gap-3 w-full lg:w-[500px]">
-          <div className="min-w-[300px] min-h-[300px] flex justify-center items-center border border-gray-300 rounded-xl p-5">
+        <div className="shrink-0 flex flex-col gap-3 w-full lg:w-[500px]">
+          <div className=" min-w-[300px] min-h-[100px] flex justify-center items-center border border-gray-300 rounded-xl p-5">
             {previewInnerImg ? (
               <img
                 src={previewInnerImg}
@@ -203,7 +203,7 @@ export default function UniverseDetailInfoStep({
               "내부이미지"
             )}
           </div>
-          <div className="min-w-[300px] min-h-[150px] flex justify-center center items-center border border-gray-300 rounded-xl p-1">
+          <div className="shrink-0 min-w-[300px] min-h-[150px] flex justify-center center items-center border border-gray-300 rounded-xl p-1">
             {previewMusic && (
               <div className="flex w-[100%]">
                 <AudioLight
@@ -216,7 +216,7 @@ export default function UniverseDetailInfoStep({
         </div>
 
         {/* 우측 입력 영역 */}
-        <div className="flex flex-col flex-1 gap-3 min-w-[450px]">
+        <div className="shrink-0 flex flex-col flex-1 gap-3 min-w-[450px]">
           {/* 제목 */}
           <InputField
             label="제목"
@@ -247,7 +247,7 @@ export default function UniverseDetailInfoStep({
 
           <div className="flex flex-row gap-3">
             {/* 카테고리 */}
-            <div className="flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-1">
+            <div className="flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-1 min-h-[75px]">
               <label className="text-neutral-500 mb-0.5">카테고리</label>
               <select
                 value={category}
@@ -266,7 +266,7 @@ export default function UniverseDetailInfoStep({
             </div>
 
             {/* 작성자 선택 */}
-            <div className="flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-1">
+            <div className="flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-1 min-h-[75px]">
               <label className="text-neutral-500 mb-1">작성자</label>
               <div className="relative w-full" onClick={openModal}>
                 <input

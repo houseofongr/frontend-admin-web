@@ -10,7 +10,7 @@ export function TextareaField({
   maxLength: number;
 }) {
   return (
-    <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-grow">
+    <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-grow min-h-[95px]">
       <label className="text-neutral-500 mb-0.5">{label}</label>
       <textarea
         value={value}

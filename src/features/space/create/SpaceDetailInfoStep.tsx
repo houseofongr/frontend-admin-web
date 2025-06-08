@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { InputField } from "../../../components/Input/InputField";
 import { TextareaField } from "../../../components/Input/TextareaField";
+import { FaRegSave } from "react-icons/fa";
+import { FiSave } from "react-icons/fi";
 
 interface DetailInfoStepProps {
   innerImg: File | null;
@@ -37,25 +39,19 @@ export default function SpaceDetailInfoStep({
     setPreviewInnerImg(null);
   }, [innerImg]);
 
-
-
-
   return (
-    <div className="flex w-full h-full mx-auto flex-col">
-      {/* 헤더 + 공개여부 */}
-      <div className="text-xl font-semibold  mb-4">세부정보 작성</div>
+    <div className="flex mx-auto flex-col">
+      <div className="shrink-0 text-xl font-semibold  mb-4">세부정보 작성</div>
 
-
-      <div className="flex flex-col lg:flex-row gap-4">
-        {/* 좌측 미리보기 영역 */}
-        <div className="flex flex-col gap-3 w-full lg:max-w-[500px] max-h-[500px]">
+      <div className="flex flex-col lg:flex-row gap-4 min-w-[500px] lg:min-w-[700px]">
+        <div className="shrink-0 flex flex-1 flex-col gap-3 ">
           {/* 이미지 미리보기 박스 */}
-          <div className="flex justify-center items-center border border-gray-300 rounded-xl p-5 grow overflow-hidden">
+          <div className="max-w-full max-h-full border border-gray-300 rounded-xl px-15 py-10 overflow-hidden">
             {previewInnerImg ? (
               <img
                 src={previewInnerImg}
                 alt="내부 이미지"
-                className="object-contain max-h-full max-w-full"
+                className="block mx-auto max-w-full max-h-full object-contain"
               />
             ) : (
               "내부이미지"
@@ -74,11 +70,8 @@ export default function SpaceDetailInfoStep({
           </div>
         </div>
 
-
         {/* 우측 입력 영역 */}
-        <div className="flex flex-col flex-1 gap-3 min-w-[450px]">
-
-
+        <div className="shrink-0 flex flex-1 flex-col gap-3 ">
           {/* 설명 */}
           <TextareaField
             label="설명"
@@ -89,12 +82,12 @@ export default function SpaceDetailInfoStep({
         </div>
       </div>
       {/* 제출 버튼 */}
-      <div className="flex justify-end mt-2">
+      <div className="shrink-0 flex justify-end mt-2">
         <button
           onClick={() => onSubmit(title, description)}
-          className="px-5 py-2 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 transition"
+          className="px-5 py-2 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 cursor-pointer transition flex flex-row justify-center gap-3 items-center"
         >
-          다음
+          <FiSave /> <p className="mt-1">완료</p>
         </button>
       </div>
     </div>

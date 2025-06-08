@@ -20,12 +20,10 @@ const IconTitleModal: React.FC<ModalProps> = ({
   bgColor,
 }) => {
   return (
-    <div
-      className="fixed inset-0 bg-black/70 flex-center z-10"
-    >
+    <div className="fixed inset-0 bg-black/70 flex-center z-10">
       <div
         className={clsx(
-          "rounded-lg shadow-lg p-4 relative max-w-[1100px]   max-h-[80vh] overflow-auto",
+          "rounded-lg shadow-lg p-4 relative max-w-[1100px] max-h-[80vh] flex flex-col",
           {
             "bg-white": bgColor === "white",
             "bg-stone-800/90": bgColor === "dark",
@@ -42,9 +40,9 @@ const IconTitleModal: React.FC<ModalProps> = ({
         >
           <IoMdClose size={20} className="cursor-pointer hover:opacity-80" />
         </button>
-        <div className=" p-4 ">
+        <div className="flex flex-col p-4 overflow-auto">
           {/* 상단 업로드 설명 부분 */}
-          <div className="flex flex-row mx-5 gap-4 items-center">
+          <div className="shrink-0 flex flex-row mx-5 gap-4 items-center">
             <div className="border w-10 h-10 border-gray-300 rounded-full p-2 inline-flex items-center justify-center">
               {icon}
             </div>
@@ -55,9 +53,12 @@ const IconTitleModal: React.FC<ModalProps> = ({
           </div>
 
           {/* 디바이더 */}
-          <div className="border-t border-gray-200 my-4" />
+          <div className="shrink border-t border-gray-200 my-4" />
 
-          {children}
+          {/* children */}
+          <div className="flex flex-col mx-auto grow overflow-auto">
+            {children}
+          </div>
         </div>
       </div>
     </div>

@@ -1,5 +1,5 @@
 import { Universe } from "../../../types/universe";
-import { UniverseCategory } from "../../../constants/universeData";
+import { UniverseCategory } from "../../../constants/UniverseData";
 import { universeListHeaderTitles } from "../../../constants/headerList";
 import {
   RiDeleteBin6Line,

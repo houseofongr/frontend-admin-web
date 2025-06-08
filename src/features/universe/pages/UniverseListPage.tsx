@@ -14,13 +14,14 @@ import IconTitleModal from "../../../components/modal/IconTitleModal";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import UniverseCreate from "./UniverseCreate";
 import API_CONFIG from "../../../config/api";
-import { UniverseCategoryOptions } from "../../../constants/universeData";
+import { UniverseCategoryOptions } from "../../../constants/UniverseData";
 import ImageUploadModal from "../../../components/modal/ImageUploadModal";
 import ModalAlertMessage, {
   AlertType,
 } from "../../../components/modal/ModalAlertMessage";
 import Button from "../../../components/buttons/Button";
 import { universeSearchOptions } from "../../../constants/searchOptions";
+import ThumbMusicPreview from "../components/ThumbMusicPreview";
 
 export default function UniverseListPage() {
   const navigate = useNavigate();
@@ -44,6 +45,9 @@ export default function UniverseListPage() {
   const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(
     null
   );
+
+  const [deleteId, setDeleteId] = useState<number>();
+  const [showThumbMusic, setShowThumbMusic] = useState<number>(-1);;
 
   const fetchUniverse = async (
     page: number = currentPage,
@@ -98,6 +102,10 @@ export default function UniverseListPage() {
     fetchUniverse();
   }
 
+  const closeThumbMusicModal = ()=>{
+    setShowThumbMusic(-1);
+  }
+
   const saveThumbnailHandler = async (file: File) => {
     if (!file) {
       setAlert({
@@ -141,21 +149,64 @@ export default function UniverseListPage() {
     }
   };
 
-  function handleSearch(type: string, word: string): void {
+  const deleteUniverseHandler = async () => {
+    try {
+      if (deleteId == null) return;
+      const response = await fetch(
+        `${API_CONFIG.BACK_API}/universes/${deleteId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      if (response.ok) {
+        setAlert({
+          text: "유니버스 삭제가 완료되었습니다.",
+          type: "success",
+        });
+      } else {
+        const errorText = await response.text();
+        setAlert({
+          text: "유니버스 삭제 실패",
+          type: "fail",
+        });
+        console.log(errorText, "    ", deleteId);
+        
+      }
+    } catch (e) {
+      console.error("에러 발생:", e);
+      setAlert({
+        text: "에러가 발생했습니다.",
+        type: "fail",
+      });
+    }
+  };
+
+  const handleSearch = (type: string, word: string) => {
     setSearchType(type);
     setKeyword(word);
     setCurrentPage(1);
     fetchUniverse(1, size, type, word); //
-  }
+  };
 
   const handlePageChange = (page: number) => {
     setCurrentPage(page);
     fetchUniverse(page, size, searchType, keyword);
   };
 
+  const handleDelete = (id: number) => {
+    setDeleteId(id);
+    setAlert({
+      text: "정말로 유니버스를 삭제하시겠습니까?",
+      type: "info",
+    });
+  };
+
+  const handlePlayMusic = (page: number) => {};
+
   return (
     <PageLayout>
-      {alert && (
+      {alert && alert.type != "info" && (
         <ModalAlertMessage
           text={alert.text}
           type={alert.type}
@@ -166,6 +217,37 @@ export default function UniverseListPage() {
           okButton={
             <Button
               label="확인"
+              onClick={() => {
+                setAlert(null);
+                handleCloseModal();
+              }}
+            />
+          }
+        />
+      )}
+      {alert && alert.type == "info" && (
+        <ModalAlertMessage
+          text={alert.text}
+          subText="* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다."
+          type={alert.type}
+          onClose={() => {
+            setAlert(null);
+            handleCloseModal();
+          }}
+          okButton={
+            <Button
+              label="확인"
+              onClick={() => {
+                deleteUniverseHandler();
+                setAlert(null);
+                handleCloseModal();
+              }}
+            />
+          }
+          cancelButton={
+            <Button
+              variant="gray"
+              label="취소"
               onClick={() => {
                 setAlert(null);
                 handleCloseModal();
@@ -220,15 +302,15 @@ export default function UniverseListPage() {
                   <UniverseListItem
                     key={universe.id}
                     universe={universe}
-                    onDelete={(id: number) => {
-                      console.log(id + " Delete");
-                    }}
+                    onDelete={handleDelete}
                     onEdit={onEdit}
                     onEditThumbnail={() =>
                       handleOpenEditThumbnail(universe.id!)
                     }
                     onPlayMusic={(id: number) => {
-                      console.log(id + " Play Music");
+                      setShowThumbMusic(id);
+                      console.log(id);
+                      
                     }}
                   />
                 );
@@ -244,7 +326,6 @@ export default function UniverseListPage() {
           />
         )}
       </section>
-
       {editThumbnailUniverseId !== null && (
         <ImageUploadModal
           title="유니버스 썸네일 수정"
@@ -257,7 +338,6 @@ export default function UniverseListPage() {
           requireSquare={true}
         />
       )}
-
       {showCreateModal && (
         <IconTitleModal
           onClose={() => setShowCreateModal(false)}
@@ -267,6 +347,20 @@ export default function UniverseListPage() {
           bgColor="white"
         >
           <UniverseCreate onClose={closeCreateModal} />
+        </IconTitleModal>
+      )}
+      {showThumbMusic != -1 && (
+        <IconTitleModal
+          onClose={() => setShowThumbMusic(-1)}
+          title="썸뮤직 듣기"
+          description="썸뮤직 미리 듣기"
+          icon={<IoCloudUploadOutline size={20} />}
+          bgColor="white"
+        >
+          <ThumbMusicPreview
+            onClose={() => setShowThumbMusic(-1)}
+            thumbMusicId={showThumbMusic}
+          />
         </IconTitleModal>
       )}
     </PageLayout>

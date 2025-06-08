@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import API_CONFIG from "../../../config/api";
 import { SpaceCreateStep } from "../../../constants/ProcessSteps";
+import { Piece, Space } from "../../../context/useUniverseStore";
 
 interface PercentPoint {
   xPercent: number;
@@ -14,6 +15,8 @@ interface SpaceSelectorProps {
   endPoint: PercentPoint | null;
   setStartPoint: React.Dispatch<React.SetStateAction<PercentPoint | null>>;
   setEndPoint: React.Dispatch<React.SetStateAction<PercentPoint | null>>;
+  existingSpaces: Space[];
+  existingPieces: Piece[];
 }
 
 export default function SpaceSelector({
@@ -23,9 +26,19 @@ export default function SpaceSelector({
   endPoint,
   setStartPoint,
   setEndPoint,
+  existingSpaces,
+  existingPieces,
 }: SpaceSelectorProps) {
   const [hoverPos, setHoverPos] = useState<PercentPoint | null>(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [popupData, setPopupData] = useState<{
+    x: number;
+    y: number;
+    title: string;
+    description: string;
+  } | null>(null);
+
   const imgRef = useRef<HTMLImageElement>(null);
 
   // ResizeObserver로 이미지 사이즈 추적
@@ -94,6 +107,37 @@ export default function SpaceSelector({
     }
   };
 
+  const handleMouseEnter = (index: number) => {
+    const space = existingSpaces[index];
+    const start = toPixel({ xPercent: space.startX, yPercent: space.startY });
+    const end = toPixel({ xPercent: space.endX, yPercent: space.endY });
+    const left = Math.min(start.x, end.x);
+    const top = Math.min(start.y, end.y);
+    const width = Math.abs(end.x - start.x);
+    const height = Math.abs(end.y - start.y);
+    console.log(space);
+    
+    console.log(
+      "width " + width,
+      "\nheight " + height,
+      "\nleft " + left,
+      "\ntop " + top
+    );
+    
+    setHoveredIndex(index);
+    setPopupData({
+      x: left + width/2 + 10, // 박스 오른쪽 10px 옆
+      y: top + height/2 + 5, // 박스 아래 5px 밑
+      title: space.title,
+      description: space.description,
+    });
+  };
+
+  const handleMouseLeave = () => {
+    setHoveredIndex(null);
+    setPopupData(null);
+  };
+
   return (
     <div
       className="relative w-full h-full"
@@ -112,7 +156,9 @@ export default function SpaceSelector({
       )}
 
       {/* Hover */}
-      {step === SpaceCreateStep.SetSize && hoverPos && !endPoint && (
+      {step === SpaceCreateStep.SetSize &&
+        hoverPos &&
+        !endPoint &&
         (() => {
           const { x, y } = toPixel(hoverPos);
           return (
@@ -142,11 +188,10 @@ export default function SpaceSelector({
               />
             </>
           );
-        })()
-      )}
+        })()}
 
       {/* Start */}
-      {startPoint && (
+      {startPoint &&
         (() => {
           const { x, y } = toPixel(startPoint);
           return (
@@ -158,11 +203,10 @@ export default function SpaceSelector({
               }}
             />
           );
-        })()
-      )}
+        })()}
 
       {/* End */}
-      {endPoint && (
+      {endPoint &&
         (() => {
           const { x, y } = toPixel(endPoint);
           return (
@@ -174,13 +218,39 @@ export default function SpaceSelector({
               }}
             />
           );
-        })()
-      )}
+        })()}
 
       {/* Box */}
-      {startPoint && endPoint && (() => {
-        const start = toPixel(startPoint);
-        const end = toPixel(endPoint);
+      {startPoint &&
+        endPoint &&
+        (() => {
+          const start = toPixel(startPoint);
+          const end = toPixel(endPoint);
+          const left = Math.min(start.x, end.x);
+          const top = Math.min(start.y, end.y);
+          const width = Math.abs(end.x - start.x);
+          const height = Math.abs(end.y - start.y);
+
+          return (
+            <div
+              className="absolute border-2 border-amber-400 bg-amber-400/20 pointer-events-none"
+              style={{
+                left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
+                top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
+                width: `${width}px`,
+                height: `${height}px`,
+              }}
+            />
+          );
+        })()}
+
+      {existingSpaces && existingSpaces.map((space, index) => {
+        const start = toPixel({
+          xPercent: space.startX,
+          yPercent: space.startY,
+        });
+        const end = toPixel({ xPercent: space.endX, yPercent: space.endY });
+
         const left = Math.min(start.x, end.x);
         const top = Math.min(start.y, end.y);
         const width = Math.abs(end.x - start.x);
@@ -188,16 +258,39 @@ export default function SpaceSelector({
 
         return (
           <div
-            className="absolute border-2 border-amber-400 bg-amber-400/20 pointer-events-none"
+            key={index}
+            className="absolute"
             style={{
               left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
               top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
               width: `${width}px`,
               height: `${height}px`,
             }}
-          />
+            onMouseEnter={() => handleMouseEnter(index)}
+            onMouseLeave={handleMouseLeave}
+          >
+            <div
+              className={`w-full h-full border-2 border-amber-400 bg-amber-400/20 pointer-events-none transition-opacity duration-300 ${
+                hoveredIndex === index ? "opacity-100" : "opacity-30"
+              }`}
+            />
+          </div>
         );
-      })()}
+      })}
+
+      <div
+        className={`absolute bg-white p-2 rounded shadow-md max-w-xs text-sm z-30 pointer-events-none transition-opacity duration-500 ${
+          popupData ? "opacity-100" : "opacity-100"
+        }`}
+        style={{
+          left: popupData?.x ?? 0,
+          top: popupData?.y ?? 0,
+          visibility: popupData ? "visible" : "hidden",
+        }}
+      >
+        <div className="font-semibold">{popupData?.title}</div>
+        <div className="text-xs mt-1">{popupData?.description}</div>
+      </div>
     </div>
   );
 }

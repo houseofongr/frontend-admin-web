@@ -1,3 +1,5 @@
+// React Context
+
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { Room } from "../types/house";
 

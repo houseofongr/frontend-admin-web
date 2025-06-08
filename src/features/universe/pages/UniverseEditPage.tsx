@@ -12,7 +12,7 @@ import ThumbMusicEditModal from "../edit/ThumbMusicEditModal";
 import {
   PublicStatusOption,
   UniverseCategory,
-} from "../../../constants/universeData";
+} from "../../../constants/UniverseData";
 import API_CONFIG from "../../../config/api";
 import { Universe } from "../../../types/universe";
 import ImageUploadModal from "../../../components/modal/ImageUploadModal";

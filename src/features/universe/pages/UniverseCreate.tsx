@@ -348,7 +348,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
 
       {/* 저장 버튼 (우측 하단 고정) */}
       <div
-        className={`flex mt-4 px-5 ${step !== UniverseCreateStep.Thumbnail ? "justify-between" : "justify-end"
+        className={`shrink-0 flex mt-4 px-5 ${step !== UniverseCreateStep.Thumbnail ? "justify-between" : "justify-end"
           }`}
       >
         {step !== UniverseCreateStep.Thumbnail && (
