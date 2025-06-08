@@ -115,19 +115,35 @@ export default function SpaceSelector({
     const top = Math.min(start.y, end.y);
     const width = Math.abs(end.x - start.x);
     const height = Math.abs(end.y - start.y);
+
+    // const start = toPixel({
+    //   xPercent: space.startX,
+    //   yPercent: space.startY,
+    // });
+    // const end = toPixel({ xPercent: space.endX, yPercent: space.endY });
+    // const left = Math.min(start.x, end.x);
+    // const top = Math.min(start.y, end.y);
+    // const width = Math.abs(end.x - start.x);
+    // const height = Math.abs(end.y - start.y);
+
+    // left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
+    // top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
+    // width: `${width}px`,
+    // height: `${height}px`,
+
     console.log(space);
-    
+
     console.log(
       "width " + width,
       "\nheight " + height,
       "\nleft " + left,
       "\ntop " + top
     );
-    
+
     setHoveredIndex(index);
     setPopupData({
-      x: left + width/2 + 10, // 박스 오른쪽 10px 옆
-      y: top + height/2 + 5, // 박스 아래 5px 밑
+      x: left + width / 2 + 10, // 박스 오른쪽 10px 옆
+      y: top + height / 2 + 5, // 박스 아래 5px 밑
       title: space.title,
       description: space.description,
     });
@@ -244,47 +260,47 @@ export default function SpaceSelector({
           );
         })()}
 
-      {existingSpaces && existingSpaces.map((space, index) => {
-        const start = toPixel({
-          xPercent: space.startX,
-          yPercent: space.startY,
-        });
-        const end = toPixel({ xPercent: space.endX, yPercent: space.endY });
+      {existingSpaces &&
+        existingSpaces.map((space, index) => {
+          const start = toPixel({
+            xPercent: space.startX,
+            yPercent: space.startY,
+          });
+          const end = toPixel({ xPercent: space.endX, yPercent: space.endY });
+          const left = Math.min(start.x, end.x);
+          const top = Math.min(start.y, end.y);
+          const width = Math.abs(end.x - start.x);
+          const height = Math.abs(end.y - start.y);
 
-        const left = Math.min(start.x, end.x);
-        const top = Math.min(start.y, end.y);
-        const width = Math.abs(end.x - start.x);
-        const height = Math.abs(end.y - start.y);
-
-        return (
-          <div
-            key={index}
-            className="absolute"
-            style={{
-              left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
-              top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
-              width: `${width}px`,
-              height: `${height}px`,
-            }}
-            onMouseEnter={() => handleMouseEnter(index)}
-            onMouseLeave={handleMouseLeave}
-          >
+          return (
             <div
-              className={`w-full h-full border-2 border-amber-400 bg-amber-400/20 pointer-events-none transition-opacity duration-300 ${
-                hoveredIndex === index ? "opacity-100" : "opacity-30"
-              }`}
-            />
-          </div>
-        );
-      })}
+              key={index}
+              className="absolute"
+              style={{
+                left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
+                top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
+                width: `${width}px`,
+                height: `${height}px`,
+              }}
+              onMouseEnter={() => handleMouseEnter(index)}
+              onMouseLeave={handleMouseLeave}
+            >
+              <div
+                className={`w-full h-full border-2 border-amber-400 bg-amber-400/20 pointer-events-none transition-opacity duration-300 ${
+                  hoveredIndex === index ? "opacity-100" : "opacity-30"
+                }`}
+              />
+            </div>
+          );
+        })}
 
       <div
         className={`absolute bg-white p-2 rounded shadow-md max-w-xs text-sm z-30 pointer-events-none transition-opacity duration-500 ${
           popupData ? "opacity-100" : "opacity-100"
         }`}
         style={{
-          left: popupData?.x ?? 0,
-          top: popupData?.y ?? 0,
+          left: `calc(50% - ${imageSize.width / 2}px + ${popupData?.x}px)`,
+          top: `calc(50% - ${imageSize.height / 2}px + ${popupData?.y}px)`,
           visibility: popupData ? "visible" : "hidden",
         }}
       >

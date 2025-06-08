@@ -15,7 +15,7 @@ import ContextMenu from "../../../components/ContextMenu";
 import DraggableIconTitleModal from "../../../components/modal/DraggableIconTitleModal";
 import ImageUploadModal from "../../../components/modal/ImageUploadModal";
 import IconTitleModal from "../../../components/modal/IconTitleModal";
-import SpaceSelector from "../components/SpaceSelector";
+import SpaceSelector from "../../space/components/SpaceSelector";
 import SpaceDetailInfoStep from "../../space/create/SpaceDetailInfoStep";
 
 import { SpaceCreateStep } from "../../../constants/ProcessSteps";
