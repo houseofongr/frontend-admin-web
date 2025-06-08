@@ -16,6 +16,7 @@ import Button from "../../../components/buttons/Button";
 import { checkFileSize, checkImageIsSquare } from "../../../utils/fileValidator";
 import { UserV2 } from "../../../types/user";
 import { UniverseCreateStep } from "../../../constants/ProcessSteps";
+import SpinnerIcon from "../../../components/icons/SpinnerIcon";
 
 interface ThumbnailEditProps {
   onClose: () => void;
@@ -53,6 +54,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
   const [previewThumbnail, setPreviewThumbnail] = useState<string | null>(null);
   const [previewMusic, setPreviewMusic] = useState<string | null>(null);
   const [previewInnerImg, setPreviewInnerImg] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   // 필수 데이터 체크 함수
   const hasRequiredData = () => {
@@ -234,6 +236,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
 
     if (!thumbnail || !thumbMusic || !innerImg) return;
 
+    setLoading(true);
     const formData = new FormData();
 
     const metadata = {
@@ -277,6 +280,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
         "fail"
       );
     }
+    setLoading(false);
   };
 
   const showAlert = (text: string, type: AlertType) => {
@@ -285,19 +289,34 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
 
   return (
     <div className="flex flex-col">
+      {loading && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50">
+          <SpinnerIcon />
+        </div>
+      )}
+
       {alert && (
         <ModalAlertMessage
           text={alert.text}
           type={alert.type}
           onClose={() => setAlert(null)}
-          okButton={<Button label="확인" onClick={() => { setAlert(null); onClose(); }} />}
+          okButton={
+            <Button
+              label="확인"
+              onClick={() => {
+                setAlert(null);
+                onClose();
+              }}
+            />
+          }
         />
       )}
 
       {step !== UniverseCreateStep.DetailInfo && (
         <div
-          className={`w-130 h-100 flex justify-center items-center border-2 border-dashed rounded-md p-10 text-center transition-all duration-200 ${dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
-            }`}
+          className={`w-130 h-100 flex justify-center items-center border-2 border-dashed rounded-md p-10 text-center transition-all duration-200 ${
+            dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
+          }`}
           onDrop={handleDrop}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
@@ -348,8 +367,11 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
 
       {/* 저장 버튼 (우측 하단 고정) */}
       <div
-        className={`shrink-0 flex mt-4 px-5 ${step !== UniverseCreateStep.Thumbnail ? "justify-between" : "justify-end"
-          }`}
+        className={`shrink-0 flex mt-4 px-5 ${
+          step !== UniverseCreateStep.Thumbnail
+            ? "justify-between"
+            : "justify-end"
+        }`}
       >
         {step !== UniverseCreateStep.Thumbnail && (
           <button
@@ -363,13 +385,13 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
         {((step === UniverseCreateStep.Thumbnail && thumbnail) ||
           (step === UniverseCreateStep.ThumbMusic && thumbMusic) ||
           (step === UniverseCreateStep.InnerImg && innerImg)) && (
-            <button
-              className="hover:opacity-80 cursor-pointer text-primary"
-              onClick={onNextClick}
-            >
-              <IoArrowForwardCircleOutline size={30} />
-            </button>
-          )}
+          <button
+            className="hover:opacity-80 cursor-pointer text-primary"
+            onClick={onNextClick}
+          >
+            <IoArrowForwardCircleOutline size={30} />
+          </button>
+        )}
 
         {step === UniverseCreateStep.DetailInfo && hasRequiredData() && (
           <button

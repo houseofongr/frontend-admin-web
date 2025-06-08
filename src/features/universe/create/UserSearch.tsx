@@ -27,6 +27,7 @@ export default function UserSearch({
   const [totalPages, setTotalPages] = useState<number>(0);
   const [totalItems, setTotalItems] = useState<number>(0);
   const [size, setSize] = useState<number>(0);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const fetchUsers = async (
     filter?: string,
@@ -34,6 +35,7 @@ export default function UserSearch({
     page = currentPage
   ) => {
     try {
+      setLoading(true);
       const searchParams = new URLSearchParams();
 
       searchParams.append("page", page.toString());
@@ -43,7 +45,7 @@ export default function UserSearch({
         searchParams.append("searchType", filter);
         searchParams.append("keyword", query);
       }
-      
+
       const response = await fetch(
         `${API_CONFIG.BACK_API}/users/v2?${searchParams}`
       );
@@ -55,6 +57,7 @@ export default function UserSearch({
     } catch (error) {
       console.error("Failed to fetch users:", error);
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -86,6 +89,11 @@ export default function UserSearch({
 
       <div className="flex items-center flex-col py-4">
         <GridHeader headerTitles={searchUserListHeaderTitles} />
+        {loading && (
+          <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50">
+            <SpinnerIcon />
+          </div>
+        )}
         {users.length === 0 && (
           <div className="py-10 ">유저가 존재하지 않습니다.</div>
         )}
