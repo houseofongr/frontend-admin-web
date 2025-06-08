@@ -13,7 +13,7 @@ interface WaveformProps {
   audioTitle: string;
 }
 
-const WaveformWithAudioDark: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) => {
+const WaveformLight: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) => {
   const waveformRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [waveSurfer, setWaveSurfer] = useState<WaveSurfer | null>(null);
@@ -225,4 +225,4 @@ const formatTime = (time: number) => {
   return `${minutes}:${seconds}`;
 };
 
-export default WaveformWithAudioDark;
+export default WaveformLight;

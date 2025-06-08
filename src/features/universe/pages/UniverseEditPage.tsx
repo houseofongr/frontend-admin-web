@@ -12,6 +12,7 @@ import ThumbMusicEditModal from "../edit/ThumbMusicEditModal";
 import {
   PublicStatusOption,
   UniverseCategory,
+  UniverseCategoryOptions,
 } from "../../../constants/UniverseData";
 import API_CONFIG from "../../../config/api";
 import { Universe } from "../../../types/universe";
@@ -24,6 +25,11 @@ import ModalAlertMessage, {
   AlertType,
 } from "../../../components/modal/ModalAlertMessage";
 import Button from "../../../components/buttons/Button";
+import { InputField } from "../../../components/Input/InputField";
+import { TextareaField } from "../../../components/Input/TextareaField";
+import { AuthorSelectField } from "../../../components/Input/AuthorSelectField";
+import { SelectableRadioField } from "../../../components/Input/SelectableRadioField";
+import { SelectField } from "../../../components/Input/SelectField";
 
 export default function UniverseEditPage() {
   const { universeId } = useParams();
@@ -201,6 +207,19 @@ export default function UniverseEditPage() {
     saveThumbMusic(file);
   }
 
+  const publicStatusOptions = [
+    {
+      value: PublicStatusOption.PUBLIC,
+      icon: <HiGlobeAsiaAustralia size={20} />,
+      label: "공개",
+    },
+    {
+      value: PublicStatusOption.PRIVATE,
+      icon: <TbShieldLock size={20} />,
+      label: "비공개",
+    },
+  ];
+
   return (
     <PageLayout>
       {alert && alert?.type != "info" && (
@@ -288,143 +307,70 @@ export default function UniverseEditPage() {
           {/* 오른쪽 - 텍스트 입력 */}
           <div className="flex flex-1 flex-col gap-3 h-[100%]">
             {/* 제목 */}
-            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2">
-              <label className="text-neutral-500 mb-0.5">제목</label>
-              <input
-                value={universe.title}
-                onChange={(e) =>
-                  setUniverse((prev) => ({ ...prev, title: e.target.value }))
-                }
-                className="outline-none bg-transparent w-full text-gray-900"
-                maxLength={100}
-                placeholder="제목을 입력하세요"
-              />
-              <div className="absolute bottom-2 right-4 text-xs text-gray-500">
-                {universe.title.length} / 100
-              </div>
-            </div>
+            <InputField
+              label="제목"
+              value={universe.title}
+              onChange={(e) =>
+                setUniverse((prev) => ({ ...prev, title: e.target.value }))
+              }
+              maxLength={100}
+              placeholder="제목을 입력하세요"
+            />
 
             {/* 설명 */}
-            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 grow">
-              <label className="text-neutral-500 mb-0.5">설명</label>
-              <textarea
-                value={universe.description}
-                onChange={(e) =>
-                  setUniverse((prev) => ({
-                    ...prev,
-                    description: e.target.value,
-                  }))
-                }
-                className="outline-none bg-transparent w-full h-full text-gray-900 mb-5"
-                maxLength={500}
-                placeholder="설명을 입력하세요"
-              />
-              <div className="absolute bottom-2 right-4 text-xs text-gray-500">
-                {universe.description?.length} / 500
-              </div>
-            </div>
+            <TextareaField
+              label="설명"
+              value={universe.description ? universe.description : ""}
+              onChange={(e) =>
+                setUniverse((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
+              maxLength={500}
+              placeholder="설명을 입력하세요"
+            />
 
             {/* 카테고리 */}
-            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2">
-              <label className="text-neutral-500 mb-0.5">카테고리</label>
-              <select
-                value={universe.category}
-                onChange={(e) =>
-                  setUniverse((prev) => ({ ...prev, category: e.target.value }))
-                }
-                className="outline-none bg-transparent w-full text-gray-900"
-              >
-                <option value="" disabled>
-                  카테고리를 선택하세요
-                </option>
-                {Object.entries(UniverseCategory).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <SelectField
+              label="카테고리"
+              value={universe.category}
+              onChange={(val) =>
+                setUniverse((prev) => ({ ...prev, category: val }))
+              }
+              options={UniverseCategoryOptions}
+              placeholder="카테고리를 선택하세요"
+            />
 
             {/* 공개여부 */}
-            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2">
-              <label className="text-neutral-500 mb-0.5">공개여부</label>
-              <div className="flex space-x-10 justify-center">
-                {[
-                  {
-                    value: PublicStatusOption.PUBLIC,
-                    icon: <HiGlobeAsiaAustralia size={20} />,
-                    label: "공개",
-                  },
-                  {
-                    value: PublicStatusOption.PRIVATE,
-                    icon: <TbShieldLock size={20} />,
-                    label: "비공개",
-                  },
-                ].map(({ value, icon, label }) => (
-                  <label
-                    key={value}
-                    className="flex items-center space-x-2 cursor-pointer"
-                  >
-                    <input
-                      type="radio"
-                      name="isPublic"
-                      checked={universe.publicStatus === value}
-                      onChange={() =>
-                        setUniverse((prev) => ({
-                          ...prev,
-                          publicStatus: value,
-                        }))
-                      }
-                      className="hidden"
-                    />
-                    <span className="h-5 w-5 border border-neutral-500 rounded-full flex items-center justify-center">
-                      {universe.publicStatus === value && (
-                        <span className="h-3 w-3 bg-neutral-400 rounded-full" />
-                      )}
-                    </span>
-                    <span className="flex items-center gap-2 text-neutral-600">
-                      {icon} {label}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
+            <SelectableRadioField
+              label="공개여부"
+              name="publicStatus"
+              value={universe.publicStatus}
+              onChange={(val) =>
+                setUniverse((prev) => ({ ...prev, publicStatus: val }))
+              }
+              options={publicStatusOptions}
+            />
 
             {/* 태그 */}
-            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2">
-              <label className="text-neutral-500 mb-0.5">태그</label>
-              <input
-                value={tags}
-                onChange={handleTagChange}
-                onBlur={() => normalizeTagsAndUpdateState(tags)}
-                placeholder="#태그를 입력하고 스페이스바로 구분"
-                className="outline-none bg-transparent w-full text-gray-900"
-              />
-              <div className="absolute bottom-2 right-4 text-xs text-gray-500">
-                {universe.hashtags?.length || 0} / 10
-              </div>
-            </div>
+            <InputField
+              label="태그"
+              value={tags}
+              onChange={handleTagChange}
+              onBlur={() => normalizeTagsAndUpdateState(tags)}
+              maxLength={100}
+              placeholder="#태그를 입력하고 스페이스바로 구분"
+              extra={`${universe.hashtags?.length} / 10`}
+            />
 
             {/* 작성자 선택 */}
-            <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2">
-              <label className="text-neutral-500 mb-1">작성자</label>
-              <div
-                className="relative w-full"
-                onClick={() => setShowAuthorEdit(true)}
-              >
-                <input
-                  type="text"
-                  value={universe.author == null ? "" : `${universe.author}`}
-                  readOnly
-                  placeholder="작성자를 검색해서 선택하세요"
-                  className="w-full pr-10 cursor-pointer bg-transparent outline-none text-gray-900"
-                />
-                <FiSearch
-                  size={20}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-              </div>
-            </div>
+            <AuthorSelectField
+              label="작성자"
+              value={universe.author == null ? "" : `${universe.author}`}
+              onClick={() => setShowAuthorEdit(true)}
+              placeholder="작성자를 검색해서 선택하세요"
+            />
           </div>
         </div>
       </section>

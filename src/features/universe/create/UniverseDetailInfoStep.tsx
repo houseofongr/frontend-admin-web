@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { HiGlobeAsiaAustralia } from "react-icons/hi2";
 import { TbShieldLock } from "react-icons/tb";
-import { UniverseCategory } from "../../../constants/UniverseData";
+import {
+  UniverseCategory,
+  UniverseCategoryOptions,
+} from "../../../constants/UniverseData";
 import { FiSearch } from "react-icons/fi";
 import UserSearch from "../../universe/create/UserSearch";
 import Modal from "../../../components/modal/Modal";
@@ -10,6 +13,8 @@ import AudioLight from "../../../components/Sound/AudioLight";
 import { PublicStatusOption } from "../../../constants/UniverseData";
 import { InputField } from "../../../components/Input/InputField";
 import { TextareaField } from "../../../components/Input/TextareaField";
+import { SelectField } from "../../../components/Input/SelectField";
+import { AuthorSelectField } from "../../../components/Input/AuthorSelectField";
 
 interface DetailInfoStepProps {
   innerImg: File | null;
@@ -31,8 +36,6 @@ interface DetailInfoStepProps {
     hashtags: string[];
   }) => void;
 }
-
-
 
 export default function UniverseDetailInfoStep({
   innerImg,
@@ -247,45 +250,25 @@ export default function UniverseDetailInfoStep({
 
           <div className="flex flex-row gap-3">
             {/* 카테고리 */}
-            <div className="flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-1 min-h-[75px]">
-              <label className="text-neutral-500 mb-0.5">카테고리</label>
-              <select
-                value={category}
-                onChange={(e) => setCategory(e.target.value)}
-                className="outline-none bg-transparent w-full text-gray-900"
-              >
-                <option value="" disabled>
-                  카테고리를 선택하세요
-                </option>
-                {Object.entries(UniverseCategory).map(([key, label]) => (
-                  <option key={key} value={key}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </div>
+            <SelectField
+              label="카테고리"
+              value={category}
+              onChange={(val) => setCategory(val)}
+              options={UniverseCategoryOptions}
+              placeholder="카테고리를 선택하세요"
+            />
 
             {/* 작성자 선택 */}
-            <div className="flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 flex-1 min-h-[75px]">
-              <label className="text-neutral-500 mb-1">작성자</label>
-              <div className="relative w-full" onClick={openModal}>
-                <input
-                  type="text"
-                  value={
-                    authorId == null
-                      ? ""
-                      : `${authorId.name}  #${authorId.nickname}`
-                  }
-                  readOnly
-                  placeholder="작성자를 검색해서 선택하세요"
-                  className="w-full pr-10 cursor-pointer bg-transparent outline-none text-gray-900"
-                />
-                <FiSearch
-                  size={20}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-              </div>
-            </div>
+            <AuthorSelectField
+              label="작성자"
+              value={
+                authorId == null
+                  ? ""
+                  : `${authorId.name}  #${authorId.nickname}`
+              }
+              onClick={openModal}
+              placeholder="작성자를 검색해서 선택하세요"
+            />
           </div>
         </div>
       </div>

@@ -2,11 +2,13 @@ export function TextareaField({
   label,
   value,
   onChange,
+  placeholder,
   maxLength,
 }: {
   label: string;
   value: string;
   onChange: React.ChangeEventHandler<HTMLTextAreaElement>;
+  placeholder?: string;
   maxLength: number;
 }) {
   return (
@@ -17,7 +19,7 @@ export function TextareaField({
         onChange={onChange}
         maxLength={maxLength}
         className="outline-none bg-transparent w-full h-full text-gray-900 mb-5"
-        placeholder="설명을 입력하세요"
+        placeholder={placeholder}
       />
       <div className="absolute bottom-2 right-4 text-xs text-gray-500">
         {value.length} / {maxLength}

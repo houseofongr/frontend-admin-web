@@ -262,7 +262,7 @@ export default function UniverseEditInnerImg({
           title="스페이스 생성"
           description="새로운 스페이스를 생성합니다."
           labelText="스페이스 내부 이미지"
-          maxFileSizeMB={5}
+          maxFileSizeMB={100}
           onClose={handleCreateModalClose}
           onConfirm={handleSaveInnerImage}
           confirmText="다음"
