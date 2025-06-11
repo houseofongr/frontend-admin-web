@@ -5,9 +5,11 @@ import {
   RiImageEditFill,
   RiFileDownloadLine,
   RiFunctionAddLine,
+  RiFileEditLine,
+  RiDeleteBin6Line,
 } from "react-icons/ri";
-import { MdOutlineFullscreen } from "react-icons/md";
-import { PiDownloadSimpleBold } from "react-icons/pi";
+import { MdOutlineFullscreen, MdOutlineGpsFixed, MdOutlineGpsNotFixed } from "react-icons/md";
+import { PiDownloadSimpleBold, PiGpsBold } from "react-icons/pi";
 import { IoPlanetOutline } from "react-icons/io5";
 import { LuPaintbrush } from "react-icons/lu";
 
@@ -22,16 +24,23 @@ import { SpaceCreateStep } from "../../../constants/ProcessSteps";
 import { PercentPoint } from "../../../constants/image";
 
 import { SPACE_DATA } from "../../../mocks/space-data";
-import { useUniverseStore } from "../../../context/useUniverseStore";
+import {
+  UniverseType,
+  useUniverseStore,
+} from "../../../context/useUniverseStore";
+import { UNIVERSE_DATA } from "../../../mocks/universe-data";
+import { TbPencilCog } from "react-icons/tb";
 
 interface UniverseEditInnerImgProps {
   innerImageId: number;
   onEdit: () => void;
+  onDelete: () => void;
 }
 
 export default function UniverseEditInnerImg({
   innerImageId,
   onEdit,
+  onDelete,
 }: UniverseEditInnerImgProps) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [createStep, setCreateStep] = useState<SpaceCreateStep | null>(null);
@@ -40,23 +49,48 @@ export default function UniverseEditInnerImg({
   const [endPoint, setEndPoint] = useState<PercentPoint | null>(null);
   const [innerImg, setInnerImg] = useState<File | null>(null);
 
-  const [universeId, setUniverseId] = useState<number>(-1);
-  const [parentSpaceId, setParentSpaceId] = useState<number>(-1);
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
-  const { setUniverse, universe } = useUniverseStore();
+  const { setUniverse, parentSpaceId, universe, universeId } =
+    useUniverseStore();
 
   useEffect(() => {
-    const loadInitialData = async () => {
-      const data = SPACE_DATA;
-      setUniverse(data);
-      console.log(data);
-    };
-
     loadInitialData();
-  }, [setUniverse]);
+  }, [universeId]);
 
+  const loadInitialData = async () => {
+    console.log("수정됨 ! ! !");
+    console.log("universeId", universeId);
+    console.log("parentSpaceId", parentSpaceId);
+
+    setUniverse(SPACE_DATA);
+
+    // try {
+    //   console.log("universeId", universeId);
+    //   console.log("parentSpaceId", parentSpaceId);
+
+    //   if (universeId == null) return;
+
+    //   const response = await fetch(
+    //     `${API_CONFIG.BACK_API}/universes/tree/${universeId}`
+    //   );
+
+    //   if (!response.ok) {
+    //     const errorData = await response.json().catch(() => null);
+    //     const errorMessage = errorData?.message || "유니버스 조회 실패";
+    //     alert(errorMessage);
+    //     return;
+    //   }
+
+    //   const data: UniverseType = await response.json();
+    //   setUniverse(data);
+    //   console.log("data", data);
+    // } catch (error) {
+    //   console.error("유니버스 조회 오류:", error);
+    //   alert("유니버스 조회 중 오류가 발생했습니다.");
+    // }
+  };
 
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -108,6 +142,9 @@ export default function UniverseEditInnerImg({
     formData.append("metadata", JSON.stringify(metadata));
     formData.append("image", innerImg);
 
+    console.log(metadata);
+    console.log(innerImg);
+
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/spaces`, {
         method: "POST",
@@ -145,19 +182,47 @@ export default function UniverseEditInnerImg({
     setInnerImg(null);
   };
 
-  const menuItems = [
-    {
-      label: "이미지 수정",
-      icon: <RiImageEditFill size={20} />,
-      onClick: onEdit,
-    },
-    {
-      label: "이미지 다운로드",
-      icon: <RiFileDownloadLine size={20} />,
-      onClick: handleDownloadImage,
-    },
-  ];
-
+  const menuItems =
+    parentSpaceId === -1
+      ? [
+          {
+            label: "이미지 수정",
+            icon: <RiImageEditFill size={20} />,
+            onClick: onEdit,
+          },
+          {
+            label: "이미지 다운로드",
+            icon: <RiFileDownloadLine size={20} />,
+            onClick: handleDownloadImage,
+          },
+        ]
+      : [
+          {
+            label: "이미지 수정",
+            icon: <RiImageEditFill size={20} />,
+            onClick: onEdit,
+          },
+          {
+            label: "이미지 다운로드",
+            icon: <RiFileDownloadLine size={20} />,
+            onClick: handleDownloadImage,
+          },
+          {
+            label: "정보 수정",
+            icon: <TbPencilCog size={20} />,
+            onClick: onEdit,
+          },
+          {
+            label: "좌표 수정",
+            icon: <PiGpsBold size={20} />,
+            onClick: handleDownloadImage,
+          },
+          {
+            label: "스페이스 삭제",
+            icon: <RiDeleteBin6Line size={20} />,
+            onClick: onDelete,
+          },
+        ];
 
   return (
     <div
@@ -208,7 +273,7 @@ export default function UniverseEditInnerImg({
         setStartPoint={setStartPoint}
         setEndPoint={setEndPoint}
         existingSpaces={universe?.spaces!}
-        existingPieces={universe?.elements!}
+        existingPieces={universe?.pieces!}
       />
 
       {/* SetSize Step */}

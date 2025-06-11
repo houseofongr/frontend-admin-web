@@ -1,8 +1,8 @@
 // stores/useUniverseStore.ts
 import { create } from "zustand";
 
-export interface Piece {
-  elementId: number;
+export interface PieceType {
+  pieceId: number;
   parentSpaceId: number | null;
   innerImageId: number;
   depth: number;
@@ -12,9 +12,11 @@ export interface Piece {
   startY: number;
   endX: number;
   endY: number;
+  createdTime: number;
+  updatedTime: number;
 }
 
-export interface Space {
+export interface SpaceType {
   spaceId: number;
   parentSpaceId: number | null;
   innerImageId: number;
@@ -25,32 +27,44 @@ export interface Space {
   startY: number;
   endX: number;
   endY: number;
-  spaces: Space[];
-  elements: Piece[];
+  spaces: SpaceType[];
+  pieces: PieceType[];
+  createdTime: number;
+  updatedTime: number;
 }
 
-export interface UniverseData {
+export interface UniverseType {
   universeId: number;
   innerImageId: number;
-  spaces: Space[];
-  elements: Piece[];
+  spaces: SpaceType[];
+  pieces: PieceType[];
 }
 
 interface UniverseStore {
-  universe: UniverseData | null;
-  setUniverse: (data: UniverseData) => void;
-  addElementToSpace: (spaceId: number, newElement: Piece) => void;
-  getSpaceById: (id: number) => Space | null;
+  universeId: number | null;
+  parentSpaceId: number;
+  universe: UniverseType | null;
+  setUniverseId: (id: number) => void;
+  setParentSpaceId: (id: number) => void;
+  setUniverse: (data: UniverseType) => void;
+  addPieceToSpace: (spaceId: number, newPiece: PieceType) => void;
+  getSpaceById: (id: number) => SpaceType | null;
   updateSpaceTitle: (id: number, title: string) => void;
 }
 
 export const useUniverseStore = create<UniverseStore>((set, get) => ({
+  universeId: null,
+  parentSpaceId: -1,
   universe: null,
+
+  setUniverseId: (id) => set({ universeId: id }),
+
+  setParentSpaceId: (id) => set({ parentSpaceId: id }),
 
   setUniverse: (data) => set({ universe: data }),
 
   getSpaceById: (id) => {
-    const find = (spaces: Space[]): Space | null => {
+    const find = (spaces: SpaceType[]): SpaceType | null => {
       for (const space of spaces) {
         if (space.spaceId === id) return space;
         const found = find(space.spaces);
@@ -64,7 +78,7 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
   },
 
   updateSpaceTitle: (id, title) => {
-    const update = (spaces: Space[]): Space[] =>
+    const update = (spaces: SpaceType[]): SpaceType[] =>
       spaces.map((space) => ({
         ...space,
         title: space.spaceId === id ? title : space.title,
@@ -76,13 +90,13 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
     set({ universe: { ...u, spaces: update(u.spaces) } });
   },
 
-  addElementToSpace: (spaceId, newElement) => {
-    const add = (spaces: Space[]): Space[] =>
+  addPieceToSpace: (spaceId, newPiece) => {
+    const add = (spaces: SpaceType[]): SpaceType[] =>
       spaces.map((space) => {
         if (space.spaceId === spaceId) {
           return {
             ...space,
-            elements: [...space.elements, newElement],
+            pieces: [...space.pieces, newPiece],
           };
         }
         return {

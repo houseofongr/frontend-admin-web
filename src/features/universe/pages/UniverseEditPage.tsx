@@ -30,6 +30,7 @@ import { TextareaField } from "../../../components/Input/TextareaField";
 import { AuthorSelectField } from "../../../components/Input/AuthorSelectField";
 import { SelectableRadioField } from "../../../components/Input/SelectableRadioField";
 import { SelectField } from "../../../components/Input/SelectField";
+import { useUniverseStore } from "../../../context/useUniverseStore";
 
 export default function UniverseEditPage() {
   const { universeId } = useParams();
@@ -58,12 +59,16 @@ export default function UniverseEditPage() {
   const [showInnerImgEdit, setShowInnerImgEdit] = useState(false);
   const [showThumbMusicEdit, setShowThumbMusicEdit] = useState(false);
   const [showAuthorEdit, setShowAuthorEdit] = useState(false);
-  const [alert, setAlert] = useState<{ text: string; type: AlertType } | null>(
-    null
-  );
+  const [alert, setAlert] = useState<{
+    text: string;
+    type: AlertType;
+    subText: string | null;
+  } | null>(null);
 
   const [innerImageId, setInnerImageId] = useState<number>(0);
   const [thumbMusicId, setThumbMusicId] = useState<number>(0);
+
+  const { setUniverseId } = useUniverseStore();
 
   // Universe 데이터 불러오기
   const fetchUniverse = async () => {
@@ -76,6 +81,8 @@ export default function UniverseEditPage() {
 
       setInnerImageId(data.innerImageId);
       setThumbMusicId(data.thumbMusicId);
+
+      setUniverseId(data.id!);
 
       setTags(data.hashtags.map((tag: string) => `#${tag}`).join(" "));
       setUniverse(data);
@@ -114,16 +121,16 @@ export default function UniverseEditPage() {
 
       if (!response.ok) throw new Error("저장에 실패했습니다.");
 
-      showAlert("변경사항이 저장되었습니다.", "success");
+      showAlert("변경사항이 저장되었습니다.", "success", null);
       navigate(-1);
     } catch (error) {
       console.error("저장 에러:", error);
-      showAlert("저장 중 오류가 발생했습니다.", "fail");
+      showAlert("저장 중 오류가 발생했습니다.", "fail", null);
     }
   };
 
-  const showAlert = (text: string, type: AlertType) => {
-    setAlert({ text, type });
+  const showAlert = (text: string, type: AlertType, subText: string | null) => {
+    setAlert({ text, type, subText });
   };
 
   const saveInnerImg = async (file: File) => {
@@ -141,10 +148,10 @@ export default function UniverseEditPage() {
 
       if (!response.ok) throw new Error("저장에 실패했습니다.");
 
-      showAlert("변경사항이 저장되었습니다.", "success");
+      showAlert("변경사항이 저장되었습니다.", "success",null);
     } catch (error) {
       console.error("저장 에러:", error);
-      showAlert("저장 중 오류가 발생했습니다.", "fail");
+      showAlert("저장 중 오류가 발생했습니다.", "fail", null);
     }
   };
 
@@ -163,15 +170,19 @@ export default function UniverseEditPage() {
 
       if (!response.ok) throw new Error("저장에 실패했습니다.");
 
-      showAlert("변경사항이 저장되었습니다.", "success");
+      showAlert("변경사항이 저장되었습니다.", "success", null);
     } catch (error) {
       console.error("저장 에러:", error);
-      showAlert("저장 중 오류가 발생했습니다.", "fail");
+      showAlert("저장 중 오류가 발생했습니다.", "fail", null);
     }
   };
 
   const handleCancel = () => {
-    showAlert("저장하지 않은 변경사항이 사라집니다. 취소하시겠습니까?", "info");
+    showAlert(
+      "저장하지 않은 변경사항이 사라집니다. 취소하시겠습니까?",
+      "check",
+      null
+    );
   };
 
   // 태그 처리
@@ -220,6 +231,15 @@ export default function UniverseEditPage() {
     },
   ];
 
+  const onSpaceDelete = () => {
+    console.log("delete");
+    showAlert(
+      "정말로 스페이스를 삭제하시겠습니까?",
+      "check",
+      "* 관련된 이미지와 음원, 내부 스페이스 및\n  요소가 모두 삭제됩니다."
+        );
+  };
+
   return (
     <PageLayout>
       {alert && alert?.type != "info" && (
@@ -237,15 +257,14 @@ export default function UniverseEditPage() {
           }
         />
       )}
-      {alert && alert?.type == "info" && (
+      {alert && alert?.type == "check" && (
         <ModalAlertMessage
           text={alert.text}
           type={alert.type}
           onClose={() => setAlert(null)}
           okButton={
             <Button
-              label="취소"
-              variant="gray"
+              label="확인"
               onClick={() => {
                 navigate(-1);
               }}
@@ -253,12 +272,14 @@ export default function UniverseEditPage() {
           }
           cancelButton={
             <Button
-              label="돌아가기"
+              label="취소"
+              variant="gray"
               onClick={() => {
                 setAlert(null);
               }}
             />
           }
+          {...(alert.subText ? { subText: alert.subText } : {})}
         />
       )}
 
@@ -293,6 +314,7 @@ export default function UniverseEditPage() {
               <UniverseEditInnerImg
                 innerImageId={universe.innerImageId}
                 onEdit={() => setShowInnerImgEdit(true)}
+                onDelete={onSpaceDelete}
               />
             </div>
             <div className="lg:min-h-[130px] flex-col min-h-[280px]">

@@ -2,7 +2,7 @@ import { MdError, MdCancel } from "react-icons/md";
 import { IoIosWarning, IoMdClose } from "react-icons/io";
 import { FaCircleCheck } from "react-icons/fa6";
 
-export type AlertType = "success" | "warning" | "fail" | "info";
+export type AlertType = "success" | "warning" | "fail" | "info" | "check";
 
 type AlertMessageProps = {
   text: string;
@@ -11,7 +11,7 @@ type AlertMessageProps = {
   okButton?: React.ReactNode;
   cancelButton?: React.ReactNode;
   onClose: () => void;
-  subText?:string;
+  subText?: string;
 };
 
 export default function ModalAlertMessage({
@@ -29,6 +29,7 @@ export default function ModalAlertMessage({
     warning: <IoIosWarning size={24} className="text-yellow-500" />,
     fail: <MdCancel size={24} className="text-red-500" />,
     info: <MdError size={24} className="text-blue-500" />,
+    check: <MdError size={24} className="text-red-500" />,
   };
 
   const titleMapping = {
@@ -36,6 +37,7 @@ export default function ModalAlertMessage({
     warning: "알림",
     fail: "실패",
     info: "알림",
+    check: "확인",
   };
 
   return (
@@ -59,9 +61,17 @@ export default function ModalAlertMessage({
           <p className="text-xl ">{titleMapping[type]}</p>
         </div>
         {/* 메시지 */}
-        <div className="flex items-start gap-2 p-4 flex-col">
+        <div className="flex items-start gap-3 p-4 flex-col">
           <div className="flex-1 max-h-[70vh] overflow-y-auto">{text}</div>
-          <div className="flex-1 text-sm text-neutral-600">{subText}</div>
+          <div className="gap-0">
+            {subText &&
+              subText.split("\n").map((line, idx) => (
+                <span className="flex-1 text-sm text-neutral-600" key={idx}>
+                  {line}
+                  <br />
+                </span>
+              ))}
+          </div>
         </div>
         {/* 버튼 */}
         <div className="mt-4 flex justify-end gap-1">

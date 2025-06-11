@@ -1,7 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import API_CONFIG from "../../../config/api";
 import { SpaceCreateStep } from "../../../constants/ProcessSteps";
-import { Piece, Space } from "../../../context/useUniverseStore";
+import {
+  PieceType,
+  SpaceType,
+  useUniverseStore,
+} from "../../../context/useUniverseStore";
 
 interface PercentPoint {
   xPercent: number;
@@ -15,8 +19,8 @@ interface SpaceSelectorProps {
   endPoint: PercentPoint | null;
   setStartPoint: React.Dispatch<React.SetStateAction<PercentPoint | null>>;
   setEndPoint: React.Dispatch<React.SetStateAction<PercentPoint | null>>;
-  existingSpaces: Space[];
-  existingPieces: Piece[];
+  existingSpaces: SpaceType[];
+  existingPieces: PieceType[];
 }
 
 export default function SpaceSelector({
@@ -29,6 +33,8 @@ export default function SpaceSelector({
   existingSpaces,
   existingPieces,
 }: SpaceSelectorProps) {
+  const { universeId, setParentSpaceId, setUniverseId } = useUniverseStore();
+
   const [hoverPos, setHoverPos] = useState<PercentPoint | null>(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
@@ -107,6 +113,11 @@ export default function SpaceSelector({
     }
   };
 
+  const handleMoveToSpace = (space:SpaceType) => {
+    setUniverseId(space.spaceId);
+    setParentSpaceId(universeId!);
+  };
+
   const handleMouseEnter = (index: number) => {
     const space = existingSpaces[index];
     const start = toPixel({ xPercent: space.startX, yPercent: space.startY });
@@ -115,30 +126,6 @@ export default function SpaceSelector({
     const top = Math.min(start.y, end.y);
     const width = Math.abs(end.x - start.x);
     const height = Math.abs(end.y - start.y);
-
-    // const start = toPixel({
-    //   xPercent: space.startX,
-    //   yPercent: space.startY,
-    // });
-    // const end = toPixel({ xPercent: space.endX, yPercent: space.endY });
-    // const left = Math.min(start.x, end.x);
-    // const top = Math.min(start.y, end.y);
-    // const width = Math.abs(end.x - start.x);
-    // const height = Math.abs(end.y - start.y);
-
-    // left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
-    // top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
-    // width: `${width}px`,
-    // height: `${height}px`,
-
-    console.log(space);
-
-    console.log(
-      "width " + width,
-      "\nheight " + height,
-      "\nleft " + left,
-      "\ntop " + top
-    );
 
     setHoveredIndex(index);
     setPopupData({
@@ -286,9 +273,10 @@ export default function SpaceSelector({
               onMouseLeave={handleMouseLeave}
             >
               <div
-                className={`w-full h-full border-2 border-amber-400 bg-amber-400/20 pointer-events-none transition-opacity duration-300 ${
+                className={` w-full h-full border-2 border-amber-400 bg-amber-400/20 cursor-pointer transition-opacity duration-300 ${
                   hoveredIndex === index ? "opacity-100" : "opacity-30"
                 }`}
+                onClick={()=>handleMoveToSpace(space)}
               />
             </div>
           );

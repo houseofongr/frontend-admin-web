@@ -1,5 +1,5 @@
-export type ElementNode = {
-  elementId: number;
+export type Piece = {
+  pieceId: number;
   parentSpaceId: number | null;
   innerImageId: number;
   depth: number;
@@ -9,6 +9,8 @@ export type ElementNode = {
   startY: number;
   endX: number;
   endY: number;
+  createdTime: number;
+  updatedTime: number;
 };
 
 export type SpaceNode = {
