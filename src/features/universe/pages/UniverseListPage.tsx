@@ -14,7 +14,6 @@ import IconTitleModal from "../../../components/modal/IconTitleModal";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import UniverseCreate from "./UniverseCreate";
 import API_CONFIG from "../../../config/api";
-import { UniverseCategoryOptions } from "../../../constants/UniverseData";
 import ImageUploadModal from "../../../components/modal/ImageUploadModal";
 import ModalAlertMessage, {
   AlertType,
@@ -22,6 +21,7 @@ import ModalAlertMessage, {
 import Button from "../../../components/buttons/Button";
 import { universeSearchOptions } from "../../../constants/searchOptions";
 import ThumbMusicPreview from "../components/ThumbMusicPreview";
+import { UniverseCategoryOptions } from "../../../constants/UniverseData";
 
 export default function UniverseListPage() {
   const navigate = useNavigate();
