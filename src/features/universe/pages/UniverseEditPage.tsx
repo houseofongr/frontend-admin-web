@@ -312,7 +312,6 @@ export default function UniverseEditPage() {
           <div className="flex flex-2 flex-col gap-3 h-[100%]">
             <div className="h-min-[200px] bg-black rounded-xl">
               <UniverseEditInnerImg
-                innerImageId={universe.innerImageId}
                 onEdit={() => setShowInnerImgEdit(true)}
                 onDelete={onSpaceDelete}
               />
