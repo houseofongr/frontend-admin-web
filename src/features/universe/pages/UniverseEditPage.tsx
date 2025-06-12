@@ -68,7 +68,7 @@ export default function UniverseEditPage() {
   const [innerImageId, setInnerImageId] = useState<number>(0);
   const [thumbMusicId, setThumbMusicId] = useState<number>(0);
 
-  const { setUniverseId } = useUniverseStore();
+  const { setCurrentSpaceId: setUniverseId } = useUniverseStore();
 
   // Universe 데이터 불러오기
   const fetchUniverse = async () => {

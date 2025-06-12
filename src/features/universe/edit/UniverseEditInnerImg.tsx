@@ -8,7 +8,11 @@ import {
   RiFileEditLine,
   RiDeleteBin6Line,
 } from "react-icons/ri";
-import { MdOutlineFullscreen, MdOutlineGpsFixed, MdOutlineGpsNotFixed } from "react-icons/md";
+import {
+  MdOutlineFullscreen,
+  MdOutlineGpsFixed,
+  MdOutlineGpsNotFixed,
+} from "react-icons/md";
 import { PiDownloadSimpleBold, PiGpsBold } from "react-icons/pi";
 import { IoPlanetOutline } from "react-icons/io5";
 import { LuPaintbrush } from "react-icons/lu";
@@ -23,22 +27,20 @@ import SpaceDetailInfoStep from "../../space/create/SpaceDetailInfoStep";
 import { SpaceCreateStep } from "../../../constants/ProcessSteps";
 import { PercentPoint } from "../../../constants/image";
 
-import { SPACE_DATA } from "../../../mocks/space-data";
 import {
+  PieceType,
+  SpaceType,
   UniverseType,
   useUniverseStore,
 } from "../../../context/useUniverseStore";
-import { UNIVERSE_DATA } from "../../../mocks/universe-data";
 import { TbPencilCog } from "react-icons/tb";
 
 interface UniverseEditInnerImgProps {
-  innerImageId: number;
   onEdit: () => void;
   onDelete: () => void;
 }
 
 export default function UniverseEditInnerImg({
-  innerImageId,
   onEdit,
   onDelete,
 }: UniverseEditInnerImgProps) {
@@ -48,48 +50,71 @@ export default function UniverseEditInnerImg({
   const [startPoint, setStartPoint] = useState<PercentPoint | null>(null);
   const [endPoint, setEndPoint] = useState<PercentPoint | null>(null);
   const [innerImg, setInnerImg] = useState<File | null>(null);
+  const [innerImgId, setInnerImgId] = useState<number | null>(null);
 
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
-  const { setUniverse, parentSpaceId, universe, universeId } =
-    useUniverseStore();
+  const [existingSpaces, setExistingSpaces] = useState<SpaceType[]>([]);
+  const [existingPieces, setExistingPieces] = useState<PieceType[]>([]);
+
+  const {
+    setRootUniverse,
+    parentSpaceId,
+    rootUniverse,
+    currentSpaceId,
+    getSpaceById,
+  } = useUniverseStore();
 
   useEffect(() => {
-    loadInitialData();
-  }, [universeId]);
+    console.log("currentSpaceId 바뀜", currentSpaceId);
+    
+    if (rootUniverse == null) loadInitialData();
+    else if(currentSpaceId == rootUniverse.universeId){
+      setExistingSpaces(rootUniverse.spaces);
+      setExistingPieces(rootUniverse.pieces);
+      setInnerImgId(rootUniverse.innerImageId);
+    }
+    else if (currentSpaceId != null) {
+      var space = getSpaceById(currentSpaceId);
+      console.log("space-------", space);
+      
+      if (space == null) return;
+
+      setExistingSpaces(space.spaces);
+      setExistingPieces(space?.pieces!);
+      setInnerImgId(space.innerImageId);
+      console.log(space);
+    } else {
+      console.log("에러");
+    }
+  }, [currentSpaceId]);
 
   const loadInitialData = async () => {
-    console.log("수정됨 ! ! !");
-    console.log("universeId", universeId);
-    console.log("parentSpaceId", parentSpaceId);
+    try {
+      if (currentSpaceId == null) return;
 
-    setUniverse(SPACE_DATA);
+      const response = await fetch(
+        `${API_CONFIG.BACK_API}/universes/tree/${currentSpaceId}`
+      );
 
-    // try {
-    //   console.log("universeId", universeId);
-    //   console.log("parentSpaceId", parentSpaceId);
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => null);
+        const errorMessage = errorData?.message || "유니버스 조회 실패";
+        alert(errorMessage);
+        return;
+      }
 
-    //   if (universeId == null) return;
-
-    //   const response = await fetch(
-    //     `${API_CONFIG.BACK_API}/universes/tree/${universeId}`
-    //   );
-
-    //   if (!response.ok) {
-    //     const errorData = await response.json().catch(() => null);
-    //     const errorMessage = errorData?.message || "유니버스 조회 실패";
-    //     alert(errorMessage);
-    //     return;
-    //   }
-
-    //   const data: UniverseType = await response.json();
-    //   setUniverse(data);
-    //   console.log("data", data);
-    // } catch (error) {
-    //   console.error("유니버스 조회 오류:", error);
-    //   alert("유니버스 조회 중 오류가 발생했습니다.");
-    // }
+      const data: UniverseType = await response.json();
+      setRootUniverse(data);
+      setInnerImgId(data.innerImageId);
+      setExistingSpaces(data.spaces);
+      setExistingPieces(data.pieces);
+      console.log("data", data);
+    } catch (error) {
+      console.error("유니버스 조회 오류:", error);
+      alert("유니버스 조회 중 오류가 발생했습니다.");
+    }
   };
 
   const menuRef = useRef<HTMLDivElement>(null);
@@ -112,8 +137,8 @@ export default function UniverseEditInnerImg({
   };
 
   const handleDownloadImage = () => {
-    if (innerImageId !== -1) {
-      const imageUrl = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/attachment/${innerImageId}`;
+    if (innerImgId !== -1) {
+      const imageUrl = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/attachment/${innerImgId}`;
       window.location.href = imageUrl;
     }
   };
@@ -129,8 +154,8 @@ export default function UniverseEditInnerImg({
 
     const formData = new FormData();
     const metadata = {
-      universeId,
-      parentSpaceId,
+      universeId: rootUniverse?.universeId,
+      parentSpaceId: currentSpaceId,
       title,
       description,
       startX: startPoint.xPercent,
@@ -140,7 +165,7 @@ export default function UniverseEditInnerImg({
     };
 
     formData.append("metadata", JSON.stringify(metadata));
-    formData.append("image", innerImg);
+    formData.append("innerImage", innerImg);
 
     console.log(metadata);
     console.log(innerImg);
@@ -267,13 +292,13 @@ export default function UniverseEditInnerImg({
       {/* 영역 선택 */}
       <SpaceSelector
         step={createStep}
-        innerImageId={innerImageId}
+        innerImageId={innerImgId}
         startPoint={startPoint}
         endPoint={endPoint}
         setStartPoint={setStartPoint}
         setEndPoint={setEndPoint}
-        existingSpaces={universe?.spaces!}
-        existingPieces={universe?.pieces!}
+        existingSpaces={existingSpaces}
+        existingPieces={existingPieces}
       />
 
       {/* SetSize Step */}

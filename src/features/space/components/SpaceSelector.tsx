@@ -6,6 +6,9 @@ import {
   SpaceType,
   useUniverseStore,
 } from "../../../context/useUniverseStore";
+import { FaArrowLeft } from "react-icons/fa6";
+import { IoIosArrowBack, IoIosArrowDropleft } from "react-icons/io";
+import { IoArrowBackCircleOutline } from "react-icons/io5";
 
 interface PercentPoint {
   xPercent: number;
@@ -14,7 +17,7 @@ interface PercentPoint {
 
 interface SpaceSelectorProps {
   step: SpaceCreateStep | null;
-  innerImageId: number;
+  innerImageId: number | null;
   startPoint: PercentPoint | null;
   endPoint: PercentPoint | null;
   setStartPoint: React.Dispatch<React.SetStateAction<PercentPoint | null>>;
@@ -33,7 +36,15 @@ export default function SpaceSelector({
   existingSpaces,
   existingPieces,
 }: SpaceSelectorProps) {
-  const { universeId, setParentSpaceId, setUniverseId } = useUniverseStore();
+  const {
+    currentSpaceId,
+    setParentSpaceId,
+    setCurrentSpaceId,
+    parentSpaceId,
+    getParentSpaceIdById,
+    setRootUniverse,
+    rootUniverse,
+  } = useUniverseStore();
 
   const [hoverPos, setHoverPos] = useState<PercentPoint | null>(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -113,9 +124,12 @@ export default function SpaceSelector({
     }
   };
 
-  const handleMoveToSpace = (space:SpaceType) => {
-    setUniverseId(space.spaceId);
-    setParentSpaceId(universeId!);
+  const handleMoveToSpace = (space: SpaceType) => {
+    console.log("ParentSpaceId", currentSpaceId);
+    console.log("CurrentSpaceId", space.spaceId);
+
+    setParentSpaceId(currentSpaceId!);
+    setCurrentSpaceId(space.spaceId);
   };
 
   const handleMouseEnter = (index: number) => {
@@ -141,12 +155,47 @@ export default function SpaceSelector({
     setPopupData(null);
   };
 
+  const backClick = () => {
+    console.log("실행?", parentSpaceId);
+
+    if (parentSpaceId == -1) {
+      console.log("root", rootUniverse);
+
+      console.log("ParentSpaceId", rootUniverse?.universeId!);
+      console.log("CurrentSpaceId", parentSpaceId);
+      setParentSpaceId(rootUniverse?.universeId!);
+      setCurrentSpaceId(parentSpaceId);
+    } else {
+      // 루트로 가는 경우임
+      if (parentSpaceId == rootUniverse?.universeId){
+        setParentSpaceId(-1);
+        setCurrentSpaceId(parentSpaceId);
+      }
+
+      var parentId = getParentSpaceIdById(parentSpaceId);
+      if (parentId == null) return;
+      console.log("--ParentSpaceId", parentId);
+      console.log("--CurrentSpaceId", parentSpaceId);
+
+      setParentSpaceId(parentId);
+      setCurrentSpaceId(parentSpaceId);
+    }
+  };
+
   return (
     <div
       className="relative w-full h-full"
       onMouseMove={handleMouseMove}
       onClick={handleClick}
     >
+      {currentSpaceId != rootUniverse?.universeId && (
+        <div
+          className="absolute top-2 left-2 px-4 py-2 z-10 text-white hover:opacity-90 cursor-pointer"
+          onClick={backClick}
+        >
+          <IoIosArrowBack size={24} />
+        </div>
+      )}
       {innerImageId !== -1 && (
         <img
           ref={imgRef}
@@ -236,7 +285,7 @@ export default function SpaceSelector({
 
           return (
             <div
-              className="absolute border-2 border-amber-400 bg-amber-400/20 pointer-events-none"
+              className="absolute border-2 border-amber-400 bg-amber-400/40 pointer-events-none"
               style={{
                 left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
                 top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
@@ -273,10 +322,10 @@ export default function SpaceSelector({
               onMouseLeave={handleMouseLeave}
             >
               <div
-                className={` w-full h-full border-2 border-amber-400 bg-amber-400/20 cursor-pointer transition-opacity duration-300 ${
+                className={` w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
                   hoveredIndex === index ? "opacity-100" : "opacity-30"
                 }`}
-                onClick={()=>handleMoveToSpace(space)}
+                onClick={() => handleMoveToSpace(space)}
               />
             </div>
           );
@@ -284,7 +333,7 @@ export default function SpaceSelector({
 
       <div
         className={`absolute bg-white p-2 rounded shadow-md max-w-xs text-sm z-30 pointer-events-none transition-opacity duration-500 ${
-          popupData ? "opacity-100" : "opacity-100"
+          popupData ? "opacity-0" : "opacity-100"
         }`}
         style={{
           left: `calc(50% - ${imageSize.width / 2}px + ${popupData?.x}px)`,

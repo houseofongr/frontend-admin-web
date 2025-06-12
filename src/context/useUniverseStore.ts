@@ -41,27 +41,28 @@ export interface UniverseType {
 }
 
 interface UniverseStore {
-  universeId: number | null;
+  currentSpaceId: number | null;
   parentSpaceId: number;
-  universe: UniverseType | null;
-  setUniverseId: (id: number) => void;
+  rootUniverse: UniverseType | null;
+  setCurrentSpaceId: (id: number) => void;
   setParentSpaceId: (id: number) => void;
-  setUniverse: (data: UniverseType) => void;
+  setRootUniverse: (data: UniverseType) => void;
   addPieceToSpace: (spaceId: number, newPiece: PieceType) => void;
   getSpaceById: (id: number) => SpaceType | null;
+  getParentSpaceIdById: (id: number) => number | null;
   updateSpaceTitle: (id: number, title: string) => void;
 }
 
 export const useUniverseStore = create<UniverseStore>((set, get) => ({
-  universeId: null,
+  currentSpaceId: null,
   parentSpaceId: -1,
-  universe: null,
+  rootUniverse: null,
 
-  setUniverseId: (id) => set({ universeId: id }),
+  setCurrentSpaceId: (id) => set({ currentSpaceId: id }),
 
   setParentSpaceId: (id) => set({ parentSpaceId: id }),
 
-  setUniverse: (data) => set({ universe: data }),
+  setRootUniverse: (data) => set({ rootUniverse: data }),
 
   getSpaceById: (id) => {
     const find = (spaces: SpaceType[]): SpaceType | null => {
@@ -72,7 +73,22 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
       }
       return null;
     };
-    const u = get().universe;
+    const u = get().rootUniverse;
+    if (!u) return null;
+    return find(u.spaces);
+  },
+
+  getParentSpaceIdById: (id: number): number | null => {
+    const find = (spaces: SpaceType[]): number | null => {
+      for (const space of spaces) {
+        if (space.spaceId === id) return space.parentSpaceId ?? null;
+        const found = find(space.spaces);
+        if (found !== null) return found;
+      }
+      return null;
+    };
+
+    const u = get().rootUniverse;
     if (!u) return null;
     return find(u.spaces);
   },
@@ -85,9 +101,9 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
         spaces: update(space.spaces),
       }));
 
-    const u = get().universe;
+    const u = get().rootUniverse;
     if (!u) return;
-    set({ universe: { ...u, spaces: update(u.spaces) } });
+    set({ rootUniverse: { ...u, spaces: update(u.spaces) } });
   },
 
   addPieceToSpace: (spaceId, newPiece) => {
@@ -105,8 +121,8 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
         };
       });
 
-    const u = get().universe;
+    const u = get().rootUniverse;
     if (!u) return;
-    set({ universe: { ...u, spaces: add(u.spaces) } });
+    set({ rootUniverse: { ...u, spaces: add(u.spaces) } });
   },
 }));
