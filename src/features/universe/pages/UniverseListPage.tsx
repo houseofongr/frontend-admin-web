@@ -22,6 +22,7 @@ import Button from "../../../components/buttons/Button";
 import { universeSearchOptions } from "../../../constants/searchOptions";
 import ThumbMusicPreview from "../components/ThumbMusicPreview";
 import { UniverseCategoryOptions } from "../../../constants/UniverseData";
+import SpinnerIcon from "../../../components/icons/SpinnerIcon";
 
 export default function UniverseListPage() {
   const navigate = useNavigate();
@@ -48,6 +49,8 @@ export default function UniverseListPage() {
 
   const [deleteId, setDeleteId] = useState<number>();
   const [showThumbMusic, setShowThumbMusic] = useState<number>(-1);;
+  const [loading, setLoading] = useState<boolean>(false);
+
 
   const fetchUniverse = async (
     page: number = currentPage,
@@ -55,6 +58,7 @@ export default function UniverseListPage() {
     type: string = searchType,
     word: string = keyword
   ) => {
+    setLoading(true);
     try {
       const query = new URLSearchParams({
         page: page.toString(),
@@ -78,6 +82,7 @@ export default function UniverseListPage() {
     } catch (error) {
       console.error("Failed to fetch users:", error);
     }
+    setLoading(false);
   };
 
   function handleOpenEditThumbnail(id: number) {
@@ -102,7 +107,7 @@ export default function UniverseListPage() {
     fetchUniverse();
   }
 
-  const closeThumbMusicModal = ()=>{
+  const closeThumbMusicModal = () => {
     setShowThumbMusic(-1);
   }
 
@@ -171,7 +176,7 @@ export default function UniverseListPage() {
           type: "fail",
         });
         console.log(errorText, "    ", deleteId);
-        
+
       }
     } catch (e) {
       console.error("에러 발생:", e);
@@ -202,10 +207,15 @@ export default function UniverseListPage() {
     });
   };
 
-  const handlePlayMusic = (page: number) => {};
+  const handlePlayMusic = (page: number) => { };
 
   return (
     <PageLayout>
+      {loading && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50">
+          <SpinnerIcon />
+        </div>
+      )}
       {alert && alert.type != "info" && (
         <ModalAlertMessage
           text={alert.text}
@@ -310,7 +320,7 @@ export default function UniverseListPage() {
                     onPlayMusic={(id: number) => {
                       setShowThumbMusic(id);
                       console.log(id);
-                      
+
                     }}
                   />
                 );
