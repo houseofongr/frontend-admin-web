@@ -5,13 +5,10 @@ import {
   RiImageEditFill,
   RiFileDownloadLine,
   RiFunctionAddLine,
-  RiFileEditLine,
   RiDeleteBin6Line,
 } from "react-icons/ri";
 import {
   MdOutlineFullscreen,
-  MdOutlineGpsFixed,
-  MdOutlineGpsNotFixed,
 } from "react-icons/md";
 import { PiDownloadSimpleBold, PiGpsBold } from "react-icons/pi";
 import { IoPlanetOutline } from "react-icons/io5";
@@ -32,7 +29,6 @@ import {
   SpaceType,
   UniverseType,
   useUniverseStore,
-  setCurrentSpaceId,
 } from "../../../context/useUniverseStore";
 import { TbPencilCog } from "react-icons/tb";
 
@@ -84,7 +80,7 @@ export default function UniverseEditInnerImg({
       if (space == null) return;
 
       setExistingSpaces(space.spaces);
-      setExistingPieces(space?.pieces!);
+      setExistingPieces(space.pieces);
       setInnerImgId(space.innerImageId);
     } else {
       console.log("에러");

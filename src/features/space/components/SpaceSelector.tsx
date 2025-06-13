@@ -40,7 +40,6 @@ export default function SpaceSelector({
     setCurrentSpaceId,
     parentSpaceId,
     getParentSpaceIdById,
-    setRootUniverse,
     rootUniverse,
   } = useUniverseStore();
 
