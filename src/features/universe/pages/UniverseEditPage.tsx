@@ -11,7 +11,6 @@ import ThumbMusicEditModal from "../edit/ThumbMusicEditModal";
 
 import {
   PublicStatusOption,
-  UniverseCategory,
   UniverseCategoryOptions,
 } from "../../../constants/UniverseData";
 import API_CONFIG from "../../../config/api";
@@ -19,7 +18,6 @@ import { Universe } from "../../../types/universe";
 import ImageUploadModal from "../../../components/modal/ImageUploadModal";
 import Modal from "../../../components/modal/Modal";
 import UserSearch from "../create/UserSearch";
-import { FiSearch } from "react-icons/fi";
 import { UserV2 } from "../../../types/user";
 import ModalAlertMessage, {
   AlertType,
@@ -65,37 +63,25 @@ export default function UniverseEditPage() {
     subText: string | null;
   } | null>(null);
 
-  const [innerImageId, setInnerImageId] = useState<number>(0);
-  const [thumbMusicId, setThumbMusicId] = useState<number>(0);
+  const { setCurrentSpaceId } = useUniverseStore();
 
-  const { setCurrentSpaceId: setUniverseId } = useUniverseStore();
+  useEffect(() => {
+    if (!isNaN(universeIdParsed)) fetchUniverse();
+  }, [universeIdParsed]);
 
-  // Universe 데이터 불러오기
   const fetchUniverse = async () => {
     try {
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes/${universeId}`
-      );
+      const response = await fetch(`${API_CONFIG.BACK_API}/universes/${universeId}`);
       if (!response.ok) throw new Error("Failed to fetch universe.");
       const data: Universe = await response.json();
 
-      setInnerImageId(data.innerImageId);
-      setThumbMusicId(data.thumbMusicId);
-
-      setUniverseId(data.id!);
-
+      setCurrentSpaceId(data.id!);
       setTags(data.hashtags.map((tag: string) => `#${tag}`).join(" "));
       setUniverse(data);
     } catch (error) {
       console.error(error);
     }
   };
-
-  useEffect(() => {
-    if (!isNaN(universeIdParsed)) {
-      fetchUniverse();
-    }
-  }, [universeIdParsed]);
 
   const saveDetail = async () => {
     const payload = {
@@ -108,16 +94,11 @@ export default function UniverseEditPage() {
     };
 
     try {
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes/${universe.id}`,
-        {
-          method: "PATCH",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      const response = await fetch(`${API_CONFIG.BACK_API}/universes/${universe.id}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
       if (!response.ok) throw new Error("저장에 실패했습니다.");
 
@@ -129,26 +110,18 @@ export default function UniverseEditPage() {
     }
   };
 
-  const showAlert = (text: string, type: AlertType, subText: string | null) => {
-    setAlert({ text, type, subText });
-  };
-
   const saveInnerImg = async (file: File) => {
     try {
       const formData = new FormData();
       formData.append("innerImage", file);
 
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes/inner-image/${universeId}`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch(`${API_CONFIG.BACK_API}/universes/inner-image/${universeId}`, {
+        method: "POST",
+        body: formData,
+      });
 
       if (!response.ok) throw new Error("저장에 실패했습니다.");
-
-      showAlert("변경사항이 저장되었습니다.", "success",null);
+      showAlert("변경사항이 저장되었습니다.", "success", null);
     } catch (error) {
       console.error("저장 에러:", error);
       showAlert("저장 중 오류가 발생했습니다.", "fail", null);
@@ -160,16 +133,12 @@ export default function UniverseEditPage() {
       const formData = new FormData();
       formData.append("thumbMusic", file);
 
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes/thumb-music/${universeId}`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch(`${API_CONFIG.BACK_API}/universes/thumb-music/${universeId}`, {
+        method: "POST",
+        body: formData,
+      });
 
       if (!response.ok) throw new Error("저장에 실패했습니다.");
-
       showAlert("변경사항이 저장되었습니다.", "success", null);
     } catch (error) {
       console.error("저장 에러:", error);
@@ -178,23 +147,18 @@ export default function UniverseEditPage() {
   };
 
   const handleCancel = () => {
-    showAlert(
-      "저장하지 않은 변경사항이 사라집니다. 취소하시겠습니까?",
-      "check",
-      null
-    );
+    showAlert("저장하지 않은 변경사항이 사라집니다. 취소하시겠습니까?", "check", null);
   };
 
-  // 태그 처리
+  const showAlert = (text: string, type: AlertType, subText: string | null) => {
+    setAlert({ text, type, subText });
+  };
+
   const normalizeTagsAndUpdateState = (raw: string) => {
     const parts = raw.trim().split(/\s+/).filter(Boolean);
-    const normalized = parts.map((tag) =>
-      tag.startsWith("#") ? tag : `#${tag}`
-    );
+    const normalized = parts.map((tag) => (tag.startsWith("#") ? tag : `#${tag}`));
     const display = normalized.join(" ") + (raw.endsWith(" ") ? " " : "");
-    const validTags = normalized
-      .filter((t) => t.length > 1)
-      .map((t) => t.replace(/^#/, ""));
+    const validTags = normalized.filter((t) => t.length > 1).map((t) => t.replace(/^#/, ""));
     setTags(display);
     setUniverse((prev) => ({ ...prev, hashtags: validTags }));
   };
@@ -208,83 +172,41 @@ export default function UniverseEditPage() {
     }
   };
 
-  function handleSaveInnerImage(file: File): void {
+  const handleSaveInnerImage = (file: File) => {
     setShowInnerImgEdit(false);
     saveInnerImg(file);
-  }
+  };
 
-  function handleSaveThumbMusicImage(file: File): void {
+  const handleSaveThumbMusicImage = (file: File) => {
     setShowThumbMusicEdit(false);
     saveThumbMusic(file);
-  }
+  };
 
   const publicStatusOptions = [
-    {
-      value: PublicStatusOption.PUBLIC,
-      icon: <HiGlobeAsiaAustralia size={20} />,
-      label: "공개",
-    },
-    {
-      value: PublicStatusOption.PRIVATE,
-      icon: <TbShieldLock size={20} />,
-      label: "비공개",
-    },
+    { value: PublicStatusOption.PUBLIC, icon: <HiGlobeAsiaAustralia size={20} />, label: "공개" },
+    { value: PublicStatusOption.PRIVATE, icon: <TbShieldLock size={20} />, label: "비공개" },
   ];
 
   const onSpaceDelete = () => {
-    console.log("delete");
-    showAlert(
-      "정말로 스페이스를 삭제하시겠습니까?",
-      "check",
-      "* 관련된 이미지와 음원, 내부 스페이스 및\n  요소가 모두 삭제됩니다."
-        );
+    showAlert("정말로 스페이스를 삭제하시겠습니까?", "check", "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다.");
   };
 
   return (
     <PageLayout>
-      {alert && alert?.type != "info" && (
+      {alert && (
         <ModalAlertMessage
           text={alert.text}
           type={alert.type}
           onClose={() => setAlert(null)}
-          okButton={
-            <Button
-              label="확인"
-              onClick={() => {
-                setAlert(null);
-              }}
-            />
-          }
-        />
-      )}
-      {alert && alert?.type == "check" && (
-        <ModalAlertMessage
-          text={alert.text}
-          type={alert.type}
-          onClose={() => setAlert(null)}
-          okButton={
-            <Button
-              label="확인"
-              onClick={() => {
-                navigate(-1);
-              }}
-            />
-          }
+          okButton={<Button label="확인" onClick={() => { alert.type === "check" ? navigate(-1) : setAlert(null) }} />}
           cancelButton={
-            <Button
-              label="취소"
-              variant="gray"
-              onClick={() => {
-                setAlert(null);
-              }}
-            />
+            alert.type === "check" ? <Button label="취소" variant="gray" onClick={() => setAlert(null)} /> : undefined
           }
           {...(alert.subText ? { subText: alert.subText } : {})}
         />
       )}
 
       <section className="w-full mx-8 py-20 md:py-10 p-3 lg:w-[90%]">
-        {/* 상단 버튼 영역 */}
         <div className="px-3 flex justify-between">
           <h1 className="font-bold text-base lg:text-lg">유니버스 상세 정보</h1>
           <div className="w-[35%] mr-1 flex justify-end gap-2">
@@ -303,78 +225,45 @@ export default function UniverseEditPage() {
           </div>
         </div>
 
-        {/* 본문 영역 */}
-        <div
-          className={`flex flex-col lg:flex-row gap-4 p-3 w-full h-screen min-h-[550px]
-        lg:max-h-[calc(100vh-150px)]`}
-        >
-          {/* 왼쪽 - 이미지 & 오디오 */}
+        <div className="flex flex-col lg:flex-row gap-4 p-3 w-full h-screen min-h-[550px] lg:max-h-[calc(100vh-150px)]">
           <div className="flex flex-2 flex-col gap-3 h-[100%]">
-            <div className="h-min-[200px] bg-black rounded-xl">
-              <UniverseEditInnerImg
-                onEdit={() => setShowInnerImgEdit(true)}
-                onDelete={onSpaceDelete}
-              />
+            <div className="min-h-[200px] bg-black rounded-xl">
+              <UniverseEditInnerImg onEdit={() => setShowInnerImgEdit(true)} onDelete={onSpaceDelete} />
             </div>
             <div className="lg:min-h-[130px] flex-col min-h-[280px]">
-              {/* 썸뮤직 미리듣기 */}
-              <UniverseEditMusic
-                thumbMusicId={universe.thumbMusicId}
-                onEdit={() => setShowThumbMusicEdit(true)}
-              />
+              <UniverseEditMusic thumbMusicId={universe.thumbMusicId} onEdit={() => setShowThumbMusicEdit(true)} />
             </div>
           </div>
 
-          {/* 오른쪽 - 텍스트 입력 */}
           <div className="flex flex-1 flex-col gap-3 h-[100%]">
-            {/* 제목 */}
             <InputField
               label="제목"
               value={universe.title}
-              onChange={(e) =>
-                setUniverse((prev) => ({ ...prev, title: e.target.value }))
-              }
+              onChange={(e) => setUniverse((prev) => ({ ...prev, title: e.target.value }))}
               maxLength={100}
               placeholder="제목을 입력하세요"
             />
-
-            {/* 설명 */}
             <TextareaField
               label="설명"
-              value={universe.description ? universe.description : ""}
-              onChange={(e) =>
-                setUniverse((prev) => ({
-                  ...prev,
-                  description: e.target.value,
-                }))
-              }
+              value={universe.description || ""}
+              onChange={(e) => setUniverse((prev) => ({ ...prev, description: e.target.value }))}
               maxLength={500}
               placeholder="설명을 입력하세요"
             />
-
-            {/* 카테고리 */}
             <SelectField
               label="카테고리"
               value={universe.category}
-              onChange={(val) =>
-                setUniverse((prev) => ({ ...prev, category: val }))
-              }
+              onChange={(val) => setUniverse((prev) => ({ ...prev, category: val }))}
               options={UniverseCategoryOptions}
               placeholder="카테고리를 선택하세요"
             />
-
-            {/* 공개여부 */}
             <SelectableRadioField
               label="공개여부"
               name="publicStatus"
               value={universe.publicStatus}
-              onChange={(val) =>
-                setUniverse((prev) => ({ ...prev, publicStatus: val }))
-              }
+              onChange={(val) => setUniverse((prev) => ({ ...prev, publicStatus: val }))}
               options={publicStatusOptions}
             />
-
-            {/* 태그 */}
             <InputField
               label="태그"
               value={tags}
@@ -384,11 +273,9 @@ export default function UniverseEditPage() {
               placeholder="#태그를 입력하고 스페이스바로 구분"
               extra={`${universe.hashtags?.length} / 10`}
             />
-
-            {/* 작성자 선택 */}
             <AuthorSelectField
               label="작성자"
-              value={universe.author == null ? "" : `${universe.author}`}
+              value={universe.author || ""}
               onClick={() => setShowAuthorEdit(true)}
               placeholder="작성자를 검색해서 선택하세요"
             />
@@ -396,7 +283,6 @@ export default function UniverseEditPage() {
         </div>
       </section>
 
-      {/* 모달들 */}
       {showInnerImgEdit && (
         <ImageUploadModal
           title="유니버스 이미지 수정"
@@ -404,11 +290,12 @@ export default function UniverseEditPage() {
           labelText="내부이미지"
           maxFileSizeMB={5}
           onClose={() => setShowInnerImgEdit(false)}
-          onConfirm={(file) => handleSaveInnerImage(file)}
+          onConfirm={handleSaveInnerImage}
           confirmText="저장"
-          requireSquare={true}
+          requireSquare
         />
       )}
+
       {showThumbMusicEdit && (
         <ThumbMusicEditModal
           onClose={() => setShowThumbMusicEdit(false)}
@@ -416,18 +303,13 @@ export default function UniverseEditPage() {
         />
       )}
 
-      {/* 작성자 검색 모달 */}
       {showAuthorEdit && (
         <Modal onClose={() => setShowAuthorEdit(false)} bgColor="white">
           <UserSearch
             isOpen={showAuthorEdit}
             onClose={() => setShowAuthorEdit(false)}
             onSelect={(user: UserV2) => {
-              setUniverse((prev) => ({
-                ...prev,
-                authorId: user.id,
-                author: user.name,
-              }));
+              setUniverse((prev) => ({ ...prev, authorId: user.id, author: user.name }));
             }}
           />
         </Modal>

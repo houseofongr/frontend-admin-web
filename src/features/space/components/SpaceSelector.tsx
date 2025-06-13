@@ -6,9 +6,8 @@ import {
   SpaceType,
   useUniverseStore,
 } from "../../../context/useUniverseStore";
-import { FaArrowLeft } from "react-icons/fa6";
-import { IoIosArrowBack, IoIosArrowDropleft } from "react-icons/io";
-import { IoArrowBackCircleOutline } from "react-icons/io5";
+import { IoIosArrowBack } from "react-icons/io";
+import SpinnerIcon from "../../../components/icons/SpinnerIcon";
 
 interface PercentPoint {
   xPercent: number;
@@ -34,7 +33,6 @@ export default function SpaceSelector({
   setStartPoint,
   setEndPoint,
   existingSpaces,
-  existingPieces,
 }: SpaceSelectorProps) {
   const {
     currentSpaceId,
@@ -55,79 +53,61 @@ export default function SpaceSelector({
     title: string;
     description: string;
   } | null>(null);
-
+  const [imgSrc, setImgSrc] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  // ResizeObserver로 이미지 사이즈 추적
+  // 이미지 크기 감지
   useEffect(() => {
     if (!imgRef.current) return;
-
     const updateSize = () => {
-      const width = imgRef.current?.clientWidth ?? 0;
-      const height = imgRef.current?.clientHeight ?? 0;
-      setImageSize({ width, height });
+      setImageSize({
+        width: imgRef.current?.clientWidth ?? 0,
+        height: imgRef.current?.clientHeight ?? 0,
+      });
     };
-
-    updateSize(); // 초기 크기
-
-    const observer = new ResizeObserver(() => {
-      updateSize();
-    });
-
+    updateSize();
+    const observer = new ResizeObserver(updateSize);
     observer.observe(imgRef.current);
-
     return () => observer.disconnect();
   }, [innerImageId]);
-
-  const getRelativePercentPos = (e: React.MouseEvent): PercentPoint | null => {
-    if (!imgRef.current) return null;
-
-    const rect = imgRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-
-    if (x < 0 || y < 0 || x > rect.width || y > rect.height) return null;
-
-    return {
-      xPercent: x / rect.width,
-      yPercent: y / rect.height,
-    };
-  };
 
   const toPixel = (point: PercentPoint) => ({
     x: point.xPercent * imageSize.width,
     y: point.yPercent * imageSize.height,
   });
 
+  const getRelativePercentPos = (e: React.MouseEvent): PercentPoint | null => {
+    if (!imgRef.current) return null;
+    const rect = imgRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    if (x < 0 || y < 0 || x > rect.width || y > rect.height) return null;
+    return { xPercent: x / rect.width, yPercent: y / rect.height };
+  };
+
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (step !== SpaceCreateStep.SetSize) {
+    if (step === SpaceCreateStep.SetSize) {
+      setHoverPos(getRelativePercentPos(e));
+    } else {
       setHoverPos(null);
-      return;
     }
-    const pos = getRelativePercentPos(e);
-    setHoverPos(pos);
   };
 
   const handleClick = (e: React.MouseEvent) => {
     if (step !== SpaceCreateStep.SetSize) return;
-
     const pos = getRelativePercentPos(e);
     if (!pos) return;
 
-    if (!startPoint) {
-      setStartPoint(pos);
-    } else if (!endPoint) {
-      setEndPoint(pos);
-    } else {
+    if (!startPoint) setStartPoint(pos);
+    else if (!endPoint) setEndPoint(pos);
+    else {
       setStartPoint(pos);
       setEndPoint(null);
     }
   };
 
   const handleMoveToSpace = (space: SpaceType) => {
-    console.log("ParentSpaceId", currentSpaceId);
-    console.log("CurrentSpaceId", space.spaceId);
-
     setParentSpaceId(currentSpaceId!);
     setCurrentSpaceId(space.spaceId);
   };
@@ -143,8 +123,8 @@ export default function SpaceSelector({
 
     setHoveredIndex(index);
     setPopupData({
-      x: left + width / 2 + 10, // 박스 오른쪽 10px 옆
-      y: top + height / 2 + 5, // 박스 아래 5px 밑
+      x: left + width / 2 + 10,
+      y: top + height / 2 + 5,
       title: space.title,
       description: space.description,
     });
@@ -155,32 +135,58 @@ export default function SpaceSelector({
     setPopupData(null);
   };
 
-  const backClick = () => {
-    console.log("실행?", parentSpaceId);
-
-    if (parentSpaceId == -1) {
-      console.log("root", rootUniverse);
-
-      console.log("ParentSpaceId", rootUniverse?.universeId!);
-      console.log("CurrentSpaceId", parentSpaceId);
-      setParentSpaceId(rootUniverse?.universeId!);
-      setCurrentSpaceId(parentSpaceId);
-    } else {
-      // 루트로 가는 경우임
-      if (parentSpaceId == rootUniverse?.universeId){
-        setParentSpaceId(-1);
+  const handleBackClick = () => {
+    if (
+      rootUniverse != null &&
+      (parentSpaceId === rootUniverse.universeId || parentSpaceId === -1)
+    ) {
+      setParentSpaceId(-1);
+      setCurrentSpaceId(rootUniverse.universeId);
+    }
+    else {
+      const parentId = getParentSpaceIdById(parentSpaceId);
+      if (parentId != null) {
+        setParentSpaceId(parentId);
         setCurrentSpaceId(parentSpaceId);
       }
-
-      var parentId = getParentSpaceIdById(parentSpaceId);
-      if (parentId == null) return;
-      console.log("--ParentSpaceId", parentId);
-      console.log("--CurrentSpaceId", parentSpaceId);
-
-      setParentSpaceId(parentId);
-      setCurrentSpaceId(parentSpaceId);
     }
   };
+
+  const calcBoxStyle = (start: PercentPoint, end: PercentPoint) => {
+    const s = toPixel(start);
+    const e = toPixel(end);
+    const left = Math.min(s.x, e.x);
+    const top = Math.min(s.y, e.y);
+    const width = Math.abs(e.x - s.x);
+    const height = Math.abs(e.y - s.y);
+
+    return {
+      left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
+      top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
+      width: `${width}px`,
+      height: `${height}px`,
+    };
+  };
+
+  useEffect(() => {
+    if (innerImageId === -1) {
+      setImgSrc(null);
+      return;
+    }
+
+    const url = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${innerImageId}`;
+    const img = new Image();
+
+    img.src = url;
+    img.onload = () => {
+      setImgSrc(url);
+      setLoading(false);
+    };
+    img.onerror = () => {
+      setLoading(false);
+      setImgSrc(null); // 실패 시 null 처리
+    };
+  }, [innerImageId]);
 
   return (
     <div
@@ -188,162 +194,109 @@ export default function SpaceSelector({
       onMouseMove={handleMouseMove}
       onClick={handleClick}
     >
-      {currentSpaceId != rootUniverse?.universeId && (
-        <div
-          className="absolute top-2 left-2 px-4 py-2 z-10 text-white hover:opacity-90 cursor-pointer"
-          onClick={backClick}
-        >
-          <IoIosArrowBack size={24} />
+      {loading && (
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50">
+          <SpinnerIcon />
         </div>
       )}
-      {innerImageId !== -1 && (
-        <img
-          ref={imgRef}
-          src={`${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${innerImageId}`}
-          alt="target"
-          className="object-contain block mx-auto max-h-full max-w-full"
-          style={{ userSelect: "none", pointerEvents: "none" }}
-          draggable={false}
-        />
-      )}
 
-      {/* Hover */}
-      {step === SpaceCreateStep.SetSize &&
-        hoverPos &&
-        !endPoint &&
-        (() => {
-          const { x, y } = toPixel(hoverPos);
-          return (
-            <>
-              <div
-                className="absolute w-3 h-3 bg-blue-400 rounded-full pointer-events-none"
-                style={{
-                  left: `calc(50% - ${imageSize.width / 2}px + ${x - 6}px)`,
-                  top: `calc(50% - ${imageSize.height / 2}px + ${y - 6}px)`,
-                }}
-              />
-              <div
-                className="absolute h-[1px] bg-blue-400 pointer-events-none"
-                style={{
-                  top: `calc(50% - ${imageSize.height / 2}px + ${y}px)`,
-                  left: `calc(50% - ${imageSize.width / 2}px)`,
-                  width: `${imageSize.width}px`,
-                }}
-              />
-              <div
-                className="absolute w-[1px] bg-blue-400 pointer-events-none"
-                style={{
-                  left: `calc(50% - ${imageSize.width / 2}px + ${x}px)`,
-                  top: `calc(50% - ${imageSize.height / 2}px)`,
-                  height: `${imageSize.height}px`,
-                }}
-              />
-            </>
-          );
-        })()}
 
-      {/* Start */}
-      {startPoint &&
-        (() => {
-          const { x, y } = toPixel(startPoint);
-          return (
+
+      {!loading && (
+        <>
+          {/* 뒤로가기 */}
+          {currentSpaceId !== rootUniverse?.universeId && (
             <div
-              className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none"
-              style={{
-                left: `calc(50% - ${imageSize.width / 2}px + ${x - 3}px)`,
-                top: `calc(50% - ${imageSize.height / 2}px + ${y - 3}px)`,
-              }}
+              className="absolute top-2 left-2 px-4 py-2 z-10 text-white cursor-pointer hover:opacity-90"
+              onClick={handleBackClick}
+            >
+              <IoIosArrowBack size={24} />
+            </div>
+          )}
+
+          {/* 이미지 */}
+          {innerImageId !== -1 && (
+            <img
+              ref={imgRef}
+              src={`${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${innerImageId}`}
+              alt="space-image"
+              loading="eager"
+              className="object-contain block mx-auto max-h-full max-w-full"
+              style={{ userSelect: "none", pointerEvents: "none" }}
+              draggable={false}
+              onLoad={() => setLoading(false)}
+              onError={() => setLoading(false)}
             />
-          );
-        })()}
+          )}
 
-      {/* End */}
-      {endPoint &&
-        (() => {
-          const { x, y } = toPixel(endPoint);
-          return (
-            <div
-              className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none"
-              style={{
-                left: `calc(50% - ${imageSize.width / 2}px + ${x - 5}px)`,
-                top: `calc(50% - ${imageSize.height / 2}px + ${y - 5}px)`,
-              }}
-            />
-          );
-        })()}
+          {/* Hover crosshair */}
+          {step === SpaceCreateStep.SetSize && hoverPos && !endPoint && (() => {
+            const { x, y } = toPixel(hoverPos);
+            const baseLeft = `calc(50% - ${imageSize.width / 2}px + ${x}px)`;
+            const baseTop = `calc(50% - ${imageSize.height / 2}px + ${y}px)`;
+            return (
+              <>
+                <div className="absolute w-3 h-3 bg-blue-400 rounded-full pointer-events-none" style={{ left: `calc(${baseLeft} - 6px)`, top: `calc(${baseTop} - 6px)` }} />
+                <div className="absolute h-[1px] bg-blue-400 pointer-events-none" style={{ top: baseTop, left: `calc(50% - ${imageSize.width / 2}px)`, width: `${imageSize.width}px` }} />
+                <div className="absolute w-[1px] bg-blue-400 pointer-events-none" style={{ left: baseLeft, top: `calc(50% - ${imageSize.height / 2}px)`, height: `${imageSize.height}px` }} />
+              </>
+            );
+          })()}
 
-      {/* Box */}
-      {startPoint &&
-        endPoint &&
-        (() => {
-          const start = toPixel(startPoint);
-          const end = toPixel(endPoint);
-          const left = Math.min(start.x, end.x);
-          const top = Math.min(start.y, end.y);
-          const width = Math.abs(end.x - start.x);
-          const height = Math.abs(end.y - start.y);
+          {/* Start / End 점 */}
+          {startPoint && (
+            <div className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none" style={{
+              left: `calc(50% - ${imageSize.width / 2}px + ${toPixel(startPoint).x - 3}px)`,
+              top: `calc(50% - ${imageSize.height / 2}px + ${toPixel(startPoint).y - 3}px)`,
+            }} />
+          )}
 
-          return (
-            <div
-              className="absolute border-2 border-amber-400 bg-amber-400/40 pointer-events-none"
-              style={{
-                left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
-                top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
-                width: `${width}px`,
-                height: `${height}px`,
-              }}
-            />
-          );
-        })()}
+          {endPoint && (
+            <div className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none" style={{
+              left: `calc(50% - ${imageSize.width / 2}px + ${toPixel(endPoint).x - 5}px)`,
+              top: `calc(50% - ${imageSize.height / 2}px + ${toPixel(endPoint).y - 5}px)`,
+            }} />
+          )}
 
-      {existingSpaces &&
-        existingSpaces.map((space, index) => {
-          const start = toPixel({
-            xPercent: space.startX,
-            yPercent: space.startY,
-          });
-          const end = toPixel({ xPercent: space.endX, yPercent: space.endY });
-          const left = Math.min(start.x, end.x);
-          const top = Math.min(start.y, end.y);
-          const width = Math.abs(end.x - start.x);
-          const height = Math.abs(end.y - start.y);
+          {/* 선택된 영역 박스 */}
+          {startPoint && endPoint && (
+            <div className="absolute border-2 border-amber-400 bg-amber-400/40 pointer-events-none" style={calcBoxStyle(startPoint, endPoint)} />
+          )}
 
-          return (
+          {/* 기존 스페이스 박스 */}
+          {existingSpaces.map((space, index) => (
             <div
               key={index}
               className="absolute"
-              style={{
-                left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
-                top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
-                width: `${width}px`,
-                height: `${height}px`,
-              }}
+              style={calcBoxStyle(
+                { xPercent: space.startX, yPercent: space.startY },
+                { xPercent: space.endX, yPercent: space.endY }
+              )}
               onMouseEnter={() => handleMouseEnter(index)}
               onMouseLeave={handleMouseLeave}
             >
               <div
-                className={` w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
-                  hoveredIndex === index ? "opacity-100" : "opacity-30"
-                }`}
+                className={`w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${hoveredIndex === index ? "opacity-100" : "opacity-30"}`}
                 onClick={() => handleMoveToSpace(space)}
               />
             </div>
-          );
-        })}
+          ))}
 
-      <div
-        className={`absolute bg-white p-2 rounded shadow-md max-w-xs text-sm z-30 pointer-events-none transition-opacity duration-500 ${
-          popupData ? "opacity-0" : "opacity-100"
-        }`}
-        style={{
-          left: `calc(50% - ${imageSize.width / 2}px + ${popupData?.x}px)`,
-          top: `calc(50% - ${imageSize.height / 2}px + ${popupData?.y}px)`,
-          visibility: popupData ? "visible" : "hidden",
-        }}
-      >
-        <div className="font-semibold">{popupData?.title}</div>
-        <div className="text-xs mt-1">{popupData?.description}</div>
-      </div>
+          {/* 팝업 */}
+          {popupData && (
+            <div
+              className="absolute bg-white p-2 rounded shadow-md max-w-xs text-sm z-30 transition-opacity duration-300 opacity-100 pointer-events-none"
+              style={{
+                left: `calc(50% - ${imageSize.width / 2}px + ${popupData.x}px)`,
+                top: `calc(50% - ${imageSize.height / 2}px + ${popupData.y}px)`,
+              }}
+            >
+              <div className="font-semibold">{popupData.title}</div>
+              <div className="text-xs mt-1">{popupData.description}</div>
+            </div>
+          )}
+        </>
+      )}
     </div>
   );
 }

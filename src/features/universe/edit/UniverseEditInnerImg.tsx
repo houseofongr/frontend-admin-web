@@ -32,6 +32,7 @@ import {
   SpaceType,
   UniverseType,
   useUniverseStore,
+  setCurrentSpaceId,
 } from "../../../context/useUniverseStore";
 import { TbPencilCog } from "react-icons/tb";
 
@@ -64,27 +65,27 @@ export default function UniverseEditInnerImg({
     rootUniverse,
     currentSpaceId,
     getSpaceById,
+    setCurrentSpaceId
   } = useUniverseStore();
 
   useEffect(() => {
     console.log("currentSpaceId 바뀜", currentSpaceId);
-    
+    console.log("parentSpaceId", parentSpaceId);
+
     if (rootUniverse == null) loadInitialData();
-    else if(currentSpaceId == rootUniverse.universeId){
+    else if (currentSpaceId == rootUniverse.universeId) {
+      setCurrentSpaceId(-1);
       setExistingSpaces(rootUniverse.spaces);
       setExistingPieces(rootUniverse.pieces);
       setInnerImgId(rootUniverse.innerImageId);
     }
     else if (currentSpaceId != null) {
-      var space = getSpaceById(currentSpaceId);
-      console.log("space-------", space);
-      
+      const space = getSpaceById(currentSpaceId);
       if (space == null) return;
 
       setExistingSpaces(space.spaces);
       setExistingPieces(space?.pieces!);
       setInnerImgId(space.innerImageId);
-      console.log(space);
     } else {
       console.log("에러");
     }
@@ -106,6 +107,8 @@ export default function UniverseEditInnerImg({
       }
 
       const data: UniverseType = await response.json();
+      console.log(data);
+
       setRootUniverse(data);
       setInnerImgId(data.innerImageId);
       setExistingSpaces(data.spaces);
@@ -155,7 +158,7 @@ export default function UniverseEditInnerImg({
     const formData = new FormData();
     const metadata = {
       universeId: rootUniverse?.universeId,
-      parentSpaceId: currentSpaceId,
+      parentSpaceId: currentSpaceId == rootUniverse?.universeId ? -1 : currentSpaceId,
       title,
       description,
       startX: startPoint.xPercent,
@@ -210,44 +213,44 @@ export default function UniverseEditInnerImg({
   const menuItems =
     parentSpaceId === -1
       ? [
-          {
-            label: "이미지 수정",
-            icon: <RiImageEditFill size={20} />,
-            onClick: onEdit,
-          },
-          {
-            label: "이미지 다운로드",
-            icon: <RiFileDownloadLine size={20} />,
-            onClick: handleDownloadImage,
-          },
-        ]
+        {
+          label: "이미지 수정",
+          icon: <RiImageEditFill size={20} />,
+          onClick: onEdit,
+        },
+        {
+          label: "이미지 다운로드",
+          icon: <RiFileDownloadLine size={20} />,
+          onClick: handleDownloadImage,
+        },
+      ]
       : [
-          {
-            label: "이미지 수정",
-            icon: <RiImageEditFill size={20} />,
-            onClick: onEdit,
-          },
-          {
-            label: "이미지 다운로드",
-            icon: <RiFileDownloadLine size={20} />,
-            onClick: handleDownloadImage,
-          },
-          {
-            label: "정보 수정",
-            icon: <TbPencilCog size={20} />,
-            onClick: onEdit,
-          },
-          {
-            label: "좌표 수정",
-            icon: <PiGpsBold size={20} />,
-            onClick: handleDownloadImage,
-          },
-          {
-            label: "스페이스 삭제",
-            icon: <RiDeleteBin6Line size={20} />,
-            onClick: onDelete,
-          },
-        ];
+        {
+          label: "이미지 수정",
+          icon: <RiImageEditFill size={20} />,
+          onClick: onEdit,
+        },
+        {
+          label: "이미지 다운로드",
+          icon: <RiFileDownloadLine size={20} />,
+          onClick: handleDownloadImage,
+        },
+        {
+          label: "정보 수정",
+          icon: <TbPencilCog size={20} />,
+          onClick: onEdit,
+        },
+        {
+          label: "좌표 수정",
+          icon: <PiGpsBold size={20} />,
+          onClick: handleDownloadImage,
+        },
+        {
+          label: "스페이스 삭제",
+          icon: <RiDeleteBin6Line size={20} />,
+          onClick: onDelete,
+        },
+      ];
 
   return (
     <div
@@ -271,7 +274,7 @@ export default function UniverseEditInnerImg({
 
       {/* 기능 버튼들 */}
       <button
-        onClick={() => {}}
+        onClick={() => { }}
         className="z-10 absolute cursor-pointer bottom-3 right-3 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <PiDownloadSimpleBold size={20} />
@@ -283,7 +286,7 @@ export default function UniverseEditInnerImg({
         <RiFunctionAddLine size={20} />
       </button>
       <button
-        onClick={() => {}}
+        onClick={() => { }}
         className="z-10 absolute cursor-pointer bottom-3 right-22 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <MdOutlineFullscreen size={25} />
