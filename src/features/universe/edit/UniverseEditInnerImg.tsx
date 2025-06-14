@@ -1,6 +1,4 @@
 import { useState, useRef, useEffect } from "react";
-import { BiDotsVerticalRounded } from "react-icons/bi";
-import API_CONFIG from "../../../config/api";
 import {
   RiImageEditFill,
   RiFileDownloadLine,
@@ -11,60 +9,58 @@ import { MdOutlineFullscreen } from "react-icons/md";
 import { PiDownloadSimpleBold, PiGpsBold } from "react-icons/pi";
 import { IoPlanetOutline } from "react-icons/io5";
 import { LuPaintbrush } from "react-icons/lu";
+import { TbPencilCog } from "react-icons/tb";
+import { BiDotsVerticalRounded } from "react-icons/bi";
+
+import API_CONFIG from "../../../config/api";
+import {
+  postSpaceCreate,
+  patchSpaceInnerImageEdit,
+} from "../../../service/spaceService";
+import {
+  getUniverseTree,
+  patchUniverseInnerImageEdit,
+} from "../../../service/universeService";
 
 import ContextMenu from "../../../components/ContextMenu";
 import DraggableIconTitleModal from "../../../components/modal/DraggableIconTitleModal";
 import ImageUploadModal from "../../../components/modal/ImageUploadModal";
 import IconTitleModal from "../../../components/modal/IconTitleModal";
+import ModalAlertMessage, {
+  AlertType,
+} from "../../../components/modal/ModalAlertMessage";
+import Button from "../../../components/buttons/Button";
+
 import SpaceSelector from "../../space/components/SpaceSelector";
 import SpaceDetailInfoStep from "../../space/create/SpaceDetailInfoStep";
 
 import { SpaceCreateStep } from "../../../constants/ProcessSteps";
 import { PercentPoint } from "../../../constants/image";
-
 import {
   PieceType,
   SaveTargetType,
-  SpaceType,
   UniverseType,
   useUniverseStore,
 } from "../../../context/useUniverseStore";
-import { TbPencilCog } from "react-icons/tb";
-import ModalAlertMessage, {
-  AlertType,
-} from "../../../components/modal/ModalAlertMessage";
-import Button from "../../../components/buttons/Button";
-import {
-  postSpaceCreate,
-  patchSpaceInnerImageEdit,
-} from "../../../service/spaceService";
-import { getUniverseTree, patchUniverseInnerImageEdit } from "../../../service/universeService";
 
 export default function UniverseEditInnerImg() {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [createStep, setCreateStep] = useState<SpaceCreateStep | null>(null);
-
   const [startPoint, setStartPoint] = useState<PercentPoint | null>(null);
   const [endPoint, setEndPoint] = useState<PercentPoint | null>(null);
   const [innerImg, setInnerImg] = useState<File | null>(null);
-
   const [alert, setAlert] = useState<{
     text: string;
     type: AlertType;
     subText: string | null;
   } | null>(null);
-
   const [showInnerImgEdit, setShowInnerImgEdit] = useState<{
     show: boolean;
     type: SaveTargetType;
     id: number;
-  }>({
-    show: false,
-    type: null,
-    id: -1,
-  });
+  }>({ show: false, type: null, id: -1 });
 
   const {
     existingSpaces,
@@ -81,7 +77,7 @@ export default function UniverseEditInnerImg() {
 
   useEffect(() => {
     if (rootUniverse == null) loadInitialData(null);
-    else if (currentSpaceId == rootUniverse.universeId) {
+    else if (currentSpaceId === rootUniverse.universeId) {
       setCurrentSpaceId(-1);
       setUniverseData(
         rootUniverse.innerImageId,
@@ -90,44 +86,36 @@ export default function UniverseEditInnerImg() {
       );
     } else if (currentSpaceId != null) {
       const space = getSpaceById(currentSpaceId);
-      if (space == null) return;
+      if (!space) return;
       setUniverseData(space.innerImageId, space.spaces, space.pieces);
-    } else {
-      console.log("에러");
     }
   }, [currentSpaceId]);
 
-  const loadInitialData = async (spaceId: null | number) => {
+  const loadInitialData = async (spaceId: number | null) => {
     try {
       if (currentSpaceId == null) return;
-      
       const data: UniverseType = await getUniverseTree(currentSpaceId);
 
-      if (spaceId == null) {
-        setRootUniverse(data);
-        setUniverseData(data.innerImageId, data.spaces, data.pieces);
-      } else {
-        setRootUniverse(data);
-        const space = getSpaceById(currentSpaceId);
-        if (space == null) return;
-        setUniverseData(space.innerImageId, space.spaces, space.pieces);
-      }
+      setRootUniverse(data);
+      const space = spaceId == null ? data : getSpaceById(currentSpaceId);
+      if (!space) return;
 
+      setUniverseData(space.innerImageId, space.spaces, space.pieces);
     } catch (error: any) {
-      const errorMessage =
-        error?.message || "유니버스 조회 중 오류가 발생했습니다.";
-      showAlert(errorMessage, "fail", null);
+      showAlert(
+        error?.message || "유니버스 조회 중 오류가 발생했습니다.",
+        "fail",
+        null
+      );
     }
   };
 
-  // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setMenuOpen(false);
       }
     }
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
@@ -144,45 +132,10 @@ export default function UniverseEditInnerImg() {
     }
   };
 
-  const createSpace = async (
-    title: string,
-    description: string
-  ): Promise<void> => {
-    if (!startPoint || !endPoint || !innerImg) {
-      showAlert("스페이스 정보를 모두 입력해주세요.", "fail", null);
-      return;
-    }
-
-    const metadata = {
-      universeId: rootUniverse?.universeId,
-      parentSpaceId:
-        currentSpaceId == rootUniverse?.universeId ? -1 : currentSpaceId,
-      title,
-      description,
-      startX: startPoint.xPercent,
-      startY: startPoint.yPercent,
-      endX: endPoint.xPercent,
-      endY: endPoint.yPercent,
-    };
-
-    try {
-      await postSpaceCreate(metadata, innerImg);
-      showAlert("스페이스가 생성되었습니다.", "success", null);
-      loadInitialData(currentSpaceId);
-    } catch (error: any) {
-      const errorMessage =
-        error?.message || "스페이스 생성 중 오류가 발생했습니다.";
-      showAlert(errorMessage, "fail", null);
-    }
-  };
-
-  // 이게 onEdit이였고
   const onInnerImgEdit = (type: SaveTargetType, id: number) => {
-    console.log("type : ", type, " id: ", id);
-    setShowInnerImgEdit({ show: true, type: type, id: id });
+    setShowInnerImgEdit({ show: true, type, id });
   };
 
-  // 이게 onDelete
   const onSpaceDelete = () => {
     showAlert(
       "정말로 스페이스를 삭제하시겠습니까?",
@@ -209,7 +162,6 @@ export default function UniverseEditInnerImg() {
       } else {
         throw new Error("잘못된 대상 유형입니다.");
       }
-
       showAlert("변경사항이 저장되었습니다.", "success", null);
     } catch (error) {
       console.error("저장 에러:", error);
@@ -217,13 +169,43 @@ export default function UniverseEditInnerImg() {
     }
   };
 
-  const handleCreateSubmit = (title: string, description: string) => {
-    if (startPoint && endPoint && innerImg) {
-      createSpace(title, description);
+  const createSpace = async (
+    title: string,
+    description: string
+  ): Promise<void> => {
+    if (!startPoint || !endPoint || !innerImg) {
+      showAlert("스페이스 정보를 모두 입력해주세요.", "fail", null);
+      return;
+    }
+    const metadata = {
+      universeId: rootUniverse?.universeId,
+      parentSpaceId:
+        currentSpaceId === rootUniverse?.universeId ? -1 : currentSpaceId,
+      title,
+      description,
+      startX: startPoint.xPercent,
+      startY: startPoint.yPercent,
+      endX: endPoint.xPercent,
+      endY: endPoint.yPercent,
+    };
+    try {
+      await postSpaceCreate(metadata, innerImg);
+      showAlert("스페이스가 생성되었습니다.", "success", null);
+      loadInitialData(currentSpaceId);
+    } catch (error: any) {
+      showAlert(
+        error?.message || "스페이스 생성 중 오류가 발생했습니다.",
+        "fail",
+        null
+      );
     }
   };
 
-  const handleCreateInnerImage = (file: File): void => {
+  const handleCreateSubmit = (title: string, description: string) => {
+    if (startPoint && endPoint && innerImg) createSpace(title, description);
+  };
+
+  const handleCreateInnerImage = (file: File) => {
     setInnerImg(file);
     setCreateStep(SpaceCreateStep.FillDetails);
   };
@@ -234,15 +216,18 @@ export default function UniverseEditInnerImg() {
     setInnerImg(null);
   };
 
+  const showAlert = (text: string, type: AlertType, subText: string | null) => {
+    setAlert({ text, type, subText });
+  };
+
   const menuItems =
-    parentSpaceId === -1
+    (parentSpaceId === -1 && currentSpaceId == -1)
       ? [
           {
             label: "이미지 수정",
             icon: <RiImageEditFill size={20} />,
-            onClick: () => {
-              onInnerImgEdit("universe", rootUniverse?.universeId!);
-            },
+            onClick: () =>
+              onInnerImgEdit("universe", rootUniverse?.universeId!),
           },
           {
             label: "이미지 다운로드",
@@ -254,9 +239,7 @@ export default function UniverseEditInnerImg() {
           {
             label: "이미지 수정",
             icon: <RiImageEditFill size={20} />,
-            onClick: () => {
-              onInnerImgEdit("space", currentSpaceId!);
-            },
+            onClick: () => onInnerImgEdit("space", currentSpaceId!),
           },
           {
             label: "이미지 다운로드",
@@ -279,10 +262,6 @@ export default function UniverseEditInnerImg() {
             onClick: onSpaceDelete,
           },
         ];
-
-  const showAlert = (text: string, type: AlertType, subText: string | null) => {
-    setAlert({ text, type, subText });
-  };
 
   return (
     <div
@@ -309,7 +288,6 @@ export default function UniverseEditInnerImg() {
         />
       )}
 
-      {/* 점 메뉴 버튼 */}
       <button
         onClick={() => setMenuOpen(!menuOpen)}
         className="z-10 absolute cursor-pointer top-2 right-2 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -323,7 +301,6 @@ export default function UniverseEditInnerImg() {
         items={menuItems}
       />
 
-      {/* 기능 버튼들 */}
       <button
         onClick={() => {}}
         className="z-10 absolute cursor-pointer bottom-3 right-3 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
@@ -343,7 +320,6 @@ export default function UniverseEditInnerImg() {
         <MdOutlineFullscreen size={25} />
       </button>
 
-      {/* 영역 선택 */}
       <SpaceSelector
         step={createStep}
         innerImageId={innerImageId}
@@ -355,7 +331,6 @@ export default function UniverseEditInnerImg() {
         existingPieces={existingPieces}
       />
 
-      {/* SetSize Step */}
       {createStep === SpaceCreateStep.SetSize && (
         <DraggableIconTitleModal
           onClose={handleCreateModalClose}
@@ -371,7 +346,6 @@ export default function UniverseEditInnerImg() {
                 (안내창은 드래그해서 이동할 수 있습니다.)
               </p>
             </div>
-
             <button
               onClick={resetSelection}
               className="px-10 py-2 border-2 border-neutral-600 text-neutral-600 font-bold rounded-lg hover:bg-neutral-200 transition"
@@ -381,7 +355,6 @@ export default function UniverseEditInnerImg() {
                 <span>다시 그리기</span>
               </div>
             </button>
-
             <div className="flex gap-3">
               <button
                 className="px-5 py-2 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 transition"
@@ -400,7 +373,6 @@ export default function UniverseEditInnerImg() {
         </DraggableIconTitleModal>
       )}
 
-      {/* UploadImage Step */}
       {createStep === SpaceCreateStep.UploadImage && (
         <ImageUploadModal
           title="스페이스 생성"
@@ -410,11 +382,10 @@ export default function UniverseEditInnerImg() {
           onClose={handleCreateModalClose}
           onConfirm={handleCreateInnerImage}
           confirmText="다음"
-          requireSquare={true}
+          requireSquare
         />
       )}
 
-      {/* FillDetails Step */}
       {createStep === SpaceCreateStep.FillDetails && (
         <IconTitleModal
           onClose={handleCreateModalClose}
@@ -428,21 +399,6 @@ export default function UniverseEditInnerImg() {
             onSubmit={handleCreateSubmit}
           />
         </IconTitleModal>
-      )}
-
-      {showInnerImgEdit.show && (
-        <ImageUploadModal
-          title="이미지 수정"
-          description="내부 이미지를 변경할 수 있습니다."
-          labelText="내부이미지"
-          maxFileSizeMB={5}
-          onClose={() =>
-            setShowInnerImgEdit({ show: false, type: null, id: -1 })
-          }
-          onConfirm={(file) => handleEditInnerImage(file)}
-          confirmText="저장"
-          requireSquare
-        />
       )}
     </div>
   );

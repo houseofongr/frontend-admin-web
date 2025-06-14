@@ -56,21 +56,45 @@ export default function SpaceSelector({
   const [loading, setLoading] = useState<boolean>(true);
   const imgRef = useRef<HTMLImageElement>(null);
 
-  // 이미지 크기 감지
+  // 이미지 크기 추적
   useEffect(() => {
     if (!imgRef.current) return;
+
     const updateSize = () => {
       setImageSize({
         width: imgRef.current?.clientWidth ?? 0,
         height: imgRef.current?.clientHeight ?? 0,
       });
     };
+
     updateSize();
     const observer = new ResizeObserver(updateSize);
     observer.observe(imgRef.current);
     return () => observer.disconnect();
   }, [innerImageId]);
 
+  // 이미지 로딩
+  useEffect(() => {
+    if (innerImageId === -1 || innerImageId === null) {
+      setImgSrc(null);
+      return;
+    }
+
+    const url = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${innerImageId}`;
+    const img = new Image();
+
+    img.src = url;
+    img.onload = () => {
+      setImgSrc(url);
+      setLoading(false);
+    };
+    img.onerror = () => {
+      setImgSrc(null);
+      setLoading(false);
+    };
+  }, [innerImageId]);
+
+  // 유틸 함수
   const toPixel = (point: PercentPoint) => ({
     x: point.xPercent * imageSize.width,
     y: point.yPercent * imageSize.height,
@@ -85,6 +109,23 @@ export default function SpaceSelector({
     return { xPercent: x / rect.width, yPercent: y / rect.height };
   };
 
+  const calcBoxStyle = (start: PercentPoint, end: PercentPoint) => {
+    const s = toPixel(start);
+    const e = toPixel(end);
+    const left = Math.min(s.x, e.x);
+    const top = Math.min(s.y, e.y);
+    const width = Math.abs(e.x - s.x);
+    const height = Math.abs(e.y - s.y);
+
+    return {
+      left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
+      top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
+      width: `${width}px`,
+      height: `${height}px`,
+    };
+  };
+
+  // 이벤트 핸들러
   const handleMouseMove = (e: React.MouseEvent) => {
     if (step === SpaceCreateStep.SetSize) {
       setHoverPos(getRelativePercentPos(e));
@@ -109,6 +150,7 @@ export default function SpaceSelector({
   const handleMoveToSpace = (space: SpaceType) => {
     setParentSpaceId(currentSpaceId!);
     setCurrentSpaceId(space.spaceId);
+    setPopupData(null);
   };
 
   const handleMouseEnter = (index: number) => {
@@ -136,13 +178,12 @@ export default function SpaceSelector({
 
   const handleBackClick = () => {
     if (
-      rootUniverse != null &&
+      rootUniverse &&
       (parentSpaceId === rootUniverse.universeId || parentSpaceId === -1)
     ) {
       setParentSpaceId(-1);
       setCurrentSpaceId(rootUniverse.universeId);
-    }
-    else {
+    } else {
       const parentId = getParentSpaceIdById(parentSpaceId);
       if (parentId != null) {
         setParentSpaceId(parentId);
@@ -150,42 +191,6 @@ export default function SpaceSelector({
       }
     }
   };
-
-  const calcBoxStyle = (start: PercentPoint, end: PercentPoint) => {
-    const s = toPixel(start);
-    const e = toPixel(end);
-    const left = Math.min(s.x, e.x);
-    const top = Math.min(s.y, e.y);
-    const width = Math.abs(e.x - s.x);
-    const height = Math.abs(e.y - s.y);
-
-    return {
-      left: `calc(50% - ${imageSize.width / 2}px + ${left}px)`,
-      top: `calc(50% - ${imageSize.height / 2}px + ${top}px)`,
-      width: `${width}px`,
-      height: `${height}px`,
-    };
-  };
-
-  useEffect(() => {
-    if (innerImageId === -1) {
-      setImgSrc(null);
-      return;
-    }
-
-    const url = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${innerImageId}`;
-    const img = new Image();
-
-    img.src = url;
-    img.onload = () => {
-      setImgSrc(url);
-      setLoading(false);
-    };
-    img.onerror = () => {
-      setLoading(false);
-      setImgSrc(null); // 실패 시 null 처리
-    };
-  }, [innerImageId]);
 
   return (
     <div
@@ -199,67 +204,103 @@ export default function SpaceSelector({
         </div>
       )}
 
-
-
       {!loading && (
         <>
           {/* 뒤로가기 */}
-          {(currentSpaceId !== rootUniverse?.universeId && currentSpaceId != -1) && (
-            <div
-              className="absolute top-2 left-2 px-4 py-2 z-10 text-white cursor-pointer hover:opacity-90"
-              onClick={handleBackClick}
-            >
-              <IoIosArrowBack size={24} />
-            </div>
-          )}
+          {currentSpaceId !== rootUniverse?.universeId &&
+            currentSpaceId !== -1 && (
+              <div
+                className="absolute top-2 left-2 px-4 py-2 z-10 text-white cursor-pointer hover:opacity-90"
+                onClick={handleBackClick}
+              >
+                <IoIosArrowBack size={24} />
+              </div>
+            )}
 
           {/* 이미지 */}
-          {innerImageId !== -1 && (
+          {imgSrc && (
             <img
               ref={imgRef}
-              src={`${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${innerImageId}`}
+              src={imgSrc}
               alt="space-image"
               loading="eager"
               className="object-contain block mx-auto max-h-full max-w-full"
               style={{ userSelect: "none", pointerEvents: "none" }}
               draggable={false}
-              onLoad={() => setLoading(false)}
-              onError={() => setLoading(false)}
             />
           )}
 
-          {/* Hover crosshair */}
-          {step === SpaceCreateStep.SetSize && hoverPos && !endPoint && (() => {
-            const { x, y } = toPixel(hoverPos);
-            const baseLeft = `calc(50% - ${imageSize.width / 2}px + ${x}px)`;
-            const baseTop = `calc(50% - ${imageSize.height / 2}px + ${y}px)`;
-            return (
-              <>
-                <div className="absolute w-3 h-3 bg-blue-400 rounded-full pointer-events-none" style={{ left: `calc(${baseLeft} - 6px)`, top: `calc(${baseTop} - 6px)` }} />
-                <div className="absolute h-[1px] bg-blue-400 pointer-events-none" style={{ top: baseTop, left: `calc(50% - ${imageSize.width / 2}px)`, width: `${imageSize.width}px` }} />
-                <div className="absolute w-[1px] bg-blue-400 pointer-events-none" style={{ left: baseLeft, top: `calc(50% - ${imageSize.height / 2}px)`, height: `${imageSize.height}px` }} />
-              </>
-            );
-          })()}
+          {/* 크로스헤어 */}
+          {step === SpaceCreateStep.SetSize &&
+            hoverPos &&
+            !endPoint &&
+            (() => {
+              const { x, y } = toPixel(hoverPos);
+              const left = `calc(50% - ${imageSize.width / 2}px + ${x}px)`;
+              const top = `calc(50% - ${imageSize.height / 2}px + ${y}px)`;
+              return (
+                <>
+                  <div
+                    className="absolute w-3 h-3 bg-blue-400 rounded-full pointer-events-none"
+                    style={{
+                      left: `calc(${left} - 6px)`,
+                      top: `calc(${top} - 6px)`,
+                    }}
+                  />
+                  <div
+                    className="absolute h-[1px] bg-blue-400 pointer-events-none"
+                    style={{
+                      top,
+                      left: `calc(50% - ${imageSize.width / 2}px)`,
+                      width: `${imageSize.width}px`,
+                    }}
+                  />
+                  <div
+                    className="absolute w-[1px] bg-blue-400 pointer-events-none"
+                    style={{
+                      left,
+                      top: `calc(50% - ${imageSize.height / 2}px)`,
+                      height: `${imageSize.height}px`,
+                    }}
+                  />
+                </>
+              );
+            })()}
 
-          {/* Start / End 점 */}
+          {/* 시작점/끝점 */}
           {startPoint && (
-            <div className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none" style={{
-              left: `calc(50% - ${imageSize.width / 2}px + ${toPixel(startPoint).x - 3}px)`,
-              top: `calc(50% - ${imageSize.height / 2}px + ${toPixel(startPoint).y - 3}px)`,
-            }} />
+            <div
+              className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none"
+              style={{
+                left: `calc(50% - ${imageSize.width / 2}px + ${
+                  toPixel(startPoint).x - 3
+                }px)`,
+                top: `calc(50% - ${imageSize.height / 2}px + ${
+                  toPixel(startPoint).y - 3
+                }px)`,
+              }}
+            />
           )}
-
           {endPoint && (
-            <div className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none" style={{
-              left: `calc(50% - ${imageSize.width / 2}px + ${toPixel(endPoint).x - 5}px)`,
-              top: `calc(50% - ${imageSize.height / 2}px + ${toPixel(endPoint).y - 5}px)`,
-            }} />
+            <div
+              className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none"
+              style={{
+                left: `calc(50% - ${imageSize.width / 2}px + ${
+                  toPixel(endPoint).x - 5
+                }px)`,
+                top: `calc(50% - ${imageSize.height / 2}px + ${
+                  toPixel(endPoint).y - 5
+                }px)`,
+              }}
+            />
           )}
 
-          {/* 선택된 영역 박스 */}
+          {/* 선택 영역 박스 */}
           {startPoint && endPoint && (
-            <div className="absolute border-2 border-amber-400 bg-amber-400/40 pointer-events-none" style={calcBoxStyle(startPoint, endPoint)} />
+            <div
+              className="absolute border-2 border-amber-400 bg-amber-400/40 pointer-events-none"
+              style={calcBoxStyle(startPoint, endPoint)}
+            />
           )}
 
           {/* 기존 스페이스 박스 */}
@@ -275,7 +316,9 @@ export default function SpaceSelector({
               onMouseLeave={handleMouseLeave}
             >
               <div
-                className={`w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${hoveredIndex === index ? "opacity-100" : "opacity-30"}`}
+                className={`w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
+                  hoveredIndex === index ? "opacity-100" : "opacity-30"
+                }`}
                 onClick={() => handleMoveToSpace(space)}
               />
             </div>
@@ -284,7 +327,7 @@ export default function SpaceSelector({
           {/* 팝업 */}
           {popupData && (
             <div
-              className="absolute bg-white p-2 rounded shadow-md max-w-xs text-sm z-30 transition-opacity duration-300 opacity-100 pointer-events-none"
+              className="absolute bg-white p-2 rounded shadow-md max-w-xs text-sm z-30 pointer-events-none"
               style={{
                 left: `calc(50% - ${imageSize.width / 2}px + ${popupData.x}px)`,
                 top: `calc(50% - ${imageSize.height / 2}px + ${popupData.y}px)`,

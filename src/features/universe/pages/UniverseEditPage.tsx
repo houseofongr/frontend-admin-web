@@ -13,7 +13,6 @@ import {
   PublicStatusOption,
   UniverseCategoryOptions,
 } from "../../../constants/UniverseData";
-import API_CONFIG from "../../../config/api";
 import { Universe } from "../../../types/universe";
 import Modal from "../../../components/modal/Modal";
 import UserSearch from "../create/UserSearch";
@@ -27,11 +26,13 @@ import { TextareaField } from "../../../components/Input/TextareaField";
 import { AuthorSelectField } from "../../../components/Input/AuthorSelectField";
 import { SelectableRadioField } from "../../../components/Input/SelectableRadioField";
 import { SelectField } from "../../../components/Input/SelectField";
+
+import { useUniverseStore } from "../../../context/useUniverseStore";
 import {
-  SaveTargetType,
-  useUniverseStore,
-} from "../../../context/useUniverseStore";
-import { getUniverseDetail, patchUniverseInfoEdit, patchUniverseThumbnailEdit } from "../../../service/universeService";
+  getUniverseDetail,
+  patchUniverseInfoEdit,
+  patchUniverseThumbnailEdit,
+} from "../../../service/universeService";
 
 export default function UniverseEditPage() {
   const { universeId } = useParams();
@@ -57,11 +58,6 @@ export default function UniverseEditPage() {
   });
 
   const [tags, setTags] = useState("");
-  // const [showInnerImgEdit, setShowInnerImgEdit] = useState<{ show: boolean, type: SaveTargetType, id: number }>({
-  //   show: false,
-  //   type: null,
-  //   id: -1
-  // });
   const [showThumbMusicEdit, setShowThumbMusicEdit] = useState(false);
   const [showAuthorEdit, setShowAuthorEdit] = useState(false);
   const [alert, setAlert] = useState<{
@@ -73,13 +69,15 @@ export default function UniverseEditPage() {
   const { setCurrentSpaceId } = useUniverseStore();
 
   useEffect(() => {
-    if (!isNaN(universeIdParsed)) fetchUniverse();
+    if (!isNaN(universeIdParsed) && universeIdParsed > 0) {
+      fetchUniverse();
+    }
   }, [universeIdParsed]);
 
+  // 데이터 가져오기
   const fetchUniverse = async () => {
     try {
-      const data: Universe = await getUniverseDetail(universeIdParsed);
-
+      const data = await getUniverseDetail(universeIdParsed);
       setCurrentSpaceId(data.id!);
       setTags(data.hashtags.map((tag: string) => `#${tag}`).join(" "));
       setUniverse(data);
@@ -88,6 +86,7 @@ export default function UniverseEditPage() {
     }
   };
 
+  // 저장하기
   const saveDetail = async () => {
     const payload = {
       title: universe.title,
@@ -100,35 +99,23 @@ export default function UniverseEditPage() {
 
     try {
       await patchUniverseInfoEdit(universe.id!, payload);
-
       showAlert("변경사항이 저장되었습니다.", "success", null);
       navigate(-1);
-    } catch (error) {
+    } catch {
       showAlert("저장 중 오류가 발생했습니다.", "fail", null);
     }
   };
 
+  // 썸네일 뮤직 저장
   const saveThumbMusic = async (file: File) => {
     try {
       await patchUniverseThumbnailEdit(universeIdParsed, file);
       showAlert("변경사항이 저장되었습니다.", "success", null);
-    } catch (error) {
+    } catch {
       showAlert("저장 중 오류가 발생했습니다.", "fail", null);
     }
   };
-
-  const handleCancel = () => {
-    showAlert(
-      "저장하지 않은 변경사항이 사라집니다. 취소하시겠습니까?",
-      "check",
-      null
-    );
-  };
-
-  const showAlert = (text: string, type: AlertType, subText: string | null) => {
-    setAlert({ text, alertType: type, subText });
-  };
-
+  // 태그 포맷팅 및 상태 업데이트
   const normalizeTagsAndUpdateState = (raw: string) => {
     const parts = raw.trim().split(/\s+/).filter(Boolean);
     const normalized = parts.map((tag) =>
@@ -142,6 +129,7 @@ export default function UniverseEditPage() {
     setUniverse((prev) => ({ ...prev, hashtags: validTags }));
   };
 
+  // 이벤트 핸들러들
   const handleTagChange = (e: ChangeEvent<HTMLInputElement>) => {
     const val = e.target.value;
     if (val.endsWith(" ")) {
@@ -156,6 +144,23 @@ export default function UniverseEditPage() {
     saveThumbMusic(file);
   };
 
+  const handleCancel = () => {
+    showAlert(
+      "저장하지 않은 변경사항이 사라집니다. 취소하시겠습니까?",
+      "check",
+      null
+    );
+  };
+
+  const showAlert = (
+    text: string,
+    alertType: AlertType,
+    subText: string | null
+  ) => {
+    setAlert({ text, alertType, subText });
+  };
+
+  // 공개여부 옵션
   const publicStatusOptions = [
     {
       value: PublicStatusOption.PUBLIC,
@@ -168,45 +173,6 @@ export default function UniverseEditPage() {
       label: "비공개",
     },
   ];
-
-  // const handleSaveInnerImage = (file: File) => {
-  //   saveInnerImg(file, showInnerImgEdit.type, showInnerImgEdit.id);
-  //   setShowInnerImgEdit({ show: false, type: null, id: -1 });
-  // };
-
-  // const onSpaceDelete = () => {
-  //   showAlert("정말로 스페이스를 삭제하시겠습니까?", "check", "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다.");
-  // };
-
-  // const onInnerImgEdit = (type: SaveTargetType, id: number) => {
-  //   console.log("type : ", type, " id: ", id);
-  //   setShowInnerImgEdit({ show: true, type: type, id: id });
-  // }
-
-  // const saveInnerImg = async (file: File,
-  //   targetType: SaveTargetType,
-  //   targetId: number) => {
-  //   try {
-  //     const formData = new FormData();
-  //     formData.append("innerImage", file);
-
-  //     const endpoint =
-  //       targetType === "universe"
-  //         ? `${API_CONFIG.BACK_API}/universes/inner-image/${targetId}`
-  //         : `${API_CONFIG.BACK_API}/spaces/inner-image/${targetId}`;
-
-  //     const response = await fetch(endpoint, {
-  //       method: "POST",
-  //       body: formData,
-  //     });
-
-  //     if (!response.ok) throw new Error("저장에 실패했습니다.");
-  //     showAlert("변경사항이 저장되었습니다.", "success", null);
-  //   } catch (error) {
-  //     console.error("저장 에러:", error);
-  //     showAlert("저장 중 오류가 발생했습니다.", "fail", null);
-  //   }
-  // };
 
   return (
     <PageLayout>
@@ -251,7 +217,6 @@ export default function UniverseEditPage() {
         <div className="flex flex-col lg:flex-row gap-4 p-3 w-full h-screen min-h-[550px] lg:max-h-[calc(100vh-150px)]">
           <div className="flex flex-2 flex-col gap-3 h-[100%]">
             <div className="min-h-[200px] bg-black rounded-xl">
-              {/* <UniverseEditInnerImg onEdit={onInnerImgEdit} onDelete={onSpaceDelete} /> */}
               <UniverseEditInnerImg />
             </div>
             <div className="lg:min-h-[130px] flex-col min-h-[280px]">
