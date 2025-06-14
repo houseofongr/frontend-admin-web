@@ -28,7 +28,7 @@ import { TextareaField } from "../../../components/Input/TextareaField";
 import { AuthorSelectField } from "../../../components/Input/AuthorSelectField";
 import { SelectableRadioField } from "../../../components/Input/SelectableRadioField";
 import { SelectField } from "../../../components/Input/SelectField";
-import { useUniverseStore } from "../../../context/useUniverseStore";
+import { SaveTargetType, useUniverseStore } from "../../../context/useUniverseStore";
 
 export default function UniverseEditPage() {
   const { universeId } = useParams();
@@ -54,7 +54,11 @@ export default function UniverseEditPage() {
   });
 
   const [tags, setTags] = useState("");
-  const [showInnerImgEdit, setShowInnerImgEdit] = useState(false);
+  const [showInnerImgEdit, setShowInnerImgEdit] = useState<{ show: boolean, type: SaveTargetType, id: number }>({
+    show: false,
+    type: null,
+    id: -1
+  });
   const [showThumbMusicEdit, setShowThumbMusicEdit] = useState(false);
   const [showAuthorEdit, setShowAuthorEdit] = useState(false);
   const [alert, setAlert] = useState<{
@@ -110,12 +114,20 @@ export default function UniverseEditPage() {
     }
   };
 
-  const saveInnerImg = async (file: File) => {
+
+  const saveInnerImg = async (file: File,
+    targetType: SaveTargetType,
+    targetId: number) => {
     try {
       const formData = new FormData();
       formData.append("innerImage", file);
 
-      const response = await fetch(`${API_CONFIG.BACK_API}/universes/inner-image/${universeId}`, {
+      const endpoint =
+        targetType === "universe"
+          ? `${API_CONFIG.BACK_API}/universes/inner-image/${targetId}`
+          : `${API_CONFIG.BACK_API}/spaces/inner-image/${targetId}`;
+
+      const response = await fetch(endpoint, {
         method: "POST",
         body: formData,
       });
@@ -173,8 +185,8 @@ export default function UniverseEditPage() {
   };
 
   const handleSaveInnerImage = (file: File) => {
-    setShowInnerImgEdit(false);
-    saveInnerImg(file);
+    saveInnerImg(file, showInnerImgEdit.type, showInnerImgEdit.id);
+    setShowInnerImgEdit({ show: false, type: null, id: -1 });
   };
 
   const handleSaveThumbMusicImage = (file: File) => {
@@ -190,6 +202,11 @@ export default function UniverseEditPage() {
   const onSpaceDelete = () => {
     showAlert("정말로 스페이스를 삭제하시겠습니까?", "check", "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다.");
   };
+
+  const onInnerImgEdit = (type: SaveTargetType, id: number) => {
+    console.log("type : ", type, " id: ", id);
+    setShowInnerImgEdit({ show: true, type: type, id: id });
+  }
 
   return (
     <PageLayout>
@@ -228,7 +245,7 @@ export default function UniverseEditPage() {
         <div className="flex flex-col lg:flex-row gap-4 p-3 w-full h-screen min-h-[550px] lg:max-h-[calc(100vh-150px)]">
           <div className="flex flex-2 flex-col gap-3 h-[100%]">
             <div className="min-h-[200px] bg-black rounded-xl">
-              <UniverseEditInnerImg onEdit={() => setShowInnerImgEdit(true)} onDelete={onSpaceDelete} />
+              <UniverseEditInnerImg onEdit={onInnerImgEdit} onDelete={onSpaceDelete} />
             </div>
             <div className="lg:min-h-[130px] flex-col min-h-[280px]">
               <UniverseEditMusic thumbMusicId={universe.thumbMusicId} onEdit={() => setShowThumbMusicEdit(true)} />
@@ -283,14 +300,16 @@ export default function UniverseEditPage() {
         </div>
       </section>
 
-      {showInnerImgEdit && (
+      {showInnerImgEdit.show && (
         <ImageUploadModal
-          title="유니버스 이미지 수정"
+          title="이미지 수정"
           description="내부 이미지를 변경할 수 있습니다."
           labelText="내부이미지"
           maxFileSizeMB={5}
-          onClose={() => setShowInnerImgEdit(false)}
-          onConfirm={handleSaveInnerImage}
+          onClose={() => setShowInnerImgEdit(
+            { show: false, type: null, id: -1 }
+          )}
+          onConfirm={(file) => handleSaveInnerImage(file)}
           confirmText="저장"
           requireSquare
         />

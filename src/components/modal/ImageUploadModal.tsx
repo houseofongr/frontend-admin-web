@@ -75,6 +75,7 @@ export default function ImageUploadModal({
   };
 
   const handleConfirm = () => {
+    // 지원
     if (innerImg) onConfirm(innerImg);
   };
 
@@ -87,9 +88,8 @@ export default function ImageUploadModal({
       bgColor="white"
     >
       <div
-        className={`w-130 h-100 flex justify-center items-center border-2 border-dashed rounded-md p-10 text-center transition-all duration-200 ${
-          dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
-        }`}
+        className={`w-130 h-100 flex justify-center items-center border-2 border-dashed rounded-md p-10 text-center transition-all duration-200 ${dragOver ? "border-blue-400 bg-blue-50" : "border-gray-300"
+          }`}
         onDrop={handleDrop}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}

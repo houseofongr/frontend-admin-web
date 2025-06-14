@@ -204,7 +204,7 @@ export default function SpaceSelector({
       {!loading && (
         <>
           {/* 뒤로가기 */}
-          {currentSpaceId !== rootUniverse?.universeId && (
+          {(currentSpaceId !== rootUniverse?.universeId && currentSpaceId != -1) && (
             <div
               className="absolute top-2 left-2 px-4 py-2 z-10 text-white cursor-pointer hover:opacity-90"
               onClick={handleBackClick}

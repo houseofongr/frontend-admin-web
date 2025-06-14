@@ -26,6 +26,7 @@ import { PercentPoint } from "../../../constants/image";
 
 import {
   PieceType,
+  SaveTargetType,
   SpaceType,
   UniverseType,
   useUniverseStore,
@@ -33,7 +34,7 @@ import {
 import { TbPencilCog } from "react-icons/tb";
 
 interface UniverseEditInnerImgProps {
-  onEdit: () => void;
+  onEdit: (type: SaveTargetType, id: number) => void;
   onDelete: () => void;
 }
 
@@ -207,12 +208,15 @@ export default function UniverseEditInnerImg({
   };
 
   const menuItems =
-    parentSpaceId === -1
+    (currentSpaceId === rootUniverse?.universeId || currentSpaceId == -1)
       ? [
         {
           label: "이미지 수정",
           icon: <RiImageEditFill size={20} />,
-          onClick: onEdit,
+          onClick: () => {
+            if (rootUniverse != null)
+              onEdit("universe", rootUniverse.universeId);
+          },
         },
         {
           label: "이미지 다운로드",
@@ -224,7 +228,10 @@ export default function UniverseEditInnerImg({
         {
           label: "이미지 수정",
           icon: <RiImageEditFill size={20} />,
-          onClick: onEdit,
+          onClick: () => {
+            if (currentSpaceId != null)
+              onEdit("space", currentSpaceId)
+          },
         },
         {
           label: "이미지 다운로드",
@@ -234,7 +241,7 @@ export default function UniverseEditInnerImg({
         {
           label: "정보 수정",
           icon: <TbPencilCog size={20} />,
-          onClick: onEdit,
+          onClick: () => { },
         },
         {
           label: "좌표 수정",

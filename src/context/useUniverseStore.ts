@@ -40,6 +40,8 @@ export interface UniverseType {
   pieces: PieceType[];
 }
 
+export type SaveTargetType = null | "universe" | "space";
+
 interface UniverseStore {
   currentSpaceId: number | null;
   parentSpaceId: number;
@@ -51,6 +53,8 @@ interface UniverseStore {
   getSpaceById: (id: number) => SpaceType | null;
   getParentSpaceIdById: (id: number) => number | null;
   updateSpaceTitle: (id: number, title: string) => void;
+
+  resetUniverse: () => void;
 }
 
 export const useUniverseStore = create<UniverseStore>((set, get) => ({
@@ -125,4 +129,11 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
     if (!u) return;
     set({ rootUniverse: { ...u, spaces: add(u.spaces) } });
   },
+
+  resetUniverse: () => {
+    set({ currentSpaceId: null });
+    set({ parentSpaceId: -1 });
+    set({ rootUniverse: null });
+  }
+
 }));

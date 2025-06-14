@@ -23,9 +23,14 @@ import { universeSearchOptions } from "../../../constants/searchOptions";
 import ThumbMusicPreview from "../components/ThumbMusicPreview";
 import { UniverseCategoryOptions } from "../../../constants/UniverseData";
 import SpinnerIcon from "../../../components/icons/SpinnerIcon";
+import { useUniverseStore } from "../../../context/useUniverseStore";
+
 
 export default function UniverseListPage() {
   const navigate = useNavigate();
+  const {
+    resetUniverse
+  } = useUniverseStore();
 
   const [universeList, setUniverseList] = useState<Universe[]>([]);
 
@@ -51,6 +56,9 @@ export default function UniverseListPage() {
   const [showThumbMusic, setShowThumbMusic] = useState<number>(-1);;
   const [loading, setLoading] = useState<boolean>(false);
 
+  useEffect(() => {
+    resetUniverse();
+  }, []);
 
   const fetchUniverse = async (
     page: number = currentPage,
