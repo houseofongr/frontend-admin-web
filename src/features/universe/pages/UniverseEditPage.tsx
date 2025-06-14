@@ -203,10 +203,10 @@ export default function UniverseEditPage() {
     showAlert("정말로 스페이스를 삭제하시겠습니까?", "check", "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다.");
   };
 
-  const onInnerImgEdit = (type: SaveTargetType, id: number) => {
-    console.log("type : ", type, " id: ", id);
-    setShowInnerImgEdit({ show: true, type: type, id: id });
-  }
+  // const onInnerImgEdit = (type: SaveTargetType, id: number) => {
+  //   console.log("type : ", type, " id: ", id);
+  //   setShowInnerImgEdit({ show: true, type: type, id: id });
+  // }
 
   const modalOKClick = () => {
     if (alert != null && alert.type === "check") {
@@ -253,7 +253,8 @@ export default function UniverseEditPage() {
         <div className="flex flex-col lg:flex-row gap-4 p-3 w-full h-screen min-h-[550px] lg:max-h-[calc(100vh-150px)]">
           <div className="flex flex-2 flex-col gap-3 h-[100%]">
             <div className="min-h-[200px] bg-black rounded-xl">
-              <UniverseEditInnerImg onEdit={onInnerImgEdit} onDelete={onSpaceDelete} />
+              {/* <UniverseEditInnerImg onEdit={onInnerImgEdit} onDelete={onSpaceDelete} /> */}
+              <UniverseEditInnerImg />
             </div>
             <div className="lg:min-h-[130px] flex-col min-h-[280px]">
               <UniverseEditMusic thumbMusicId={universe.thumbMusicId} onEdit={() => setShowThumbMusicEdit(true)} />

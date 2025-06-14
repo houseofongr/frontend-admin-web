@@ -190,6 +190,12 @@ export default function UniverseEditInnerImg() {
     setShowInnerImgEdit({ show: true, type: type, id: id });
   }
 
+  // 이게 onDelete
+  const onSpaceDelete = () => {
+    showAlert("정말로 스페이스를 삭제하시겠습니까?", "check", "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다.");
+  };
+
+
   const handleSaveInnerImage = (file: File) => {
     saveInnerImg(file, showInnerImgEdit.type, showInnerImgEdit.id);
     setShowInnerImgEdit({ show: false, type: null, id: -1 });
