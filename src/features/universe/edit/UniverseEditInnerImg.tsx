@@ -7,9 +7,7 @@ import {
   RiFunctionAddLine,
   RiDeleteBin6Line,
 } from "react-icons/ri";
-import {
-  MdOutlineFullscreen,
-} from "react-icons/md";
+import { MdOutlineFullscreen } from "react-icons/md";
 import { PiDownloadSimpleBold, PiGpsBold } from "react-icons/pi";
 import { IoPlanetOutline } from "react-icons/io5";
 import { LuPaintbrush } from "react-icons/lu";
@@ -30,6 +28,10 @@ import {
   useUniverseStore,
 } from "../../../context/useUniverseStore";
 import { TbPencilCog } from "react-icons/tb";
+import ModalAlertMessage, {
+  AlertType,
+} from "../../../components/modal/ModalAlertMessage";
+import Button from "../../../components/buttons/Button";
 
 interface UniverseEditInnerImgProps {
   onEdit: (type: SaveTargetType, id: number) => void;
@@ -47,11 +49,21 @@ export default function UniverseEditInnerImg() {
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
-  const [showInnerImgEdit, setShowInnerImgEdit] = useState<{ show: boolean, type: SaveTargetType, id: number }>({
+  const [showInnerImgEdit, setShowInnerImgEdit] = useState<{
+    show: boolean;
+    type: SaveTargetType;
+    id: number;
+  }>({
     show: false,
     type: null,
-    id: -1
+    id: -1,
   });
+
+  const [alert, setAlert] = useState<{
+    text: string;
+    type: AlertType;
+    subText: string | null;
+  } | null>(null);
 
   const {
     existingSpaces,
@@ -69,9 +81,12 @@ export default function UniverseEditInnerImg() {
     if (rootUniverse == null) loadInitialData(null);
     else if (currentSpaceId == rootUniverse.universeId) {
       setCurrentSpaceId(-1);
-      setUniverseData(rootUniverse.innerImageId, rootUniverse.spaces, rootUniverse.pieces);
-    }
-    else if (currentSpaceId != null) {
+      setUniverseData(
+        rootUniverse.innerImageId,
+        rootUniverse.spaces,
+        rootUniverse.pieces
+      );
+    } else if (currentSpaceId != null) {
       const space = getSpaceById(currentSpaceId);
       if (space == null) return;
       setUniverseData(space.innerImageId, space.spaces, space.pieces);
@@ -91,7 +106,7 @@ export default function UniverseEditInnerImg() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         const errorMessage = errorData?.message || "유니버스 조회 실패";
-        alert(errorMessage);
+        showAlert(errorMessage, "fail", null);
         return;
       }
 
@@ -109,7 +124,7 @@ export default function UniverseEditInnerImg() {
       console.log("data", data);
     } catch (error) {
       console.error("유니버스 조회 오류:", error);
-      alert("유니버스 조회 중 오류가 발생했습니다.");
+      showAlert("유니버스 조회 중 오류가 발생했습니다.", "fail", null);
     }
   };
 
@@ -144,14 +159,15 @@ export default function UniverseEditInnerImg() {
     description: string
   ): Promise<void> => {
     if (!startPoint || !endPoint || !innerImg) {
-      alert("스페이스 정보를 모두 입력해주세요.");
+      showAlert("스페이스 정보를 모두 입력해주세요.", "info", null);
       return;
     }
 
     const formData = new FormData();
     const metadata = {
       universeId: rootUniverse?.universeId,
-      parentSpaceId: currentSpaceId == rootUniverse?.universeId ? -1 : currentSpaceId,
+      parentSpaceId:
+        currentSpaceId == rootUniverse?.universeId ? -1 : currentSpaceId,
       title,
       description,
       startX: startPoint.xPercent,
@@ -172,38 +188,71 @@ export default function UniverseEditInnerImg() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         const errorMessage = errorData?.message || "스페이스 생성 실패";
-        alert(errorMessage);
+        showAlert(errorMessage, "fail", null);
         return;
       }
 
-      alert("스페이스가 생성되었습니다.");
+      showAlert("스페이스가 생성되었습니다.", "success", null);
       loadInitialData(currentSpaceId);
     } catch (error) {
       console.error("스페이스 생성 오류:", error);
-      alert("스페이스 생성 중 오류가 발생했습니다.");
+      showAlert("스페이스 생성 중 오류가 발생했습니다.", "fail", null);
     }
   };
 
   // 이게 onEdit이였고
   const onInnerImgEdit = (type: SaveTargetType, id: number) => {
-    console.log("type : ", type, " id: ", id);
     setShowInnerImgEdit({ show: true, type: type, id: id });
-  }
+  };
 
   // 이게 onDelete
   const onSpaceDelete = () => {
-    showAlert("정말로 스페이스를 삭제하시겠습니까?", "check", "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다.");
+    showAlert(
+      "정말로 스페이스를 삭제하시겠습니까?",
+      "check",
+      "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다."
+    );
   };
 
+  const showAlert = (text: string, type: AlertType, subText: string | null) => {
+    setAlert({ text, type, subText });
+  };
 
   const handleSaveInnerImage = (file: File) => {
-    saveInnerImg(file, showInnerImgEdit.type, showInnerImgEdit.id);
+    setInnerImg(file);
+    setCreateStep(SpaceCreateStep.FillDetails);
+  };
+
+  const handleEditInnerImage = (file: File): void => {
+    editInnerImg(file, showInnerImgEdit.type, showInnerImgEdit.id);
     setShowInnerImgEdit({ show: false, type: null, id: -1 });
   };
 
-  const handleSaveInnerImage = (file: File): void => {
-    setInnerImg(file);
-    setCreateStep(SpaceCreateStep.FillDetails);
+  const editInnerImg = async (
+    file: File,
+    targetType: SaveTargetType,
+    targetId: number
+  ) => {
+    try {
+      const formData = new FormData();
+      formData.append("innerImage", file);
+
+      const endpoint =
+        targetType === "universe"
+          ? `${API_CONFIG.BACK_API}/universes/inner-image/${targetId}`
+          : `${API_CONFIG.BACK_API}/spaces/inner-image/${targetId}`;
+
+      const response = await fetch(endpoint, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) throw new Error("저장에 실패했습니다.");
+      showAlert("변경사항이 저장되었습니다.", "success", null);
+    } catch (error) {
+      console.error("저장 에러:", error);
+      showAlert("저장 중 오류가 발생했습니다.", "fail", null);
+    }
   };
 
   const handleSubmit = (title: string, description: string) => {
@@ -219,52 +268,52 @@ export default function UniverseEditInnerImg() {
   };
 
   const menuItems =
-    (currentSpaceId === rootUniverse?.universeId || currentSpaceId == -1)
+    currentSpaceId === rootUniverse?.universeId || currentSpaceId == -1
       ? [
-        {
-          label: "이미지 수정",
-          icon: <RiImageEditFill size={20} />,
-          onClick: () => {
-            if (rootUniverse != null)
-              onEdit("universe", rootUniverse.universeId);
+          {
+            label: "이미지 수정",
+            icon: <RiImageEditFill size={20} />,
+            onClick: () => {
+              if (rootUniverse != null)
+                onInnerImgEdit("universe", rootUniverse.universeId);
+            },
           },
-        },
-        {
-          label: "이미지 다운로드",
-          icon: <RiFileDownloadLine size={20} />,
-          onClick: handleDownloadImage,
-        },
-      ]
+          {
+            label: "이미지 다운로드",
+            icon: <RiFileDownloadLine size={20} />,
+            onClick: handleDownloadImage,
+          },
+        ]
       : [
-        {
-          label: "이미지 수정",
-          icon: <RiImageEditFill size={20} />,
-          onClick: () => {
-            if (currentSpaceId != null)
-              onEdit("space", currentSpaceId)
+          {
+            label: "이미지 수정",
+            icon: <RiImageEditFill size={20} />,
+            onClick: () => {
+              if (currentSpaceId != null)
+                onInnerImgEdit("space", currentSpaceId);
+            },
           },
-        },
-        {
-          label: "이미지 다운로드",
-          icon: <RiFileDownloadLine size={20} />,
-          onClick: handleDownloadImage,
-        },
-        {
-          label: "정보 수정",
-          icon: <TbPencilCog size={20} />,
-          onClick: () => { },
-        },
-        {
-          label: "좌표 수정",
-          icon: <PiGpsBold size={20} />,
-          onClick: handleDownloadImage,
-        },
-        {
-          label: "스페이스 삭제",
-          icon: <RiDeleteBin6Line size={20} />,
-          onClick: onDelete,
-        },
-      ];
+          {
+            label: "이미지 다운로드",
+            icon: <RiFileDownloadLine size={20} />,
+            onClick: handleDownloadImage,
+          },
+          {
+            label: "정보 수정",
+            icon: <TbPencilCog size={20} />,
+            onClick: () => {},
+          },
+          {
+            label: "좌표 수정",
+            icon: <PiGpsBold size={20} />,
+            onClick: handleDownloadImage,
+          },
+          {
+            label: "스페이스 삭제",
+            icon: <RiDeleteBin6Line size={20} />,
+            onClick: onSpaceDelete,
+          },
+        ];
 
   return (
     <div
@@ -272,6 +321,26 @@ export default function UniverseEditInnerImg() {
       className="h-full relative text-left group flex justify-center"
       onMouseLeave={() => setMenuOpen(false)}
     >
+      {alert && alert.type != "info" && (
+        <ModalAlertMessage
+          text={alert.text}
+          type={alert.type}
+          onClose={() => {
+            setAlert(null);
+            // handleCloseModal();
+          }}
+          okButton={
+            <Button
+              label="확인"
+              onClick={() => {
+                setAlert(null);
+                // handleCloseModal();
+              }}
+            />
+          }
+        />
+      )}
+
       {/* 점 메뉴 버튼 */}
       <button
         onClick={() => setMenuOpen(!menuOpen)}
@@ -288,7 +357,7 @@ export default function UniverseEditInnerImg() {
 
       {/* 기능 버튼들 */}
       <button
-        onClick={() => { }}
+        onClick={() => {}}
         className="z-10 absolute cursor-pointer bottom-3 right-3 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <PiDownloadSimpleBold size={20} />
@@ -300,7 +369,7 @@ export default function UniverseEditInnerImg() {
         <RiFunctionAddLine size={20} />
       </button>
       <button
-        onClick={() => { }}
+        onClick={() => {}}
         className="z-10 absolute cursor-pointer bottom-3 right-22 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <MdOutlineFullscreen size={25} />
@@ -400,15 +469,14 @@ export default function UniverseEditInnerImg() {
           description="내부 이미지를 변경할 수 있습니다."
           labelText="내부이미지"
           maxFileSizeMB={5}
-          onClose={() => setShowInnerImgEdit(
-            { show: false, type: null, id: -1 }
-          )}
-          onConfirm={(file) => handleSaveInnerImage(file)}
+          onClose={() =>
+            setShowInnerImgEdit({ show: false, type: null, id: -1 })
+          }
+          onConfirm={(file) => handleEditInnerImage(file)}
           confirmText="저장"
           requireSquare
         />
       )}
-
     </div>
   );
 }

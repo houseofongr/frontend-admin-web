@@ -115,30 +115,30 @@ export default function UniverseEditPage() {
   };
 
 
-  const saveInnerImg = async (file: File,
-    targetType: SaveTargetType,
-    targetId: number) => {
-    try {
-      const formData = new FormData();
-      formData.append("innerImage", file);
+  // const saveInnerImg = async (file: File,
+  //   targetType: SaveTargetType,
+  //   targetId: number) => {
+  //   try {
+  //     const formData = new FormData();
+  //     formData.append("innerImage", file);
 
-      const endpoint =
-        targetType === "universe"
-          ? `${API_CONFIG.BACK_API}/universes/inner-image/${targetId}`
-          : `${API_CONFIG.BACK_API}/spaces/inner-image/${targetId}`;
+  //     const endpoint =
+  //       targetType === "universe"
+  //         ? `${API_CONFIG.BACK_API}/universes/inner-image/${targetId}`
+  //         : `${API_CONFIG.BACK_API}/spaces/inner-image/${targetId}`;
 
-      const response = await fetch(endpoint, {
-        method: "POST",
-        body: formData,
-      });
+  //     const response = await fetch(endpoint, {
+  //       method: "POST",
+  //       body: formData,
+  //     });
 
-      if (!response.ok) throw new Error("저장에 실패했습니다.");
-      showAlert("변경사항이 저장되었습니다.", "success", null);
-    } catch (error) {
-      console.error("저장 에러:", error);
-      showAlert("저장 중 오류가 발생했습니다.", "fail", null);
-    }
-  };
+  //     if (!response.ok) throw new Error("저장에 실패했습니다.");
+  //     showAlert("변경사항이 저장되었습니다.", "success", null);
+  //   } catch (error) {
+  //     console.error("저장 에러:", error);
+  //     showAlert("저장 중 오류가 발생했습니다.", "fail", null);
+  //   }
+  // };
 
   const saveThumbMusic = async (file: File) => {
     try {
@@ -184,10 +184,10 @@ export default function UniverseEditPage() {
     }
   };
 
-  const handleSaveInnerImage = (file: File) => {
-    saveInnerImg(file, showInnerImgEdit.type, showInnerImgEdit.id);
-    setShowInnerImgEdit({ show: false, type: null, id: -1 });
-  };
+  // const handleSaveInnerImage = (file: File) => {
+  //   saveInnerImg(file, showInnerImgEdit.type, showInnerImgEdit.id);
+  //   setShowInnerImgEdit({ show: false, type: null, id: -1 });
+  // };
 
   const handleSaveThumbMusicImage = (file: File) => {
     setShowThumbMusicEdit(false);
@@ -199,9 +199,9 @@ export default function UniverseEditPage() {
     { value: PublicStatusOption.PRIVATE, icon: <TbShieldLock size={20} />, label: "비공개" },
   ];
 
-  const onSpaceDelete = () => {
-    showAlert("정말로 스페이스를 삭제하시겠습니까?", "check", "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다.");
-  };
+  // const onSpaceDelete = () => {
+  //   showAlert("정말로 스페이스를 삭제하시겠습니까?", "check", "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다.");
+  // };
 
   // const onInnerImgEdit = (type: SaveTargetType, id: number) => {
   //   console.log("type : ", type, " id: ", id);
