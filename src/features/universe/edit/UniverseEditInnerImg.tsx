@@ -25,9 +25,7 @@ import { SpaceCreateStep } from "../../../constants/ProcessSteps";
 import { PercentPoint } from "../../../constants/image";
 
 import {
-  PieceType,
   SaveTargetType,
-  SpaceType,
   UniverseType,
   useUniverseStore,
 } from "../../../context/useUniverseStore";
@@ -38,57 +36,51 @@ interface UniverseEditInnerImgProps {
   onDelete: () => void;
 }
 
-export default function UniverseEditInnerImg({
-  onEdit,
-  onDelete,
-}: UniverseEditInnerImgProps) {
+export default function UniverseEditInnerImg() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [createStep, setCreateStep] = useState<SpaceCreateStep | null>(null);
 
   const [startPoint, setStartPoint] = useState<PercentPoint | null>(null);
   const [endPoint, setEndPoint] = useState<PercentPoint | null>(null);
   const [innerImg, setInnerImg] = useState<File | null>(null);
-  const [innerImgId, setInnerImgId] = useState<number | null>(null);
 
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
 
-  const [existingSpaces, setExistingSpaces] = useState<SpaceType[]>([]);
-  const [existingPieces, setExistingPieces] = useState<PieceType[]>([]);
+  const [showInnerImgEdit, setShowInnerImgEdit] = useState<{ show: boolean, type: SaveTargetType, id: number }>({
+    show: false,
+    type: null,
+    id: -1
+  });
 
   const {
-    setRootUniverse,
-    parentSpaceId,
+    existingSpaces,
+    existingPieces,
+    innerImageId,
     rootUniverse,
     currentSpaceId,
     getSpaceById,
-    setCurrentSpaceId
+    setCurrentSpaceId,
+    setRootUniverse,
+    setUniverseData,
   } = useUniverseStore();
 
   useEffect(() => {
-    console.log("currentSpaceId 바뀜", currentSpaceId);
-    console.log("parentSpaceId", parentSpaceId);
-
-    if (rootUniverse == null) loadInitialData();
+    if (rootUniverse == null) loadInitialData(null);
     else if (currentSpaceId == rootUniverse.universeId) {
       setCurrentSpaceId(-1);
-      setExistingSpaces(rootUniverse.spaces);
-      setExistingPieces(rootUniverse.pieces);
-      setInnerImgId(rootUniverse.innerImageId);
+      setUniverseData(rootUniverse.innerImageId, rootUniverse.spaces, rootUniverse.pieces);
     }
     else if (currentSpaceId != null) {
       const space = getSpaceById(currentSpaceId);
       if (space == null) return;
-
-      setExistingSpaces(space.spaces);
-      setExistingPieces(space.pieces);
-      setInnerImgId(space.innerImageId);
+      setUniverseData(space.innerImageId, space.spaces, space.pieces);
     } else {
       console.log("에러");
     }
   }, [currentSpaceId]);
 
-  const loadInitialData = async () => {
+  const loadInitialData = async (spaceId: null | number) => {
     try {
       if (currentSpaceId == null) return;
 
@@ -104,12 +96,16 @@ export default function UniverseEditInnerImg({
       }
 
       const data: UniverseType = await response.json();
-      console.log(data);
+      if (spaceId == null) {
+        setRootUniverse(data);
+        setUniverseData(data.innerImageId, data.spaces, data.pieces);
+      } else {
+        setRootUniverse(data);
+        const space = getSpaceById(currentSpaceId);
+        if (space == null) return;
+        setUniverseData(space.innerImageId, space.spaces, space.pieces);
+      }
 
-      setRootUniverse(data);
-      setInnerImgId(data.innerImageId);
-      setExistingSpaces(data.spaces);
-      setExistingPieces(data.pieces);
       console.log("data", data);
     } catch (error) {
       console.error("유니버스 조회 오류:", error);
@@ -137,8 +133,8 @@ export default function UniverseEditInnerImg({
   };
 
   const handleDownloadImage = () => {
-    if (innerImgId !== -1) {
-      const imageUrl = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/attachment/${innerImgId}`;
+    if (innerImageId !== -1) {
+      const imageUrl = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/attachment/${innerImageId}`;
       window.location.href = imageUrl;
     }
   };
@@ -167,9 +163,6 @@ export default function UniverseEditInnerImg({
     formData.append("metadata", JSON.stringify(metadata));
     formData.append("innerImage", innerImg);
 
-    console.log(metadata);
-    console.log(innerImg);
-
     try {
       const response = await fetch(`${API_CONFIG.BACK_API}/spaces`, {
         method: "POST",
@@ -184,10 +177,22 @@ export default function UniverseEditInnerImg({
       }
 
       alert("스페이스가 생성되었습니다.");
+      loadInitialData(currentSpaceId);
     } catch (error) {
       console.error("스페이스 생성 오류:", error);
       alert("스페이스 생성 중 오류가 발생했습니다.");
     }
+  };
+
+  // 이게 onEdit이였고
+  const onInnerImgEdit = (type: SaveTargetType, id: number) => {
+    console.log("type : ", type, " id: ", id);
+    setShowInnerImgEdit({ show: true, type: type, id: id });
+  }
+
+  const handleSaveInnerImage = (file: File) => {
+    saveInnerImg(file, showInnerImgEdit.type, showInnerImgEdit.id);
+    setShowInnerImgEdit({ show: false, type: null, id: -1 });
   };
 
   const handleSaveInnerImage = (file: File): void => {
@@ -298,7 +303,7 @@ export default function UniverseEditInnerImg({
       {/* 영역 선택 */}
       <SpaceSelector
         step={createStep}
-        innerImageId={innerImgId}
+        innerImageId={innerImageId}
         startPoint={startPoint}
         endPoint={endPoint}
         setStartPoint={setStartPoint}
@@ -382,6 +387,22 @@ export default function UniverseEditInnerImg({
           />
         </IconTitleModal>
       )}
+
+      {showInnerImgEdit.show && (
+        <ImageUploadModal
+          title="이미지 수정"
+          description="내부 이미지를 변경할 수 있습니다."
+          labelText="내부이미지"
+          maxFileSizeMB={5}
+          onClose={() => setShowInnerImgEdit(
+            { show: false, type: null, id: -1 }
+          )}
+          onConfirm={(file) => handleSaveInnerImage(file)}
+          confirmText="저장"
+          requireSquare
+        />
+      )}
+
     </div>
   );
 }

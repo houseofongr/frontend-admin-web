@@ -46,15 +46,25 @@ interface UniverseStore {
   currentSpaceId: number | null;
   parentSpaceId: number;
   rootUniverse: UniverseType | null;
+  innerImageId: number | null;
+  existingSpaces: SpaceType[];
+  existingPieces: PieceType[];
   setCurrentSpaceId: (id: number) => void;
   setParentSpaceId: (id: number) => void;
   setRootUniverse: (data: UniverseType) => void;
-  addPieceToSpace: (spaceId: number, newPiece: PieceType) => void;
+
+  setInnerImageId: (id: number) => void;
+  setExistingSpaces: (spaces: SpaceType[]) => void;
+  setExistingPieces: (pieces: PieceType[]) => void;
+
+  setUniverseData: (innerImgId: number, existingSpaces: SpaceType[], existingPieces: PieceType[]) => void;
+
   getSpaceById: (id: number) => SpaceType | null;
   getParentSpaceIdById: (id: number) => number | null;
-  updateSpaceTitle: (id: number, title: string) => void;
 
   resetUniverse: () => void;
+  refreshUniverseData: (currentPageSpaceId: number) => void;
+
 }
 
 export const useUniverseStore = create<UniverseStore>((set, get) => ({
@@ -62,11 +72,28 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
   parentSpaceId: -1,
   rootUniverse: null,
 
+  innerImageId: null,
+  existingSpaces: [],
+  existingPieces: [],
+
   setCurrentSpaceId: (id) => set({ currentSpaceId: id }),
 
   setParentSpaceId: (id) => set({ parentSpaceId: id }),
 
   setRootUniverse: (data) => set({ rootUniverse: data }),
+
+  setInnerImageId: (id) => set({ innerImageId: id }),
+
+  setExistingSpaces: (spaces) => set({ existingSpaces: spaces }),
+
+  setExistingPieces: (pieces) => set({ existingPieces: pieces }),
+
+  setUniverseData: (innerImageId, existingSpaces, existingPieces) =>
+    set({
+      innerImageId,
+      existingSpaces,
+      existingPieces,
+    }),
 
   getSpaceById: (id) => {
     const find = (spaces: SpaceType[]): SpaceType | null => {
@@ -97,43 +124,32 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
     return find(u.spaces);
   },
 
-  updateSpaceTitle: (id, title) => {
-    const update = (spaces: SpaceType[]): SpaceType[] =>
-      spaces.map((space) => ({
-        ...space,
-        title: space.spaceId === id ? title : space.title,
-        spaces: update(space.spaces),
-      }));
-
-    const u = get().rootUniverse;
-    if (!u) return;
-    set({ rootUniverse: { ...u, spaces: update(u.spaces) } });
-  },
-
-  addPieceToSpace: (spaceId, newPiece) => {
-    const add = (spaces: SpaceType[]): SpaceType[] =>
-      spaces.map((space) => {
-        if (space.spaceId === spaceId) {
-          return {
-            ...space,
-            pieces: [...space.pieces, newPiece],
-          };
-        }
-        return {
-          ...space,
-          spaces: add(space.spaces),
-        };
-      });
-
-    const u = get().rootUniverse;
-    if (!u) return;
-    set({ rootUniverse: { ...u, spaces: add(u.spaces) } });
-  },
 
   resetUniverse: () => {
     set({ currentSpaceId: null });
     set({ parentSpaceId: -1 });
     set({ rootUniverse: null });
-  }
+  },
+
+  refreshUniverseData: async () => {
+    // try {
+    //   const response = await axios.get(`/api/universe/${universeId}`);
+    //   const data: UniverseType = response.data;
+
+    //   set({ rootUniverse: data });
+
+    //   // 예: 현재 spaceId 다시 설정 (기존 위치 유지)
+    //   const currentId = get().currentSpaceId;
+    //   if (currentId) {
+    //     const found = get().getSpaceById(currentId);
+    //     if (!found) {
+    //       // 현재 ID가 없어졌으면 루트로 이동
+    //       set({ currentSpaceId: null, parentSpaceId: -1 });
+    //     }
+    //   }
+    // } catch (error) {
+    //   console.error("Failed to refresh universe data", error);
+    // }
+  },
 
 }));
