@@ -4,6 +4,7 @@ import API_CONFIG from "../../../config/api";
 import { FaRegSave } from "react-icons/fa";
 import ModalAlertMessage, { AlertType } from "../../../components/modal/ModalAlertMessage";
 import Button from "../../../components/buttons/Button";
+import { patchUniverseThumbnailEdit } from "../../../service/universeService";
 
 interface ThumbnailEditProps {
   universeId: number;
@@ -84,34 +85,16 @@ export default function UniverseThumbnailEdit({
     }
 
     try {
-      const formData = new FormData();
-      formData.append("thumbnail", file);
+      await patchUniverseThumbnailEdit(universeId, file);
 
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes/thumbnail/${universeId}`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (response.ok) {
-        setAlert({
-          text: "썸네일 저장이 완료되었습니다.",
-          type: "success",
-        });
-      } else {
-        const errorText = await response.text();
-        setAlert({
-          text: "썸네일 저장에 실패했습니다.",
-          type: "fail",
-        });
-        console.error("썸네일 저장 실패:", errorText);
-      }
-    } catch (e) {
-      console.error("에러 발생:", e);
       setAlert({
-        text: "에러가 발생했습니다.",
+        text: "썸네일 저장이 완료되었습니다.",
+        type: "success",
+      });
+    } catch (e) {
+      console.error("썸네일 저장 실패:", e);
+      setAlert({
+        text: "썸네일 저장에 실패했습니다.",
         type: "fail",
       });
     }

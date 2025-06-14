@@ -31,6 +31,7 @@ import {
   SaveTargetType,
   useUniverseStore,
 } from "../../../context/useUniverseStore";
+import { getUniverseDetail, patchUniverseInfoEdit, patchUniverseThumbnailEdit } from "../../../service/universeService";
 
 export default function UniverseEditPage() {
   const { universeId } = useParams();
@@ -77,17 +78,13 @@ export default function UniverseEditPage() {
 
   const fetchUniverse = async () => {
     try {
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes/${universeId}`
-      );
-      if (!response.ok) throw new Error("Failed to fetch universe.");
-      const data: Universe = await response.json();
+      const data: Universe = await getUniverseDetail(universeIdParsed);
 
       setCurrentSpaceId(data.id!);
       setTags(data.hashtags.map((tag: string) => `#${tag}`).join(" "));
       setUniverse(data);
     } catch (error) {
-      console.error(error);
+      console.error("유니버스 조회 실패:", error);
     }
   };
 
@@ -102,42 +99,20 @@ export default function UniverseEditPage() {
     };
 
     try {
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes/${universe.id}`,
-        {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (!response.ok) throw new Error("저장에 실패했습니다.");
+      await patchUniverseInfoEdit(universe.id!, payload);
 
       showAlert("변경사항이 저장되었습니다.", "success", null);
       navigate(-1);
     } catch (error) {
-      console.error("저장 에러:", error);
       showAlert("저장 중 오류가 발생했습니다.", "fail", null);
     }
   };
 
   const saveThumbMusic = async (file: File) => {
     try {
-      const formData = new FormData();
-      formData.append("thumbMusic", file);
-
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes/thumb-music/${universeId}`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (!response.ok) throw new Error("저장에 실패했습니다.");
+      await patchUniverseThumbnailEdit(universeIdParsed, file);
       showAlert("변경사항이 저장되었습니다.", "success", null);
     } catch (error) {
-      console.error("저장 에러:", error);
       showAlert("저장 중 오류가 발생했습니다.", "fail", null);
     }
   };
@@ -232,14 +207,6 @@ export default function UniverseEditPage() {
   //     showAlert("저장 중 오류가 발생했습니다.", "fail", null);
   //   }
   // };
-
-  const modalOKClick = () => {
-    if (alert != null && alert.alertType === "check") {
-      navigate(-1);
-    } else {
-      setAlert(null);
-    }
-  };
 
   return (
     <PageLayout>

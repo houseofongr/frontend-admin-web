@@ -6,11 +6,6 @@ import { FiSave } from "react-icons/fi";
 
 interface DetailInfoStepProps {
   innerImg: File | null;
-  detailInfo: {
-    title: string;
-    description: string;
-
-  };
   onSubmit: (
     title: string,
     description: string
@@ -19,15 +14,14 @@ interface DetailInfoStepProps {
 
 export default function SpaceDetailInfoStep({
   innerImg,
-  detailInfo,
   onSubmit,
 }: DetailInfoStepProps) {
   // 미리보기
   const [previewInnerImg, setPreviewInnerImg] = useState<string | null>(null);
 
   // 입력값 상태
-  const [title, setTitle] = useState(detailInfo.title);
-  const [description, setDescription] = useState(detailInfo.description);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
 
   // 미리보기 처리
   useEffect(() => {

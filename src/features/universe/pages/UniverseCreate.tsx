@@ -17,6 +17,7 @@ import { checkFileSize, checkImageIsSquare } from "../../../utils/fileValidator"
 import { UserV2 } from "../../../types/user";
 import { UniverseCreateStep } from "../../../constants/ProcessSteps";
 import SpinnerIcon from "../../../components/icons/SpinnerIcon";
+import { postUniverse } from "../../../service/universeService";
 
 interface ThumbnailEditProps {
   onClose: () => void;
@@ -237,7 +238,6 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
     if (!thumbnail || !thumbMusic || !innerImg) return;
 
     setLoading(true);
-    const formData = new FormData();
 
     const metadata = {
       title: detailInfo.title,
@@ -248,40 +248,26 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
       hashtags: detailInfo.hashtags,
     };
 
-    formData.append("innerImage", innerImg);
-    formData.append("thumbnail", thumbnail);
-    formData.append("thumbMusic", thumbMusic);
-    formData.append("metadata", JSON.stringify(metadata));
-
-
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/universes`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        let errorMessage =
-          "새로운 유니버스 데이터를 생성하는데 실패하였습니다.";
-        try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || errorMessage;
-        } catch (jsonError) {
-          console.error("JSON 파싱 오류:", jsonError);
-        }
-        showAlert(errorMessage, "fail");
-        return;
-      }
+      await postUniverse(
+        innerImg,
+        thumbnail,
+        thumbMusic,
+        JSON.stringify(metadata)
+      );
 
       showAlert("새로운 유니버스가 성공적으로 저장되었습니다.", "success");
     } catch (error) {
-      showAlert(
-        `데이터 저장 중 오류가 발생하였습니다. error: ${error}`,
-        "fail"
-      );
+      let errorMessage = "새로운 유니버스 데이터를 생성하는데 실패하였습니다.";
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      showAlert(errorMessage, "fail");
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
+  
 
   const showAlert = (text: string, type: AlertType) => {
     setAlert({ text, type });

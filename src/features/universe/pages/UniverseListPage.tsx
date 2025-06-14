@@ -24,6 +24,7 @@ import ThumbMusicPreview from "../components/ThumbMusicPreview";
 import { UniverseCategoryOptions } from "../../../constants/UniverseData";
 import SpinnerIcon from "../../../components/icons/SpinnerIcon";
 import { useUniverseStore } from "../../../context/useUniverseStore";
+import { deleteUniverse, getUniverse, patchUniverseThumbnailEdit } from "../../../service/universeService";
 
 
 export default function UniverseListPage() {
@@ -63,32 +64,21 @@ export default function UniverseListPage() {
   const fetchUniverse = async (
     page: number = currentPage,
     sizeValue: number = size,
-    type: string = searchType,
-    word: string = keyword
+    type: string | null = searchType,
+    word: string | null = keyword
   ) => {
     setLoading(true);
     try {
-      const query = new URLSearchParams({
-        page: page.toString(),
-        size: sizeValue.toString(),
-      });
+      const data = await getUniverse(page, sizeValue, type, word);
 
-      if (type && word) {
-        query.append("searchType", type);
-        query.append("keyword", word);
-      }
-
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes?${query.toString()}`
-      );
-      const { universes, pagination } = await response.json();
+      const { universes, pagination } = data;
 
       setUniverseList(universes);
       setTotalPages(pagination.totalPages);
       setTotalItems(pagination.totalElements);
       setSize(pagination.size);
     } catch (error) {
-      console.error("Failed to fetch users:", error);
+      console.error("Failed to fetch universes:", error);
     }
     setLoading(false);
   };
@@ -118,7 +108,6 @@ export default function UniverseListPage() {
   const closeThumbMusicModal = () => {
     setShowThumbMusic(-1);
   }
-
   const saveThumbnailHandler = async (file: File) => {
     if (!file) {
       setAlert({
@@ -129,67 +118,36 @@ export default function UniverseListPage() {
     }
 
     try {
-      const formData = new FormData();
-      formData.append("thumbnail", file);
+      await patchUniverseThumbnailEdit(editThumbnailUniverseId!, file);
 
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes/thumbnail/${editThumbnailUniverseId}`,
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
-
-      if (response.ok) {
-        setAlert({
-          text: "썸네일 저장이 완료되었습니다.",
-          type: "success",
-        });
-      } else {
-        const errorText = await response.text();
-        setAlert({
-          text: "썸네일 저장에 실패했습니다.",
-          type: "fail",
-        });
-        console.error("썸네일 저장 실패:", errorText);
-      }
-    } catch (e) {
-      console.error("에러 발생:", e);
       setAlert({
-        text: "에러가 발생했습니다.",
+        text: "썸네일 저장이 완료되었습니다.",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("썸네일 저장 실패:", error);
+      setAlert({
+        text: "썸네일 저장에 실패했습니다.",
         type: "fail",
       });
     }
   };
+  
 
   const deleteUniverseHandler = async () => {
     try {
       if (deleteId == null) return;
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes/${deleteId}`,
-        {
-          method: "DELETE",
-        }
-      );
 
-      if (response.ok) {
-        setAlert({
-          text: "유니버스 삭제가 완료되었습니다.",
-          type: "success",
-        });
-      } else {
-        const errorText = await response.text();
-        setAlert({
-          text: "유니버스 삭제 실패",
-          type: "fail",
-        });
-        console.log(errorText, "    ", deleteId);
+      await deleteUniverse(deleteId);
 
-      }
-    } catch (e) {
-      console.error("에러 발생:", e);
       setAlert({
-        text: "에러가 발생했습니다.",
+        text: "유니버스 삭제가 완료되었습니다.",
+        type: "success",
+      });
+    } catch (error) {
+      console.error("유니버스 삭제 실패:", error);
+      setAlert({
+        text: "유니버스 삭제 실패",
         type: "fail",
       });
     }

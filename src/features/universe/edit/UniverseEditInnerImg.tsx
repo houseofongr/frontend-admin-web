@@ -34,6 +34,11 @@ import ModalAlertMessage, {
   AlertType,
 } from "../../../components/modal/ModalAlertMessage";
 import Button from "../../../components/buttons/Button";
+import {
+  postSpaceCreate,
+  patchSpaceInnerImageEdit,
+} from "../../../service/spaceService";
+import { getUniverseTree, patchUniverseInnerImageEdit } from "../../../service/universeService";
 
 export default function UniverseEditInnerImg() {
   const menuRef = useRef<HTMLDivElement>(null);
@@ -44,9 +49,6 @@ export default function UniverseEditInnerImg() {
   const [startPoint, setStartPoint] = useState<PercentPoint | null>(null);
   const [endPoint, setEndPoint] = useState<PercentPoint | null>(null);
   const [innerImg, setInnerImg] = useState<File | null>(null);
-
-  const [title, setTitle] = useState<string>("");
-  const [description, setDescription] = useState<string>("");
 
   const [alert, setAlert] = useState<{
     text: string;
@@ -98,19 +100,9 @@ export default function UniverseEditInnerImg() {
   const loadInitialData = async (spaceId: null | number) => {
     try {
       if (currentSpaceId == null) return;
+      
+      const data: UniverseType = await getUniverseTree(currentSpaceId);
 
-      const response = await fetch(
-        `${API_CONFIG.BACK_API}/universes/tree/${currentSpaceId}`
-      );
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        const errorMessage = errorData?.message || "유니버스 조회 실패";
-        alert(errorMessage);
-        return;
-      }
-
-      const data: UniverseType = await response.json();
       if (spaceId == null) {
         setRootUniverse(data);
         setUniverseData(data.innerImageId, data.spaces, data.pieces);
@@ -121,10 +113,10 @@ export default function UniverseEditInnerImg() {
         setUniverseData(space.innerImageId, space.spaces, space.pieces);
       }
 
-      console.log("data", data);
-    } catch (error) {
-      console.error("유니버스 조회 오류:", error);
-      alert("유니버스 조회 중 오류가 발생했습니다.");
+    } catch (error: any) {
+      const errorMessage =
+        error?.message || "유니버스 조회 중 오류가 발생했습니다.";
+      showAlert(errorMessage, "fail", null);
     }
   };
 
@@ -161,7 +153,6 @@ export default function UniverseEditInnerImg() {
       return;
     }
 
-    const formData = new FormData();
     const metadata = {
       universeId: rootUniverse?.universeId,
       parentSpaceId:
@@ -174,27 +165,14 @@ export default function UniverseEditInnerImg() {
       endY: endPoint.yPercent,
     };
 
-    formData.append("metadata", JSON.stringify(metadata));
-    formData.append("innerImage", innerImg);
-
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/spaces`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => null);
-        const errorMessage = errorData?.message || "스페이스 생성 실패";
-        showAlert(errorMessage, "fail", null);
-        return;
-      }
-
+      await postSpaceCreate(metadata, innerImg);
       showAlert("스페이스가 생성되었습니다.", "success", null);
       loadInitialData(currentSpaceId);
-    } catch (error) {
-      console.error("스페이스 생성 오류:", error);
-      showAlert("스페이스 생성 중 오류가 발생했습니다.", "fail", null);
+    } catch (error: any) {
+      const errorMessage =
+        error?.message || "스페이스 생성 중 오류가 발생했습니다.";
+      showAlert(errorMessage, "fail", null);
     }
   };
 
@@ -224,20 +202,14 @@ export default function UniverseEditInnerImg() {
     targetId: number
   ) => {
     try {
-      const formData = new FormData();
-      formData.append("innerImage", file);
+      if (targetType === "universe") {
+        await patchUniverseInnerImageEdit(targetId, file);
+      } else if (targetType === "space") {
+        await patchSpaceInnerImageEdit(targetId, file);
+      } else {
+        throw new Error("잘못된 대상 유형입니다.");
+      }
 
-      const endpoint =
-        targetType === "universe"
-          ? `${API_CONFIG.BACK_API}/universes/inner-image/${targetId}`
-          : `${API_CONFIG.BACK_API}/spaces/inner-image/${targetId}`;
-
-      const response = await fetch(endpoint, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error("저장에 실패했습니다.");
       showAlert("변경사항이 저장되었습니다.", "success", null);
     } catch (error) {
       console.error("저장 에러:", error);
@@ -453,7 +425,6 @@ export default function UniverseEditInnerImg() {
         >
           <SpaceDetailInfoStep
             innerImg={innerImg}
-            detailInfo={{ title, description }}
             onSubmit={handleCreateSubmit}
           />
         </IconTitleModal>
