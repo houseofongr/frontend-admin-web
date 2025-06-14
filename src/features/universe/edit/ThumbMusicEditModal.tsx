@@ -7,12 +7,12 @@ import { checkFileSize } from "../../../utils/fileValidator";
 
 interface InnerImageEditModalProps {
   onClose: () => void;
-  handleSaveThumbMusicImage: (file: File) => void;
+  handleSaveThumbMusic: (file: File) => void;
 }
 
 export default function ThumbMusicEditModal({
   onClose,
-  handleSaveThumbMusicImage,
+  handleSaveThumbMusic: handleSaveThumbMusicImage,
 }: InnerImageEditModalProps) {
 
   const [thumbMusic, setThumbMusic] = useState<File | null>(null);

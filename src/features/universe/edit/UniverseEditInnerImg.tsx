@@ -23,7 +23,9 @@ import { SpaceCreateStep } from "../../../constants/ProcessSteps";
 import { PercentPoint } from "../../../constants/image";
 
 import {
+  PieceType,
   SaveTargetType,
+  SpaceType,
   UniverseType,
   useUniverseStore,
 } from "../../../context/useUniverseStore";
@@ -33,12 +35,9 @@ import ModalAlertMessage, {
 } from "../../../components/modal/ModalAlertMessage";
 import Button from "../../../components/buttons/Button";
 
-interface UniverseEditInnerImgProps {
-  onEdit: (type: SaveTargetType, id: number) => void;
-  onDelete: () => void;
-}
-
 export default function UniverseEditInnerImg() {
+  const menuRef = useRef<HTMLDivElement>(null);
+
   const [menuOpen, setMenuOpen] = useState(false);
   const [createStep, setCreateStep] = useState<SpaceCreateStep | null>(null);
 
@@ -48,6 +47,12 @@ export default function UniverseEditInnerImg() {
 
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
+
+  const [alert, setAlert] = useState<{
+    text: string;
+    type: AlertType;
+    subText: string | null;
+  } | null>(null);
 
   const [showInnerImgEdit, setShowInnerImgEdit] = useState<{
     show: boolean;
@@ -59,18 +64,13 @@ export default function UniverseEditInnerImg() {
     id: -1,
   });
 
-  const [alert, setAlert] = useState<{
-    text: string;
-    type: AlertType;
-    subText: string | null;
-  } | null>(null);
-
   const {
     existingSpaces,
     existingPieces,
     innerImageId,
     rootUniverse,
     currentSpaceId,
+    parentSpaceId,
     getSpaceById,
     setCurrentSpaceId,
     setRootUniverse,
@@ -106,7 +106,7 @@ export default function UniverseEditInnerImg() {
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
         const errorMessage = errorData?.message || "유니버스 조회 실패";
-        showAlert(errorMessage, "fail", null);
+        alert(errorMessage);
         return;
       }
 
@@ -124,11 +124,9 @@ export default function UniverseEditInnerImg() {
       console.log("data", data);
     } catch (error) {
       console.error("유니버스 조회 오류:", error);
-      showAlert("유니버스 조회 중 오류가 발생했습니다.", "fail", null);
+      alert("유니버스 조회 중 오류가 발생했습니다.");
     }
   };
-
-  const menuRef = useRef<HTMLDivElement>(null);
 
   // 외부 클릭 시 메뉴 닫기
   useEffect(() => {
@@ -159,7 +157,7 @@ export default function UniverseEditInnerImg() {
     description: string
   ): Promise<void> => {
     if (!startPoint || !endPoint || !innerImg) {
-      showAlert("스페이스 정보를 모두 입력해주세요.", "info", null);
+      showAlert("스페이스 정보를 모두 입력해주세요.", "fail", null);
       return;
     }
 
@@ -202,6 +200,7 @@ export default function UniverseEditInnerImg() {
 
   // 이게 onEdit이였고
   const onInnerImgEdit = (type: SaveTargetType, id: number) => {
+    console.log("type : ", type, " id: ", id);
     setShowInnerImgEdit({ show: true, type: type, id: id });
   };
 
@@ -214,21 +213,12 @@ export default function UniverseEditInnerImg() {
     );
   };
 
-  const showAlert = (text: string, type: AlertType, subText: string | null) => {
-    setAlert({ text, type, subText });
-  };
-
-  const handleSaveInnerImage = (file: File) => {
-    setInnerImg(file);
-    setCreateStep(SpaceCreateStep.FillDetails);
-  };
-
-  const handleEditInnerImage = (file: File): void => {
-    editInnerImg(file, showInnerImgEdit.type, showInnerImgEdit.id);
+  const handleEditInnerImage = (file: File) => {
+    EditInnerImgSave(file, showInnerImgEdit.type, showInnerImgEdit.id);
     setShowInnerImgEdit({ show: false, type: null, id: -1 });
   };
 
-  const editInnerImg = async (
+  const EditInnerImgSave = async (
     file: File,
     targetType: SaveTargetType,
     targetId: number
@@ -255,10 +245,15 @@ export default function UniverseEditInnerImg() {
     }
   };
 
-  const handleSubmit = (title: string, description: string) => {
+  const handleCreateSubmit = (title: string, description: string) => {
     if (startPoint && endPoint && innerImg) {
       createSpace(title, description);
     }
+  };
+
+  const handleCreateInnerImage = (file: File): void => {
+    setInnerImg(file);
+    setCreateStep(SpaceCreateStep.FillDetails);
   };
 
   const handleCreateModalClose = () => {
@@ -268,14 +263,13 @@ export default function UniverseEditInnerImg() {
   };
 
   const menuItems =
-    currentSpaceId === rootUniverse?.universeId || currentSpaceId == -1
+    parentSpaceId === -1
       ? [
           {
             label: "이미지 수정",
             icon: <RiImageEditFill size={20} />,
             onClick: () => {
-              if (rootUniverse != null)
-                onInnerImgEdit("universe", rootUniverse.universeId);
+              onInnerImgEdit("universe", rootUniverse?.universeId!);
             },
           },
           {
@@ -289,8 +283,7 @@ export default function UniverseEditInnerImg() {
             label: "이미지 수정",
             icon: <RiImageEditFill size={20} />,
             onClick: () => {
-              if (currentSpaceId != null)
-                onInnerImgEdit("space", currentSpaceId);
+              onInnerImgEdit("space", currentSpaceId!);
             },
           },
           {
@@ -306,7 +299,7 @@ export default function UniverseEditInnerImg() {
           {
             label: "좌표 수정",
             icon: <PiGpsBold size={20} />,
-            onClick: handleDownloadImage,
+            onClick: () => {},
           },
           {
             label: "스페이스 삭제",
@@ -315,29 +308,32 @@ export default function UniverseEditInnerImg() {
           },
         ];
 
+  const showAlert = (text: string, type: AlertType, subText: string | null) => {
+    setAlert({ text, type, subText });
+  };
+
   return (
     <div
       ref={menuRef}
       className="h-full relative text-left group flex justify-center"
       onMouseLeave={() => setMenuOpen(false)}
     >
-      {alert && alert.type != "info" && (
+      {alert && (
         <ModalAlertMessage
           text={alert.text}
           type={alert.type}
-          onClose={() => {
-            setAlert(null);
-            // handleCloseModal();
-          }}
-          okButton={
-            <Button
-              label="확인"
-              onClick={() => {
-                setAlert(null);
-                // handleCloseModal();
-              }}
-            />
+          onClose={() => setAlert(null)}
+          okButton={<Button label="확인" onClick={() => setAlert(null)} />}
+          cancelButton={
+            alert.type === "check" ? (
+              <Button
+                label="취소"
+                variant="gray"
+                onClick={() => setAlert(null)}
+              />
+            ) : undefined
           }
+          {...(alert.subText ? { subText: alert.subText } : {})}
         />
       )}
 
@@ -440,7 +436,7 @@ export default function UniverseEditInnerImg() {
           labelText="스페이스 내부 이미지"
           maxFileSizeMB={100}
           onClose={handleCreateModalClose}
-          onConfirm={handleSaveInnerImage}
+          onConfirm={handleCreateInnerImage}
           confirmText="다음"
           requireSquare={true}
         />
@@ -458,7 +454,7 @@ export default function UniverseEditInnerImg() {
           <SpaceDetailInfoStep
             innerImg={innerImg}
             detailInfo={{ title, description }}
-            onSubmit={handleSubmit}
+            onSubmit={handleCreateSubmit}
           />
         </IconTitleModal>
       )}

@@ -15,7 +15,6 @@ import {
 } from "../../../constants/UniverseData";
 import API_CONFIG from "../../../config/api";
 import { Universe } from "../../../types/universe";
-import ImageUploadModal from "../../../components/modal/ImageUploadModal";
 import Modal from "../../../components/modal/Modal";
 import UserSearch from "../create/UserSearch";
 import { UserV2 } from "../../../types/user";
@@ -28,7 +27,10 @@ import { TextareaField } from "../../../components/Input/TextareaField";
 import { AuthorSelectField } from "../../../components/Input/AuthorSelectField";
 import { SelectableRadioField } from "../../../components/Input/SelectableRadioField";
 import { SelectField } from "../../../components/Input/SelectField";
-import { SaveTargetType, useUniverseStore } from "../../../context/useUniverseStore";
+import {
+  SaveTargetType,
+  useUniverseStore,
+} from "../../../context/useUniverseStore";
 
 export default function UniverseEditPage() {
   const { universeId } = useParams();
@@ -63,7 +65,7 @@ export default function UniverseEditPage() {
   const [showAuthorEdit, setShowAuthorEdit] = useState(false);
   const [alert, setAlert] = useState<{
     text: string;
-    type: AlertType;
+    alertType: AlertType;
     subText: string | null;
   } | null>(null);
 
@@ -75,7 +77,9 @@ export default function UniverseEditPage() {
 
   const fetchUniverse = async () => {
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/universes/${universeId}`);
+      const response = await fetch(
+        `${API_CONFIG.BACK_API}/universes/${universeId}`
+      );
       if (!response.ok) throw new Error("Failed to fetch universe.");
       const data: Universe = await response.json();
 
@@ -98,11 +102,14 @@ export default function UniverseEditPage() {
     };
 
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/universes/${universe.id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
+      const response = await fetch(
+        `${API_CONFIG.BACK_API}/universes/${universe.id}`,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (!response.ok) throw new Error("저장에 실패했습니다.");
 
@@ -114,6 +121,92 @@ export default function UniverseEditPage() {
     }
   };
 
+  const saveThumbMusic = async (file: File) => {
+    try {
+      const formData = new FormData();
+      formData.append("thumbMusic", file);
+
+      const response = await fetch(
+        `${API_CONFIG.BACK_API}/universes/thumb-music/${universeId}`,
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      if (!response.ok) throw new Error("저장에 실패했습니다.");
+      showAlert("변경사항이 저장되었습니다.", "success", null);
+    } catch (error) {
+      console.error("저장 에러:", error);
+      showAlert("저장 중 오류가 발생했습니다.", "fail", null);
+    }
+  };
+
+  const handleCancel = () => {
+    showAlert(
+      "저장하지 않은 변경사항이 사라집니다. 취소하시겠습니까?",
+      "check",
+      null
+    );
+  };
+
+  const showAlert = (text: string, type: AlertType, subText: string | null) => {
+    setAlert({ text, alertType: type, subText });
+  };
+
+  const normalizeTagsAndUpdateState = (raw: string) => {
+    const parts = raw.trim().split(/\s+/).filter(Boolean);
+    const normalized = parts.map((tag) =>
+      tag.startsWith("#") ? tag : `#${tag}`
+    );
+    const display = normalized.join(" ") + (raw.endsWith(" ") ? " " : "");
+    const validTags = normalized
+      .filter((t) => t.length > 1)
+      .map((t) => t.replace(/^#/, ""));
+    setTags(display);
+    setUniverse((prev) => ({ ...prev, hashtags: validTags }));
+  };
+
+  const handleTagChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const val = e.target.value;
+    if (val.endsWith(" ")) {
+      normalizeTagsAndUpdateState(val);
+    } else {
+      setTags(val);
+    }
+  };
+
+  const handleSaveThumbMusic = (file: File) => {
+    setShowThumbMusicEdit(false);
+    saveThumbMusic(file);
+  };
+
+  const publicStatusOptions = [
+    {
+      value: PublicStatusOption.PUBLIC,
+      icon: <HiGlobeAsiaAustralia size={20} />,
+      label: "공개",
+    },
+    {
+      value: PublicStatusOption.PRIVATE,
+      icon: <TbShieldLock size={20} />,
+      label: "비공개",
+    },
+  ];
+
+  // const handleSaveInnerImage = (file: File) => {
+  //   saveInnerImg(file, showInnerImgEdit.type, showInnerImgEdit.id);
+  //   setShowInnerImgEdit({ show: false, type: null, id: -1 });
+  // };
+
+  // const onSpaceDelete = () => {
+  //   showAlert("정말로 스페이스를 삭제하시겠습니까?", "check", "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다.");
+  // };
+
+  // const onInnerImgEdit = (type: SaveTargetType, id: number) => {
+  //   console.log("type : ", type, " id: ", id);
+  //   setShowInnerImgEdit({ show: true, type: type, id: id });
+  // }
 
   // const saveInnerImg = async (file: File,
   //   targetType: SaveTargetType,
@@ -140,92 +233,30 @@ export default function UniverseEditPage() {
   //   }
   // };
 
-  const saveThumbMusic = async (file: File) => {
-    try {
-      const formData = new FormData();
-      formData.append("thumbMusic", file);
-
-      const response = await fetch(`${API_CONFIG.BACK_API}/universes/thumb-music/${universeId}`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) throw new Error("저장에 실패했습니다.");
-      showAlert("변경사항이 저장되었습니다.", "success", null);
-    } catch (error) {
-      console.error("저장 에러:", error);
-      showAlert("저장 중 오류가 발생했습니다.", "fail", null);
-    }
-  };
-
-  const handleCancel = () => {
-    showAlert("저장하지 않은 변경사항이 사라집니다. 취소하시겠습니까?", "check", null);
-  };
-
-  const showAlert = (text: string, type: AlertType, subText: string | null) => {
-    setAlert({ text, type, subText });
-  };
-
-  const normalizeTagsAndUpdateState = (raw: string) => {
-    const parts = raw.trim().split(/\s+/).filter(Boolean);
-    const normalized = parts.map((tag) => (tag.startsWith("#") ? tag : `#${tag}`));
-    const display = normalized.join(" ") + (raw.endsWith(" ") ? " " : "");
-    const validTags = normalized.filter((t) => t.length > 1).map((t) => t.replace(/^#/, ""));
-    setTags(display);
-    setUniverse((prev) => ({ ...prev, hashtags: validTags }));
-  };
-
-  const handleTagChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value;
-    if (val.endsWith(" ")) {
-      normalizeTagsAndUpdateState(val);
-    } else {
-      setTags(val);
-    }
-  };
-
-  // const handleSaveInnerImage = (file: File) => {
-  //   saveInnerImg(file, showInnerImgEdit.type, showInnerImgEdit.id);
-  //   setShowInnerImgEdit({ show: false, type: null, id: -1 });
-  // };
-
-  const handleSaveThumbMusicImage = (file: File) => {
-    setShowThumbMusicEdit(false);
-    saveThumbMusic(file);
-  };
-
-  const publicStatusOptions = [
-    { value: PublicStatusOption.PUBLIC, icon: <HiGlobeAsiaAustralia size={20} />, label: "공개" },
-    { value: PublicStatusOption.PRIVATE, icon: <TbShieldLock size={20} />, label: "비공개" },
-  ];
-
-  // const onSpaceDelete = () => {
-  //   showAlert("정말로 스페이스를 삭제하시겠습니까?", "check", "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다.");
-  // };
-
-  // const onInnerImgEdit = (type: SaveTargetType, id: number) => {
-  //   console.log("type : ", type, " id: ", id);
-  //   setShowInnerImgEdit({ show: true, type: type, id: id });
-  // }
-
   const modalOKClick = () => {
-    if (alert != null && alert.type === "check") {
+    if (alert != null && alert.alertType === "check") {
       navigate(-1);
     } else {
       setAlert(null);
     }
-  }
+  };
 
   return (
     <PageLayout>
       {alert && (
         <ModalAlertMessage
           text={alert.text}
-          type={alert.type}
+          type={alert.alertType}
           onClose={() => setAlert(null)}
-          okButton={<Button label="확인" onClick={modalOKClick} />}
+          okButton={<Button label="확인" onClick={() => setAlert(null)} />}
           cancelButton={
-            alert.type === "check" ? <Button label="취소" variant="gray" onClick={() => setAlert(null)} /> : undefined
+            alert.alertType === "check" ? (
+              <Button
+                label="취소"
+                variant="gray"
+                onClick={() => setAlert(null)}
+              />
+            ) : undefined
           }
           {...(alert.subText ? { subText: alert.subText } : {})}
         />
@@ -257,7 +288,10 @@ export default function UniverseEditPage() {
               <UniverseEditInnerImg />
             </div>
             <div className="lg:min-h-[130px] flex-col min-h-[280px]">
-              <UniverseEditMusic thumbMusicId={universe.thumbMusicId} onEdit={() => setShowThumbMusicEdit(true)} />
+              <UniverseEditMusic
+                thumbMusicId={universe.thumbMusicId}
+                onEdit={() => setShowThumbMusicEdit(true)}
+              />
             </div>
           </div>
 
@@ -265,21 +299,30 @@ export default function UniverseEditPage() {
             <InputField
               label="제목"
               value={universe.title}
-              onChange={(e) => setUniverse((prev) => ({ ...prev, title: e.target.value }))}
+              onChange={(e) =>
+                setUniverse((prev) => ({ ...prev, title: e.target.value }))
+              }
               maxLength={100}
               placeholder="제목을 입력하세요"
             />
             <TextareaField
               label="설명"
               value={universe.description || ""}
-              onChange={(e) => setUniverse((prev) => ({ ...prev, description: e.target.value }))}
+              onChange={(e) =>
+                setUniverse((prev) => ({
+                  ...prev,
+                  description: e.target.value,
+                }))
+              }
               maxLength={500}
               placeholder="설명을 입력하세요"
             />
             <SelectField
               label="카테고리"
               value={universe.category}
-              onChange={(val) => setUniverse((prev) => ({ ...prev, category: val }))}
+              onChange={(val) =>
+                setUniverse((prev) => ({ ...prev, category: val }))
+              }
               options={UniverseCategoryOptions}
               placeholder="카테고리를 선택하세요"
             />
@@ -287,7 +330,9 @@ export default function UniverseEditPage() {
               label="공개여부"
               name="publicStatus"
               value={universe.publicStatus}
-              onChange={(val) => setUniverse((prev) => ({ ...prev, publicStatus: val }))}
+              onChange={(val) =>
+                setUniverse((prev) => ({ ...prev, publicStatus: val }))
+              }
               options={publicStatusOptions}
             />
             <InputField
@@ -327,7 +372,7 @@ export default function UniverseEditPage() {
       {showThumbMusicEdit && (
         <ThumbMusicEditModal
           onClose={() => setShowThumbMusicEdit(false)}
-          handleSaveThumbMusicImage={handleSaveThumbMusicImage}
+          handleSaveThumbMusic={handleSaveThumbMusic}
         />
       )}
 
@@ -337,7 +382,11 @@ export default function UniverseEditPage() {
             isOpen={showAuthorEdit}
             onClose={() => setShowAuthorEdit(false)}
             onSelect={(user: UserV2) => {
-              setUniverse((prev) => ({ ...prev, authorId: user.id, author: user.name }));
+              setUniverse((prev) => ({
+                ...prev,
+                authorId: user.id,
+                author: user.name,
+              }));
             }}
           />
         </Modal>
