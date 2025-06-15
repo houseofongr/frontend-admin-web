@@ -96,7 +96,7 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
 
   setInnerImageId: (id) => set({ innerImageId: id }),
 
-  setExistingSpaces: (spaces) => set({ existingSpaces: spaces }),
+  setExistingSpaces: (spaces) => { set({ existingSpaces: spaces }) },
 
   setExistingPieces: (pieces) => set({ existingPieces: pieces }),
 

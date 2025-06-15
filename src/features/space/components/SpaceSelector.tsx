@@ -21,8 +21,6 @@ interface SpaceSelectorProps {
   endPoint: PercentPoint | null;
   setStartPoint: React.Dispatch<React.SetStateAction<PercentPoint | null>>;
   setEndPoint: React.Dispatch<React.SetStateAction<PercentPoint | null>>;
-  existingSpaces: SpaceType[];
-  existingPieces: PieceType[];
 }
 
 export default function SpaceSelector({
@@ -32,7 +30,6 @@ export default function SpaceSelector({
   endPoint,
   setStartPoint,
   setEndPoint,
-  existingSpaces,
 }: SpaceSelectorProps) {
   const {
     currentSpaceId,
@@ -41,6 +38,8 @@ export default function SpaceSelector({
     parentSpaceId,
     getParentSpaceIdById,
     rootUniverse,
+    existingSpaces,
+    existingPieces
   } = useUniverseStore();
 
   const [hoverPos, setHoverPos] = useState<PercentPoint | null>(null);
@@ -67,11 +66,18 @@ export default function SpaceSelector({
       });
     };
 
-    updateSize();
     const observer = new ResizeObserver(updateSize);
-    observer.observe(imgRef.current);
+
+    // 다음 프레임에서 observer 등록
+    requestAnimationFrame(() => {
+      if (imgRef.current) {
+        observer.observe(imgRef.current);
+        updateSize(); // 초기 호출
+      }
+    });
+
     return () => observer.disconnect();
-  }, [innerImageId]);
+  }, [imgSrc]); // ← innerImageId가 아니라 imgSrc로 변경
 
   // 이미지 로딩
   useEffect(() => {
@@ -152,6 +158,7 @@ export default function SpaceSelector({
     setParentSpaceId(currentSpaceId ?? -1);
     setCurrentSpaceId(space.spaceId);
     setPopupData(null);
+
   };
   const handleMouseEnter = (index: number) => {
     const space = existingSpaces[index];
@@ -198,7 +205,7 @@ export default function SpaceSelector({
       onClick={handleClick}
     >
       {loading && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50">
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70">
           <SpinnerIcon />
         </div>
       )}
@@ -271,12 +278,10 @@ export default function SpaceSelector({
             <div
               className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none"
               style={{
-                left: `calc(50% - ${imageSize.width / 2}px + ${
-                  toPixel(startPoint).x - 3
-                }px)`,
-                top: `calc(50% - ${imageSize.height / 2}px + ${
-                  toPixel(startPoint).y - 3
-                }px)`,
+                left: `calc(50% - ${imageSize.width / 2}px + ${toPixel(startPoint).x - 3
+                  }px)`,
+                top: `calc(50% - ${imageSize.height / 2}px + ${toPixel(startPoint).y - 3
+                  }px)`,
               }}
             />
           )}
@@ -284,12 +289,10 @@ export default function SpaceSelector({
             <div
               className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none"
               style={{
-                left: `calc(50% - ${imageSize.width / 2}px + ${
-                  toPixel(endPoint).x - 5
-                }px)`,
-                top: `calc(50% - ${imageSize.height / 2}px + ${
-                  toPixel(endPoint).y - 5
-                }px)`,
+                left: `calc(50% - ${imageSize.width / 2}px + ${toPixel(endPoint).x - 5
+                  }px)`,
+                top: `calc(50% - ${imageSize.height / 2}px + ${toPixel(endPoint).y - 5
+                  }px)`,
               }}
             />
           )}
@@ -303,7 +306,8 @@ export default function SpaceSelector({
           )}
 
           {/* 기존 스페이스 박스 */}
-          {existingSpaces.map((space, index) => (
+          {existingSpaces.map((space, index) =>
+          (
             <div
               key={index}
               className="absolute"
@@ -315,13 +319,13 @@ export default function SpaceSelector({
               onMouseLeave={handleMouseLeave}
             >
               <div
-                className={`w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
-                  hoveredIndex === index ? "opacity-100" : "opacity-30"
-                }`}
+                className={`w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${hoveredIndex === index ? "opacity-100" : "opacity-30"
+                  }`}
                 onClick={() => handleMoveToSpace(space)}
               />
             </div>
-          ))}
+          ))
+          }
 
           {/* 팝업 */}
           {popupData && (

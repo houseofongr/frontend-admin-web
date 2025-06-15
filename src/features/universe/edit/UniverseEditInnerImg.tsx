@@ -358,8 +358,6 @@ export default function UniverseEditInnerImg() {
         endPoint={endPoint}
         setStartPoint={setStartPoint}
         setEndPoint={setEndPoint}
-        existingSpaces={existingSpaces}
-        existingPieces={existingPieces}
       />
 
       {createStep === SpaceCreateStep.SetSize && (
@@ -430,6 +428,21 @@ export default function UniverseEditInnerImg() {
             onSubmit={handleCreateSubmit}
           />
         </IconTitleModal>
+      )}
+
+      {showInnerImgEdit.show && (
+        <ImageUploadModal
+          title="이미지 수정"
+          description="내부 이미지를 변경할 수 있습니다."
+          labelText="내부이미지"
+          maxFileSizeMB={5}
+          onClose={() => setShowInnerImgEdit(
+            { show: false, type: null, id: -1 }
+          )}
+          onConfirm={(file) => handleEditInnerImage(file)}
+          confirmText="저장"
+          requireSquare
+        />
       )}
     </div>
   );
