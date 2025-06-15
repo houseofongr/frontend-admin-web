@@ -223,45 +223,45 @@ export default function UniverseEditInnerImg() {
   const menuItems =
     (parentSpaceId === -1 && currentSpaceId == -1)
       ? [
-          {
-            label: "이미지 수정",
-            icon: <RiImageEditFill size={20} />,
-            onClick: () =>
-              onInnerImgEdit("universe", rootUniverse?.universeId!),
-          },
-          {
-            label: "이미지 다운로드",
-            icon: <RiFileDownloadLine size={20} />,
-            onClick: handleDownloadImage,
-          },
-        ]
+        {
+          label: "이미지 수정",
+          icon: <RiImageEditFill size={20} />,
+          onClick: () =>
+            onInnerImgEdit("universe", rootUniverse?.universeId!),
+        },
+        {
+          label: "이미지 다운로드",
+          icon: <RiFileDownloadLine size={20} />,
+          onClick: handleDownloadImage,
+        },
+      ]
       : [
-          {
-            label: "이미지 수정",
-            icon: <RiImageEditFill size={20} />,
-            onClick: () => onInnerImgEdit("space", currentSpaceId!),
-          },
-          {
-            label: "이미지 다운로드",
-            icon: <RiFileDownloadLine size={20} />,
-            onClick: handleDownloadImage,
-          },
-          {
-            label: "정보 수정",
-            icon: <TbPencilCog size={20} />,
-            onClick: () => {},
-          },
-          {
-            label: "좌표 수정",
-            icon: <PiGpsBold size={20} />,
-            onClick: () => {},
-          },
-          {
-            label: "스페이스 삭제",
-            icon: <RiDeleteBin6Line size={20} />,
-            onClick: onSpaceDelete,
-          },
-        ];
+        {
+          label: "이미지 수정",
+          icon: <RiImageEditFill size={20} />,
+          onClick: () => onInnerImgEdit("space", currentSpaceId!),
+        },
+        {
+          label: "이미지 다운로드",
+          icon: <RiFileDownloadLine size={20} />,
+          onClick: handleDownloadImage,
+        },
+        {
+          label: "정보 수정",
+          icon: <TbPencilCog size={20} />,
+          onClick: () => { },
+        },
+        {
+          label: "좌표 수정",
+          icon: <PiGpsBold size={20} />,
+          onClick: () => { },
+        },
+        {
+          label: "스페이스 삭제",
+          icon: <RiDeleteBin6Line size={20} />,
+          onClick: onSpaceDelete,
+        },
+      ];
 
   return (
     <div
@@ -302,7 +302,7 @@ export default function UniverseEditInnerImg() {
       />
 
       <button
-        onClick={() => {}}
+        onClick={() => { }}
         className="z-10 absolute cursor-pointer bottom-3 right-3 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <PiDownloadSimpleBold size={20} />
@@ -314,7 +314,7 @@ export default function UniverseEditInnerImg() {
         <RiFunctionAddLine size={20} />
       </button>
       <button
-        onClick={() => {}}
+        onClick={() => { }}
         className="z-10 absolute cursor-pointer bottom-3 right-22 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <MdOutlineFullscreen size={25} />
