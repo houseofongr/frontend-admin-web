@@ -147,12 +147,12 @@ export default function SpaceSelector({
     }
   };
 
+  // 화면 전환 함수
   const handleMoveToSpace = (space: SpaceType) => {
-    setParentSpaceId(currentSpaceId!);
+    setParentSpaceId(currentSpaceId ?? -1);
     setCurrentSpaceId(space.spaceId);
     setPopupData(null);
   };
-
   const handleMouseEnter = (index: number) => {
     const space = existingSpaces[index];
     const start = toPixel({ xPercent: space.startX, yPercent: space.startY });
@@ -177,12 +177,11 @@ export default function SpaceSelector({
   };
 
   const handleBackClick = () => {
-    if (
-      rootUniverse &&
-      (parentSpaceId === rootUniverse.universeId || parentSpaceId === -1)
-    ) {
+    console.log(parentSpaceId, currentSpaceId);
+
+    if (parentSpaceId == -1) {
       setParentSpaceId(-1);
-      setCurrentSpaceId(rootUniverse.universeId);
+      setCurrentSpaceId(-1);
     } else {
       const parentId = getParentSpaceIdById(parentSpaceId);
       if (parentId != null) {

@@ -63,6 +63,7 @@ export default function UniverseEditInnerImg() {
   }>({ show: false, type: null, id: -1 });
 
   const {
+    universeId,
     existingSpaces,
     existingPieces,
     innerImageId,
@@ -73,40 +74,58 @@ export default function UniverseEditInnerImg() {
     setCurrentSpaceId,
     setRootUniverse,
     setUniverseData,
+    setParentSpaceId,
+    setRootUniverseInnerImageId,
   } = useUniverseStore();
 
+  // currentSpaceId 변경 시마다 화면 데이터 설정
   useEffect(() => {
-    if (rootUniverse == null) loadInitialData(null);
-    else if (currentSpaceId === rootUniverse.universeId) {
-      setCurrentSpaceId(-1);
-      setUniverseData(
-        rootUniverse.innerImageId,
-        rootUniverse.spaces,
-        rootUniverse.pieces
-      );
-    } else if (currentSpaceId != null) {
-      const space = getSpaceById(currentSpaceId);
-      if (!space) return;
-      setUniverseData(space.innerImageId, space.spaces, space.pieces);
+    if (rootUniverse == null) {
+      loadInitialData(null);
+      return;
     }
-  }, [currentSpaceId]);
 
-  const loadInitialData = async (spaceId: number | null) => {
+    if (currentSpaceId === -1) {
+      setUniverseData(rootUniverse.innerImageId, rootUniverse.spaces, rootUniverse.pieces);
+      return;
+    }
+
+    if (currentSpaceId != null) {
+      const space = getSpaceById(currentSpaceId);
+      if (space) {
+        setUniverseData(space.innerImageId, space.spaces, space.pieces);
+      } else {
+        // 공간을 못 찾으면 루트로 복귀
+        setUniverseData(rootUniverse.innerImageId, rootUniverse.spaces, rootUniverse.pieces);
+        setCurrentSpaceId(-1);
+      }
+    }
+  }, [currentSpaceId, rootUniverse, universeId]);
+
+
+  // 초기 데이터 로딩 함수
+  const loadInitialData = async (spaceID: number | null) => {
     try {
-      if (currentSpaceId == null) return;
-      const data: UniverseType = await getUniverseTree(currentSpaceId);
+      if (universeId == null) return;
 
-      setRootUniverse(data);
-      const space = spaceId == null ? data : getSpaceById(currentSpaceId);
-      if (!space) return;
+      const data: UniverseType = await getUniverseTree(universeId); // 0 또는 특정 유니버스 ID
+      if (spaceID == null) {
+        setRootUniverse(data);
+        setUniverseData(data.innerImageId, data.spaces, data.pieces);
+        setCurrentSpaceId(-1);
+        setParentSpaceId(-1);
+      } else {
+        setRootUniverse(data);
+        const space = getSpaceById(spaceID);
+        if (space != null) {
+          setUniverseData(space.innerImageId, space.spaces, space.pieces);
+        }
 
-      setUniverseData(space.innerImageId, space.spaces, space.pieces);
+      }
+
+
     } catch (error: any) {
-      showAlert(
-        error?.message || "유니버스 조회 중 오류가 발생했습니다.",
-        "fail",
-        null
-      );
+      showAlert(error?.message || "유니버스 조회 중 오류가 발생했습니다.", "fail", null);
     }
   };
 
@@ -132,9 +151,16 @@ export default function UniverseEditInnerImg() {
     }
   };
 
-  const onInnerImgEdit = (type: SaveTargetType, id: number) => {
-    setShowInnerImgEdit({ show: true, type, id });
+  const onInnerImgEdit = (type: SaveTargetType) => {
+    if (type == "universe" && rootUniverse != null) {
+      const universeId = rootUniverse.universeId;
+      setShowInnerImgEdit({ show: true, type, id: universeId });
+    } else if (type == "space" && currentSpaceId != null) {
+      setShowInnerImgEdit({ show: true, type, id: currentSpaceId });
+    }
   };
+
+
 
   const onSpaceDelete = () => {
     showAlert(
@@ -155,14 +181,19 @@ export default function UniverseEditInnerImg() {
     targetId: number
   ) => {
     try {
+      console.log(file, targetType, targetId);
+      console.log(rootUniverse);
+
       if (targetType === "universe") {
-        await patchUniverseInnerImageEdit(targetId, file);
+        const response = await patchUniverseInnerImageEdit(targetId, file);
+        setRootUniverseInnerImageId(response.newInnerImageId);
       } else if (targetType === "space") {
         await patchSpaceInnerImageEdit(targetId, file);
       } else {
         throw new Error("잘못된 대상 유형입니다.");
       }
       showAlert("변경사항이 저장되었습니다.", "success", null);
+
     } catch (error) {
       console.error("저장 에러:", error);
       showAlert("저장 중 오류가 발생했습니다.", "fail", null);
@@ -177,21 +208,22 @@ export default function UniverseEditInnerImg() {
       showAlert("스페이스 정보를 모두 입력해주세요.", "fail", null);
       return;
     }
+    const currentId = currentSpaceId === rootUniverse?.universeId ? -1 : currentSpaceId;
     const metadata = {
       universeId: rootUniverse?.universeId,
-      parentSpaceId:
-        currentSpaceId === rootUniverse?.universeId ? -1 : currentSpaceId,
+      parentSpaceId: currentId,
       title,
       description,
       startX: startPoint.xPercent,
       startY: startPoint.yPercent,
       endX: endPoint.xPercent,
       endY: endPoint.yPercent,
+      hidden: true,
     };
     try {
       await postSpaceCreate(metadata, innerImg);
       showAlert("스페이스가 생성되었습니다.", "success", null);
-      loadInitialData(currentSpaceId);
+      loadInitialData(currentId);
     } catch (error: any) {
       showAlert(
         error?.message || "스페이스 생성 중 오류가 발생했습니다.",
@@ -221,47 +253,46 @@ export default function UniverseEditInnerImg() {
   };
 
   const menuItems =
-    (parentSpaceId === -1 && currentSpaceId == -1)
+    (currentSpaceId == -1)
       ? [
-          {
-            label: "이미지 수정",
-            icon: <RiImageEditFill size={20} />,
-            onClick: () =>
-              onInnerImgEdit("universe", rootUniverse?.universeId!),
-          },
-          {
-            label: "이미지 다운로드",
-            icon: <RiFileDownloadLine size={20} />,
-            onClick: handleDownloadImage,
-          },
-        ]
+        {
+          label: "이미지 수정",
+          icon: <RiImageEditFill size={20} />,
+          onClick: () => onInnerImgEdit("universe")
+        },
+        {
+          label: "이미지 다운로드",
+          icon: <RiFileDownloadLine size={20} />,
+          onClick: handleDownloadImage,
+        },
+      ]
       : [
-          {
-            label: "이미지 수정",
-            icon: <RiImageEditFill size={20} />,
-            onClick: () => onInnerImgEdit("space", currentSpaceId!),
-          },
-          {
-            label: "이미지 다운로드",
-            icon: <RiFileDownloadLine size={20} />,
-            onClick: handleDownloadImage,
-          },
-          {
-            label: "정보 수정",
-            icon: <TbPencilCog size={20} />,
-            onClick: () => {},
-          },
-          {
-            label: "좌표 수정",
-            icon: <PiGpsBold size={20} />,
-            onClick: () => {},
-          },
-          {
-            label: "스페이스 삭제",
-            icon: <RiDeleteBin6Line size={20} />,
-            onClick: onSpaceDelete,
-          },
-        ];
+        {
+          label: "이미지 수정",
+          icon: <RiImageEditFill size={20} />,
+          onClick: () => onInnerImgEdit("space"),
+        },
+        {
+          label: "이미지 다운로드",
+          icon: <RiFileDownloadLine size={20} />,
+          onClick: handleDownloadImage,
+        },
+        {
+          label: "정보 수정",
+          icon: <TbPencilCog size={20} />,
+          onClick: () => { },
+        },
+        {
+          label: "좌표 수정",
+          icon: <PiGpsBold size={20} />,
+          onClick: () => { },
+        },
+        {
+          label: "스페이스 삭제",
+          icon: <RiDeleteBin6Line size={20} />,
+          onClick: onSpaceDelete,
+        },
+      ];
 
   return (
     <div
@@ -302,7 +333,7 @@ export default function UniverseEditInnerImg() {
       />
 
       <button
-        onClick={() => {}}
+        onClick={() => { }}
         className="z-10 absolute cursor-pointer bottom-3 right-3 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <PiDownloadSimpleBold size={20} />
@@ -314,7 +345,7 @@ export default function UniverseEditInnerImg() {
         <RiFunctionAddLine size={20} />
       </button>
       <button
-        onClick={() => {}}
+        onClick={() => { }}
         className="z-10 absolute cursor-pointer bottom-3 right-22 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
       >
         <MdOutlineFullscreen size={25} />

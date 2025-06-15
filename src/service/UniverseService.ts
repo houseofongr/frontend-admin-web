@@ -133,6 +133,10 @@ export const patchUniverseInnerImageEdit = async (
   const formData = new FormData();
   formData.append("innerImage", innerImg);
 
+  console.log(`${API_CONFIG.BACK_API}/universes/inner-image/${universeId}`);
+  console.log(formData);
+
+
   const response = await fetch(
     `${API_CONFIG.BACK_API}/universes/inner-image/${universeId}`,
     {

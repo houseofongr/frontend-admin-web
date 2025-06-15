@@ -66,7 +66,7 @@ export default function UniverseEditPage() {
     subText: string | null;
   } | null>(null);
 
-  const { setCurrentSpaceId } = useUniverseStore();
+  const { setUniverseId } = useUniverseStore();
 
   useEffect(() => {
     if (!isNaN(universeIdParsed) && universeIdParsed > 0) {
@@ -78,7 +78,7 @@ export default function UniverseEditPage() {
   const fetchUniverse = async () => {
     try {
       const data = await getUniverseDetail(universeIdParsed);
-      setCurrentSpaceId(data.id!);
+      setUniverseId(data.id!);
       setTags(data.hashtags.map((tag: string) => `#${tag}`).join(" "));
       setUniverse(data);
     } catch (error) {
