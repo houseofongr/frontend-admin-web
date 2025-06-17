@@ -94,7 +94,7 @@ export default function UserSearch({
             <SpinnerIcon />
           </div>
         )}
-        {users.length === 0 && (
+        {!loading && users.length === 0 && (
           <div className="py-10 ">유저가 존재하지 않습니다.</div>
         )}
         {users && (
