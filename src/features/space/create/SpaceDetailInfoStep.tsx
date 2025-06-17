@@ -69,6 +69,7 @@ export default function SpaceDetailInfoStep({
           {/* 설명 */}
           <TextareaField
             label="설명"
+            placeholder="설명을 입력하세요"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={500}

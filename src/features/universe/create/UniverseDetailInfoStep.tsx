@@ -15,6 +15,7 @@ import { InputField } from "../../../components/Input/InputField";
 import { TextareaField } from "../../../components/Input/TextareaField";
 import { SelectField } from "../../../components/Input/SelectField";
 import { AuthorSelectField } from "../../../components/Input/AuthorSelectField";
+import { SelectableRadioField } from "../../../components/Input/SelectableRadioField";
 
 interface DetailInfoStepProps {
   innerImg: File | null;
@@ -146,50 +147,32 @@ export default function UniverseDetailInfoStep({
     }
   }, [title, description, authorId, category, publicStatus, tagList]);
 
+  const publicStatusOptions = [
+    {
+      value: PublicStatusOption.PUBLIC,
+      icon: <HiGlobeAsiaAustralia size={20} />,
+      label: "공개",
+    },
+    {
+      value: PublicStatusOption.PRIVATE,
+      icon: <TbShieldLock size={20} />,
+      label: "비공개",
+    },
+  ];
+
   return (
     <div className="flex flex-col w-full max-w-[1000px] mx-auto min-h-[420px] ">
       {/* 헤더 + 공개여부 */}
-      <div className="shrink-0 flex justify-between items-end mb-4">
+      <div className="shrink-0 flex justify-between items-end mb-4 mr-4">
         <div className="text-xl font-semibold">세부정보 작성</div>
-        <div className="flex space-x-5">
-          {[PublicStatusOption.PUBLIC, PublicStatusOption.PRIVATE].map(
-            (option) => (
-              <label
-                key={option}
-                className="flex items-center space-x-2 cursor-pointer"
-              >
-                <input
-                  type="radio"
-                  name="publicStatus"
-                  checked={publicStatus === option}
-                  onChange={() => setPublicStatus(option)}
-                  className="hidden"
-                />
-                <span className="h-5 w-5 border border-neutral-500 rounded-full flex items-center justify-center">
-                  {publicStatus === option && (
-                    <span className="h-3 w-3 bg-neutral-400 rounded-full" />
-                  )}
-                </span>
-                <span className="flex items-center gap-1 text-neutral-600">
-                  {option === PublicStatusOption.PUBLIC ? (
-                    <>
-                      <HiGlobeAsiaAustralia
-                        className="text-neutral-500"
-                        size={17}
-                      />{" "}
-                      공개
-                    </>
-                  ) : (
-                    <>
-                      <TbShieldLock className="text-neutral-500" size={17} />{" "}
-                      비공개
-                    </>
-                  )}
-                </span>
-              </label>
-            )
-          )}
-        </div>
+        <SelectableRadioField
+          label=""
+          name="publicStatus"
+          value={publicStatus}
+          onChange={(val) => setPublicStatus(val)}
+          options={publicStatusOptions}
+          border={false}
+        />
       </div>
 
       <div className="flex flex-col lg:flex-row gap-4 lg:h-[500px]">
@@ -232,6 +215,7 @@ export default function UniverseDetailInfoStep({
           {/* 설명 */}
           <TextareaField
             label="설명"
+            placeholder="설명을 입력하세요"
             value={description}
             onChange={(e) => setDescription(e.target.value)}
             maxLength={500}

@@ -4,17 +4,31 @@ import API_CONFIG from "../../../config/api";
 import { RiImageEditFill, RiFileDownloadLine } from "react-icons/ri";
 import WaveformWithAudioLightRow from "../../../components/Sound/WaveformWithAudioLightRow";
 import ContextMenu from "../../../components/ContextMenu";
+import ThumbMusicEditModal from "./ThumbMusicEditModal";
+import { patchUniverseThumbMusicEdit } from "../../../service/universeService";
+import { useUniverseStore } from "../../../context/useUniverseStore";
+import { AlertType } from "../../../components/modal/ModalAlertMessage";
 
 interface UniverseEditMusicProps {
+  showAlert: (
+    text: string,
+    alertType: AlertType,
+    subText: string | null
+  ) => void;
   thumbMusicId: number;
-  onEdit: () => void;
+  setThumbMusicId: (newMusicId: number) => void;
 }
 
 export default function UniverseEditMusic({
+  showAlert,
   thumbMusicId,
-  onEdit,
+  setThumbMusicId,
 }: UniverseEditMusicProps) {
+  const { universeId } = useUniverseStore();
+
   const [open, setOpen] = useState(false);
+  const [showThumbMusicEdit, setShowThumbMusicEdit] = useState(false);
+
   const menuRef = useRef<HTMLDivElement>(null);
 
   const handleDownloadMusic = async () => {
@@ -27,6 +41,23 @@ export default function UniverseEditMusic({
       console.error("이미지 다운로드 실패:", error);
     }
   };
+
+  const handleSaveThumbMusic = (file: File) => {
+    setShowThumbMusicEdit(false);
+    saveThumbMusic(file);
+  };
+
+  // 썸네일 뮤직 저장
+  const saveThumbMusic = async (file: File) => {
+    try {
+      var response = await patchUniverseThumbMusicEdit(universeId!, file);
+      setThumbMusicId(response.newThumbMusicId);
+      showAlert("변경사항이 저장되었습니다.", "success", null);
+    } catch {
+      showAlert("저장 중 오류가 발생했습니다.", "fail", null);
+    }
+  };
+
   // 외부 클릭 감지 후 닫기
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -43,7 +74,7 @@ export default function UniverseEditMusic({
     {
       label: "오디오 수정",
       icon: <RiImageEditFill size={20} />,
-      onClick: onEdit,
+      onClick: () => setShowThumbMusicEdit(true),
     },
     {
       label: "오디오 다운로드",
@@ -60,7 +91,7 @@ export default function UniverseEditMusic({
     >
       <button
         onClick={() => setOpen(!open)}
-        className="z-50 absolute cursor-pointer top-2 right-2 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity  duration-300"
+        className="z-10 absolute cursor-pointer top-2 right-2 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity  duration-300"
       >
         <BiDotsVerticalRounded size={20} />
       </button>
@@ -79,6 +110,13 @@ export default function UniverseEditMusic({
           />
         )}
       </div>
+
+      {showThumbMusicEdit && (
+        <ThumbMusicEditModal
+          onClose={() => setShowThumbMusicEdit(false)}
+          handleSaveThumbMusic={handleSaveThumbMusic}
+        />
+      )}
     </div>
   );
 }

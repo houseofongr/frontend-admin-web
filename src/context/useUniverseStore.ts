@@ -47,7 +47,7 @@ interface UniverseStore {
   currentSpaceId: number | null;
   parentSpaceId: number;
   rootUniverse: UniverseType | null;
-  innerImageId: number | null;
+  activeInnerImageId: number | null;
   existingSpaces: SpaceType[];
   existingPieces: PieceType[];
   setUniverseId: (id: number) => void;
@@ -55,10 +55,10 @@ interface UniverseStore {
   setParentSpaceId: (id: number) => void;
   setRootUniverse: (data: UniverseType) => void;
   setRootUniverseInnerImageId: (id: number) => void;
-  setInnerImageId: (id: number) => void;
+  setActiveInnerImageId: (id: number) => void;
   setExistingSpaces: (spaces: SpaceType[]) => void;
   setExistingPieces: (pieces: PieceType[]) => void;
-  setUniverseData: (innerImgId: number, existingSpaces: SpaceType[], existingPieces: PieceType[]) => void;
+  setUniverseData: (innerImgId  : number, existingSpaces: SpaceType[], existingPieces: PieceType[]) => void;
 
   getSpaceById: (id: number) => SpaceType | null;
   getParentSpaceIdById: (id: number) => number | null;
@@ -79,7 +79,7 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
   parentSpaceId: -1,
   rootUniverse: null,
 
-  innerImageId: null,
+  activeInnerImageId: null,
   existingSpaces: [],
   existingPieces: [],
 
@@ -94,7 +94,7 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
 
   setRootUniverse: (data) => set({ rootUniverse: data }),
 
-  setInnerImageId: (id) => set({ innerImageId: id }),
+  setActiveInnerImageId: (id) => set({ activeInnerImageId: id }),
 
   setExistingSpaces: (spaces) => { set({ existingSpaces: spaces }) },
 
@@ -102,10 +102,11 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
 
   setUniverseData: (innerImageId, existingSpaces, existingPieces) =>
     set({
-      innerImageId,
+      activeInnerImageId: innerImageId,
       existingSpaces,
       existingPieces,
     }),
+
   setRootUniverseInnerImageId: (id: number) =>
     set((state) => ({
       rootUniverse: {
@@ -175,6 +176,8 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
   },
 
   resetUniverse: () => {
+    set({ universeId: null });
+    set({ activeInnerImageId: null });
     set({ currentSpaceId: null });
     set({ parentSpaceId: -1 });
     set({ rootUniverse: null });
