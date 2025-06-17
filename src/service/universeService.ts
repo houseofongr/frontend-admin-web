@@ -5,7 +5,7 @@ export const postUniverse = async (
   innerImg: File,
   thumbnail: File,
   thumbMusic: File,
-  metadata: string
+  metadata: object
 ) => {
   const formData = new FormData();
 
@@ -18,6 +18,7 @@ export const postUniverse = async (
     method: "POST",
     body: formData,
   });
+  
 
   if (!response.ok) throw new Error("Failed to fetch universe.");
 
