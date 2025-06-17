@@ -31,6 +31,7 @@ import { useUniverseStore } from "../../../context/useUniverseStore";
 import {
   getUniverseDetail,
   patchUniverseInfoEdit,
+  patchUniverseThumbMusicEdit,
   patchUniverseThumbnailEdit,
 } from "../../../service/universeService";
 
@@ -58,7 +59,7 @@ export default function UniverseEditPage() {
   });
 
   const [tags, setTags] = useState("");
-  const [showThumbMusicEdit, setShowThumbMusicEdit] = useState(false);
+  // const [showThumbMusicEdit, setShowThumbMusicEdit] = useState(false);
   const [showAuthorEdit, setShowAuthorEdit] = useState(false);
   const [alert, setAlert] = useState<{
     text: string;
@@ -66,7 +67,7 @@ export default function UniverseEditPage() {
     subText: string | null;
   } | null>(null);
 
-  const { setCurrentSpaceId } = useUniverseStore();
+  const { setUniverseId } = useUniverseStore();
 
   useEffect(() => {
     if (!isNaN(universeIdParsed) && universeIdParsed > 0) {
@@ -78,7 +79,7 @@ export default function UniverseEditPage() {
   const fetchUniverse = async () => {
     try {
       const data = await getUniverseDetail(universeIdParsed);
-      setCurrentSpaceId(data.id!);
+      setUniverseId(data.id!);
       setTags(data.hashtags.map((tag: string) => `#${tag}`).join(" "));
       setUniverse(data);
     } catch (error) {
@@ -100,21 +101,11 @@ export default function UniverseEditPage() {
     try {
       await patchUniverseInfoEdit(universe.id!, payload);
       showAlert("변경사항이 저장되었습니다.", "success", null);
-      navigate(-1);
     } catch {
       showAlert("저장 중 오류가 발생했습니다.", "fail", null);
     }
   };
 
-  // 썸네일 뮤직 저장
-  const saveThumbMusic = async (file: File) => {
-    try {
-      await patchUniverseThumbnailEdit(universeIdParsed, file);
-      showAlert("변경사항이 저장되었습니다.", "success", null);
-    } catch {
-      showAlert("저장 중 오류가 발생했습니다.", "fail", null);
-    }
-  };
   // 태그 포맷팅 및 상태 업데이트
   const normalizeTagsAndUpdateState = (raw: string) => {
     const parts = raw.trim().split(/\s+/).filter(Boolean);
@@ -139,10 +130,10 @@ export default function UniverseEditPage() {
     }
   };
 
-  const handleSaveThumbMusic = (file: File) => {
-    setShowThumbMusicEdit(false);
-    saveThumbMusic(file);
-  };
+  // const handleSaveThumbMusic = (file: File) => {
+  //   setShowThumbMusicEdit(false);
+  //   saveThumbMusic(file);
+  // };
 
   const handleCancel = () => {
     showAlert(
@@ -176,22 +167,49 @@ export default function UniverseEditPage() {
 
   return (
     <PageLayout>
-      {alert && (
+      {alert && alert.alertType != "success" && (
         <ModalAlertMessage
           text={alert.text}
           type={alert.alertType}
           onClose={() => setAlert(null)}
-          okButton={<Button label="확인" onClick={() => setAlert(null)} />}
+          okButton={
+            <Button
+              label="취소"
+              onClick={() => {
+                setAlert(null);
+                navigate(-1);
+              }}
+            />
+          }
           cancelButton={
             alert.alertType === "check" ? (
               <Button
-                label="취소"
+                label="수정으로 돌아가기"
                 variant="gray"
                 onClick={() => setAlert(null)}
               />
             ) : undefined
           }
           {...(alert.subText ? { subText: alert.subText } : {})}
+        />
+      )}
+      {alert && alert.alertType == "success" && (
+        <ModalAlertMessage
+          text={alert.text}
+          type={alert.alertType}
+          onClose={() => {
+            setAlert(null);
+            navigate(-1);
+          }}
+          okButton={
+            <Button
+              label="확인"
+              onClick={() => {
+                setAlert(null);
+                navigate(-1);
+              }}
+            />
+          }
         />
       )}
 
@@ -216,13 +234,19 @@ export default function UniverseEditPage() {
 
         <div className="flex flex-col lg:flex-row gap-4 p-3 w-full h-screen min-h-[550px] lg:max-h-[calc(100vh-150px)]">
           <div className="flex flex-2 flex-col gap-3 h-[100%]">
-            <div className="min-h-[200px] bg-black rounded-xl">
+            <div className="grow bg-black rounded-xl">
               <UniverseEditInnerImg />
             </div>
             <div className="lg:min-h-[130px] flex-col min-h-[280px]">
               <UniverseEditMusic
+                showAlert={showAlert}
                 thumbMusicId={universe.thumbMusicId}
-                onEdit={() => setShowThumbMusicEdit(true)}
+                setThumbMusicId={(newMusicId: number) =>
+                  setUniverse((prev) => ({
+                    ...prev,
+                    thumbMusicId: newMusicId,
+                  }))
+                }
               />
             </div>
           </div>
@@ -301,12 +325,12 @@ export default function UniverseEditPage() {
         />
       )} */}
 
-      {showThumbMusicEdit && (
+      {/* {showThumbMusicEdit && (
         <ThumbMusicEditModal
           onClose={() => setShowThumbMusicEdit(false)}
           handleSaveThumbMusic={handleSaveThumbMusic}
         />
-      )}
+      )} */}
 
       {showAuthorEdit && (
         <Modal onClose={() => setShowAuthorEdit(false)} bgColor="white">

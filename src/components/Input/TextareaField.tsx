@@ -18,7 +18,7 @@ export function TextareaField({
         value={value}
         onChange={onChange}
         maxLength={maxLength}
-        className="outline-none bg-transparent w-full h-full text-gray-900 mb-5"
+        className="grow outline-none bg-transparent w-full h-full text-gray-900 mb-5"
         placeholder={placeholder}
       />
       <div className="absolute bottom-2 right-4 text-xs text-gray-500">

@@ -97,6 +97,7 @@ export default function UniverseListPage() {
   }, [currentPage]);
 
   const onEdit = (id: number) => {
+    resetUniverse();
     navigate(`/universe/edit/${id}`);
   };
 
@@ -177,11 +178,6 @@ export default function UniverseListPage() {
 
   return (
     <PageLayout>
-      {loading && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/50">
-          <SpinnerIcon />
-        </div>
-      )}
       {alert && alert.type != "info" && (
         <ModalAlertMessage
           text={alert.text}
@@ -268,7 +264,12 @@ export default function UniverseListPage() {
         {/* 유니버스 리스트 */}
         <div className="flex items-center flex-col lg:py-4">
           <GridHeader headerTitles={universeListHeaderTitles} />
-          {universeList.length === 0 && (
+          {loading && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center">
+              <SpinnerIcon />
+            </div>
+          )}
+          {!loading && universeList.length === 0 && (
             <div className="py-10 ">유니버스가 존재하지 않습니다.</div>
           )}
           {universeList && (
@@ -286,7 +287,6 @@ export default function UniverseListPage() {
                     onPlayMusic={(id: number) => {
                       setShowThumbMusic(id);
                       console.log(id);
-
                     }}
                   />
                 );

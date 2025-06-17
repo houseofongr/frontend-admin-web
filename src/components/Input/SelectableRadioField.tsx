@@ -8,6 +8,7 @@ type SelectableRadioFieldProps<T extends string> = {
     label: string;
   }[];
   name: string;
+  border?:boolean;
 };
 
 export function SelectableRadioField<T extends string>({
@@ -16,9 +17,16 @@ export function SelectableRadioField<T extends string>({
   onChange,
   options,
   name,
+  border = true,
 }: SelectableRadioFieldProps<T>) {
   return (
-    <div className="relative flex flex-col border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[75px]">
+    <div
+      className={`relative flex flex-col ${
+        border
+          ? "border border-gray-300 rounded-xl px-5 pt-3 pb-2 min-h-[75px]"
+          : ""
+      }`}
+    >
       <label className="text-neutral-500 mb-0.5">{label}</label>
       <div className="flex space-x-10 justify-center">
         {options.map((option) => (

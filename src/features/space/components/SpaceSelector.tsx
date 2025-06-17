@@ -8,6 +8,7 @@ import {
 } from "../../../context/useUniverseStore";
 import { IoIosArrowBack } from "react-icons/io";
 import SpinnerIcon from "../../../components/icons/SpinnerIcon";
+import { ScaleLoader } from "react-spinners";
 
 interface PercentPoint {
   xPercent: number;
@@ -153,13 +154,13 @@ export default function SpaceSelector({
     }
   };
 
+  // 화면 전환 함수
   const handleMoveToSpace = (space: SpaceType) => {
-    setParentSpaceId(currentSpaceId!);
+    setParentSpaceId(currentSpaceId ?? -1);
     setCurrentSpaceId(space.spaceId);
     setPopupData(null);
 
   };
-
   const handleMouseEnter = (index: number) => {
     const space = existingSpaces[index];
     const start = toPixel({ xPercent: space.startX, yPercent: space.startY });
@@ -184,12 +185,11 @@ export default function SpaceSelector({
   };
 
   const handleBackClick = () => {
-    if (
-      rootUniverse &&
-      (parentSpaceId === rootUniverse.universeId || parentSpaceId === -1)
-    ) {
+    console.log(parentSpaceId, currentSpaceId);
+
+    if (parentSpaceId == -1) {
       setParentSpaceId(-1);
-      setCurrentSpaceId(rootUniverse.universeId);
+      setCurrentSpaceId(-1);
     } else {
       const parentId = getParentSpaceIdById(parentSpaceId);
       if (parentId != null) {
@@ -207,7 +207,7 @@ export default function SpaceSelector({
     >
       {loading && (
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70">
-          <SpinnerIcon />
+          <ScaleLoader width={2} height={40} color="#F5946D" />
         </div>
       )}
 
@@ -279,10 +279,12 @@ export default function SpaceSelector({
             <div
               className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none"
               style={{
-                left: `calc(50% - ${imageSize.width / 2}px + ${toPixel(startPoint).x - 3
-                  }px)`,
-                top: `calc(50% - ${imageSize.height / 2}px + ${toPixel(startPoint).y - 3
-                  }px)`,
+                left: `calc(50% - ${imageSize.width / 2}px + ${
+                  toPixel(startPoint).x - 3
+                }px)`,
+                top: `calc(50% - ${imageSize.height / 2}px + ${
+                  toPixel(startPoint).y - 3
+                }px)`,
               }}
             />
           )}
@@ -290,10 +292,12 @@ export default function SpaceSelector({
             <div
               className="absolute w-2 h-2 z-10 border-2 border-amber-400 bg-white pointer-events-none"
               style={{
-                left: `calc(50% - ${imageSize.width / 2}px + ${toPixel(endPoint).x - 5
-                  }px)`,
-                top: `calc(50% - ${imageSize.height / 2}px + ${toPixel(endPoint).y - 5
-                  }px)`,
+                left: `calc(50% - ${imageSize.width / 2}px + ${
+                  toPixel(endPoint).x - 5
+                }px)`,
+                top: `calc(50% - ${imageSize.height / 2}px + ${
+                  toPixel(endPoint).y - 5
+                }px)`,
               }}
             />
           )}
@@ -307,8 +311,7 @@ export default function SpaceSelector({
           )}
 
           {/* 기존 스페이스 박스 */}
-          {existingSpaces.map((space, index) =>
-          (
+          {existingSpaces.map((space, index) => (
             <div
               key={index}
               className="absolute"
@@ -320,13 +323,13 @@ export default function SpaceSelector({
               onMouseLeave={handleMouseLeave}
             >
               <div
-                className={`w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${hoveredIndex === index ? "opacity-100" : "opacity-30"
-                  }`}
+                className={`w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
+                  hoveredIndex === index ? "opacity-100" : "opacity-30"
+                }`}
                 onClick={() => handleMoveToSpace(space)}
               />
             </div>
-          ))
-          }
+          ))}
 
           {/* 팝업 */}
           {popupData && (

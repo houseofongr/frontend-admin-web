@@ -5,7 +5,7 @@ export const postUniverse = async (
   innerImg: File,
   thumbnail: File,
   thumbMusic: File,
-  metadata: string
+  metadata: object
 ) => {
   const formData = new FormData();
 
@@ -18,6 +18,7 @@ export const postUniverse = async (
     method: "POST",
     body: formData,
   });
+  
 
   if (!response.ok) throw new Error("Failed to fetch universe.");
 
@@ -132,6 +133,10 @@ export const patchUniverseInnerImageEdit = async (
 ) => {
   const formData = new FormData();
   formData.append("innerImage", innerImg);
+
+  console.log(`${API_CONFIG.BACK_API}/universes/inner-image/${universeId}`);
+  console.log(formData);
+
 
   const response = await fetch(
     `${API_CONFIG.BACK_API}/universes/inner-image/${universeId}`,

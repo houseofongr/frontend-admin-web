@@ -253,7 +253,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
         innerImg,
         thumbnail,
         thumbMusic,
-        JSON.stringify(metadata)
+        metadata
       );
 
       showAlert("새로운 유니버스가 성공적으로 저장되었습니다.", "success");
