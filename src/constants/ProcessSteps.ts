@@ -1,5 +1,6 @@
-export enum SpaceCreateStep {
-  SetSize,
+export enum SpaceCreateEditStep {
+  SetSizeOnCreate,
+  SetSizeOnEdit,
   UploadImage,
   FillDetails,
 }

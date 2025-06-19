@@ -1,24 +1,28 @@
 import { IoPlanetOutline } from "react-icons/io5";
 import DraggableIconTitleModal from "../../../components/modal/DraggableIconTitleModal";
 import { LuPaintbrush } from "react-icons/lu";
-import { SpaceCreateStep } from "../../../constants/ProcessSteps";
+import { SpaceCreateEditStep } from "../../../constants/ProcessSteps";
 
 interface SpaceCreateSetSizeModalProps {
-  handleCreateModalClose: () => void;
+  title: string;
+  description: string;
+  handleModalClose: () => void;
   resetSelection: () => void;
-  setCreateStep: (step: SpaceCreateStep) => void;
+  onSubmit:() => void;
 }
 
 export default function SpaceCreateSetSizeModal({
-  handleCreateModalClose,
+  title,
+  description,
+  handleModalClose: handleCreateModalClose,
   resetSelection,
-  setCreateStep,
+  onSubmit,
 }: SpaceCreateSetSizeModalProps) {
   return (
     <DraggableIconTitleModal
       onClose={handleCreateModalClose}
-      title="스페이스 생성"
-      description="새로운 스페이스를 생성합니다."
+      title={title}
+      description={description}
       icon={<IoPlanetOutline className="text-blue-950" size={20} />}
       bgColor="white"
     >
@@ -41,7 +45,7 @@ export default function SpaceCreateSetSizeModal({
         <div className="flex gap-3">
           <button
             className="px-5 py-2 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 transition"
-            onClick={() => setCreateStep(SpaceCreateStep.UploadImage)}
+            onClick={onSubmit}
           >
             완료
           </button>

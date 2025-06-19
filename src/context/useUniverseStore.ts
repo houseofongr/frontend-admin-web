@@ -1,5 +1,6 @@
 // stores/useUniverseStore.ts
 import { create } from "zustand";
+import { getUniverseTree } from "../service/universeService";
 
 export interface PieceType {
   pieceId: number;
@@ -44,46 +45,65 @@ export type SaveTargetType = null | "universe" | "space";
 
 interface UniverseStore {
   universeId: number | null;
+  rootUniverse: UniverseType | null;
+
+  currentSpace: SpaceType | null;
   currentSpaceId: number | null;
   parentSpaceId: number;
-  rootUniverse: UniverseType | null;
-  activeInnerImageId: number | null;
+
   existingSpaces: SpaceType[];
   existingPieces: PieceType[];
+
+  activeInnerImageId: number | null;
+
   setUniverseId: (id: number) => void;
+  setRootUniverse: (data: UniverseType) => void;
+
+  setCurrentSpace: (data: SpaceType | null) => void;
   setCurrentSpaceId: (id: number | null) => void;
   setParentSpaceId: (id: number) => void;
-  setRootUniverse: (data: UniverseType) => void;
-  setRootUniverseInnerImageId: (id: number) => void;
-  setActiveInnerImageId: (id: number) => void;
+
   setExistingSpaces: (spaces: SpaceType[]) => void;
   setExistingPieces: (pieces: PieceType[]) => void;
-  setUniverseData: (innerImgId  : number, existingSpaces: SpaceType[], existingPieces: PieceType[]) => void;
+
+  setRootUniverseInnerImageId: (id: number) => void;
+  setActiveInnerImageId: (id: number) => void;
+
+  setUniverseData: (
+    innerImgId: number,
+    existingSpaces: SpaceType[],
+    existingPieces: PieceType[]
+  ) => void;
 
   getSpaceById: (id: number) => SpaceType | null;
   getParentSpaceIdById: (id: number) => number | null;
+  getParentSpaceInnerImageId: () => number | null;
 
-  // 새로 추가한 함수
   getChildrenSpaces: (parentId: number | null) => SpaceType[];
+
   updateExistingSpacesByCurrentSpace: () => void;
 
   resetUniverse: () => void;
-  refreshUniverseData: (currentPageSpaceId: number) => void;
+  refreshUniverseData: () => void;
 }
 
 export const useUniverseStore = create<UniverseStore>((set, get) => ({
   universeId: null,
+  rootUniverse: null,
+
   // currentSpaceId 값이 -1이면 루트
+  currentSpace: null,
   currentSpaceId: null,
 
   parentSpaceId: -1,
-  rootUniverse: null,
 
   activeInnerImageId: null,
   existingSpaces: [],
   existingPieces: [],
 
   setUniverseId: (id) => set({ universeId: id }),
+
+  setCurrentSpace: (space) => set({ currentSpace: space }),
 
   setCurrentSpaceId: (id) => {
     set({ currentSpaceId: id });
@@ -92,11 +112,16 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
 
   setParentSpaceId: (id) => set({ parentSpaceId: id }),
 
-  setRootUniverse: (data) => set({ rootUniverse: data }),
+  setRootUniverse: (data) => {
+    set({ rootUniverse: data });
+    console.log(data);
+  },
 
   setActiveInnerImageId: (id) => set({ activeInnerImageId: id }),
 
-  setExistingSpaces: (spaces) => { set({ existingSpaces: spaces }) },
+  setExistingSpaces: (spaces) => {
+    set({ existingSpaces: spaces });
+  },
 
   setExistingPieces: (pieces) => set({ existingPieces: pieces }),
 
@@ -114,7 +139,7 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
         innerImageId: id,
         spaces: state.rootUniverse?.spaces ?? [],
         pieces: state.rootUniverse?.pieces ?? [],
-      }
+      },
     })),
 
   getSpaceById: (id) => {
@@ -145,6 +170,23 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
     if (!u) return null;
     return find(u.spaces);
   },
+
+  getParentSpaceInnerImageId: (): number | null => {
+    const { rootUniverse, currentSpaceId, getParentSpaceIdById, getSpaceById } =
+      get();
+    if (!rootUniverse || currentSpaceId == null) return null;
+
+    const parentId = getParentSpaceIdById(currentSpaceId);
+
+    // 부모가 루트라면 universe의 이미지 ID 반환
+    if (parentId === null || parentId === -1) {
+      return rootUniverse.innerImageId;
+    }
+
+    const parentSpace = getSpaceById(parentId);
+    return parentSpace?.innerImageId ?? null;
+  },
+
   getChildrenSpaces: (parentId: number | null): SpaceType[] => {
     const root = get().rootUniverse;
     if (!root) return [];
@@ -161,7 +203,9 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
 
     if (parentId === null || parentId === -1) {
       // 루트 레벨 스페이스들 필터링
-      return root.spaces.filter(s => s.parentSpaceId === null || s.parentSpaceId === -1);
+      return root.spaces.filter(
+        (s) => s.parentSpaceId === null || s.parentSpaceId === -1
+      );
     }
 
     const parentSpace = findParentSpace(root.spaces);
@@ -186,24 +230,33 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
   },
 
   refreshUniverseData: async () => {
-    // try {
-    //   const response = await axios.get(`/api/universe/${universeId}`);
-    //   const data: UniverseType = response.data;
+    const {
+      universeId,
+      getSpaceById,
+      setRootUniverse,
+      setUniverseData,
+      setCurrentSpaceId,
+      setCurrentSpace,
+      setParentSpaceId,
+    } = get();
 
-    //   set({ rootUniverse: data });
+    if (universeId == null) return;
 
-    //   // 예: 현재 spaceId 다시 설정 (기존 위치 유지)
-    //   const currentId = get().currentSpaceId;
-    //   if (currentId) {
-    //     const found = get().getSpaceById(currentId);
-    //     if (!found) {
-    //       // 현재 ID가 없어졌으면 루트로 이동
-    //       set({ currentSpaceId: null, parentSpaceId: -1 });
-    //     }
-    //   }
-    // } catch (error) {
-    //   console.error("Failed to refresh universe data", error);
-    // }
+    const data: UniverseType = await getUniverseTree(universeId);
+
+    const spaceID = get().currentSpaceId;
+    if (spaceID == null) {
+      setRootUniverse(data);
+      setUniverseData(data.innerImageId, data.spaces, data.pieces);
+      setCurrentSpaceId(-1);
+      setCurrentSpace(null);
+      setParentSpaceId(-1);
+    } else {
+      setRootUniverse(data);
+      const space = getSpaceById(spaceID);
+      if (space != null) {
+        setUniverseData(space.innerImageId, space.spaces, space.pieces);
+      }
+    }
   },
-
 }));

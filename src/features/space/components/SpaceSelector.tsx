@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import API_CONFIG from "../../../config/api";
-import { SpaceCreateStep } from "../../../constants/ProcessSteps";
+import { SpaceCreateEditStep } from "../../../constants/ProcessSteps";
 import {
   PieceType,
   SpaceType,
@@ -16,7 +16,7 @@ interface PercentPoint {
 }
 
 interface SpaceSelectorProps {
-  step: SpaceCreateStep | null;
+  step: SpaceCreateEditStep | null;
   innerImageId: number | null;
   startPoint: PercentPoint | null;
   endPoint: PercentPoint | null;
@@ -36,11 +36,12 @@ export default function SpaceSelector({
     currentSpaceId,
     setParentSpaceId,
     setCurrentSpaceId,
+    setCurrentSpace,
     parentSpaceId,
     getParentSpaceIdById,
     rootUniverse,
     existingSpaces,
-    existingPieces
+    existingPieces,
   } = useUniverseStore();
 
   const [hoverPos, setHoverPos] = useState<PercentPoint | null>(null);
@@ -134,7 +135,10 @@ export default function SpaceSelector({
 
   // 이벤트 핸들러
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (step === SpaceCreateStep.SetSize) {
+    if (
+      step === SpaceCreateEditStep.SetSizeOnCreate ||
+      step === SpaceCreateEditStep.SetSizeOnEdit
+    ) {
       setHoverPos(getRelativePercentPos(e));
     } else {
       setHoverPos(null);
@@ -142,7 +146,11 @@ export default function SpaceSelector({
   };
 
   const handleClick = (e: React.MouseEvent) => {
-    if (step !== SpaceCreateStep.SetSize) return;
+    if (
+      step !== SpaceCreateEditStep.SetSizeOnCreate &&
+      step !== SpaceCreateEditStep.SetSizeOnEdit
+    )
+      return;
     const pos = getRelativePercentPos(e);
     if (!pos) return;
 
@@ -158,8 +166,8 @@ export default function SpaceSelector({
   const handleMoveToSpace = (space: SpaceType) => {
     setParentSpaceId(currentSpaceId ?? -1);
     setCurrentSpaceId(space.spaceId);
+    setCurrentSpace(space);
     setPopupData(null);
-
   };
   const handleMouseEnter = (index: number) => {
     const space = existingSpaces[index];
@@ -238,9 +246,9 @@ export default function SpaceSelector({
           )}
 
           {/* 크로스헤어 */}
-          {step === SpaceCreateStep.SetSize &&
-            hoverPos &&
-            !endPoint &&
+          {hoverPos &&
+            ((step === SpaceCreateEditStep.SetSizeOnCreate && !endPoint) ||
+              step === SpaceCreateEditStep.SetSizeOnEdit) &&
             (() => {
               const { x, y } = toPixel(hoverPos);
               const left = `calc(50% - ${imageSize.width / 2}px + ${x}px)`;
