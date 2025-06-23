@@ -1,14 +1,13 @@
 import { IoPlanetOutline } from "react-icons/io5";
 import DraggableIconTitleModal from "../../../components/modal/DraggableIconTitleModal";
 import { LuPaintbrush } from "react-icons/lu";
-import { SpaceCreateEditStep } from "../../../constants/ProcessSteps";
 
 interface SpaceCreateSetSizeModalProps {
   title: string;
   description: string;
   handleModalClose: () => void;
   resetSelection: () => void;
-  onSubmit:() => void;
+  onSubmit: () => void;
 }
 
 export default function SpaceCreateSetSizeModal({
