@@ -11,6 +11,8 @@ export interface UniverseType {
   pieces: PieceType[];
 }
 
+export type SaveTargetType = null | "universe" | "space";
+
 interface UniverseStore {
   universeId: number | null;
   rootUniverse: UniverseType | null;

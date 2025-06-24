@@ -20,8 +20,6 @@ export interface SpaceType {
   updatedTime: number;
 }
 
-export type SaveTargetType = null | "universe" | "space";
-
 interface SpaceStore {
   currentSpace: SpaceType | null;
   currentSpaceId: number | null;
@@ -31,6 +29,7 @@ interface SpaceStore {
   setCurrentSpace: (space: SpaceType | null) => void;
   setCurrentSpaceId: (id: number | null) => void;
   setParentSpaceId: (id: number) => void;
+
   setExistingSpaces: (spaces: SpaceType[]) => void;
 
   getSpaceById: (id: number) => SpaceType | null;

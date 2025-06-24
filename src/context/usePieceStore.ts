@@ -15,6 +15,7 @@ export interface PieceType {
   createdTime: number;
   updatedTime: number;
 }
+export type CreatePieceMethod = "coordination" | "image";
 
 interface PieceStore {
   existingPieces: PieceType[];

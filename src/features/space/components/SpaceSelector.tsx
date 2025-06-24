@@ -1,14 +1,17 @@
 import React, { useState, useRef, useEffect } from "react";
 import API_CONFIG from "../../../config/api";
-import { SpaceCreateEditStep } from "../../../constants/ProcessSteps";
 import {
-  PieceType,
-  SpaceType,
-  useUniverseStore,
-} from "../../../context/useUniverseStore";
+  CreateEditStep,
+} from "../../../constants/ProcessSteps";
+import { useUniverseStore } from "../../../context/useUniverseStore";
+import { PieceType } from "../../../context/usePieceStore";
+import { SpaceType } from "../../../context/useSpcaeStore";
 import { IoIosArrowBack } from "react-icons/io";
 import SpinnerIcon from "../../../components/icons/SpinnerIcon";
 import { ScaleLoader } from "react-spinners";
+import { useSpaceStore } from "../../../context/useSpcaeStore";
+import { usePieceStore } from "../../../context/usePieceStore";
+import PieceDetailPanel from "../../piece/components/PieceDetailPanel";
 
 interface PercentPoint {
   xPercent: number;
@@ -16,7 +19,7 @@ interface PercentPoint {
 }
 
 interface SpaceSelectorProps {
-  step: SpaceCreateEditStep | null;
+  step: CreateEditStep | null;
   innerImageId: number | null;
   startPoint: PercentPoint | null;
   endPoint: PercentPoint | null;
@@ -32,6 +35,8 @@ export default function SpaceSelector({
   setStartPoint,
   setEndPoint,
 }: SpaceSelectorProps) {
+  const { rootUniverse } = useUniverseStore();
+
   const {
     currentSpaceId,
     setParentSpaceId,
@@ -39,14 +44,15 @@ export default function SpaceSelector({
     setCurrentSpace,
     parentSpaceId,
     getParentSpaceIdById,
-    rootUniverse,
     existingSpaces,
-    existingPieces,
-  } = useUniverseStore();
+  } = useSpaceStore();
+
+  const { existingPieces } = usePieceStore();
 
   const [hoverPos, setHoverPos] = useState<PercentPoint | null>(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [hoveredSpaceIndex, setHoveredSpaceIndex] = useState<number | null>(null);
+  const [hoveredPieceIndex, setHoveredPieceIndex] = useState<number | null>(null);
   const [popupData, setPopupData] = useState<{
     x: number;
     y: number;
@@ -55,6 +61,8 @@ export default function SpaceSelector({
   } | null>(null);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
+  const [currentPiece, setCurrentPiece] = useState<PieceType | null>(null);
+
   const imgRef = useRef<HTMLImageElement>(null);
 
   // 이미지 크기 추적
@@ -136,8 +144,9 @@ export default function SpaceSelector({
   // 이벤트 핸들러
   const handleMouseMove = (e: React.MouseEvent) => {
     if (
-      step === SpaceCreateEditStep.SetSizeOnCreate ||
-      step === SpaceCreateEditStep.SetSizeOnEdit
+      step === CreateEditStep.Space_SetSizeOnCreate ||
+      step === CreateEditStep.Space_SetSizeOnEdit ||
+      step === CreateEditStep.Piece_SelectCoordinates
     ) {
       setHoverPos(getRelativePercentPos(e));
     } else {
@@ -147,8 +156,9 @@ export default function SpaceSelector({
 
   const handleClick = (e: React.MouseEvent) => {
     if (
-      step !== SpaceCreateEditStep.SetSizeOnCreate &&
-      step !== SpaceCreateEditStep.SetSizeOnEdit
+      step !== CreateEditStep.Space_SetSizeOnCreate &&
+      step !== CreateEditStep.Space_SetSizeOnEdit &&
+      step !== CreateEditStep.Piece_SelectCoordinates
     )
       return;
     const pos = getRelativePercentPos(e);
@@ -169,7 +179,13 @@ export default function SpaceSelector({
     setCurrentSpace(space);
     setPopupData(null);
   };
-  const handleMouseEnter = (index: number) => {
+
+  const handleMoveToPiece = (piece: PieceType) => {
+    setCurrentPiece(piece);
+    console.log(piece);
+    
+  };
+  const handleSpaceMouseEnter = (index: number) => {
     const space = existingSpaces[index];
     const start = toPixel({ xPercent: space.startX, yPercent: space.startY });
     const end = toPixel({ xPercent: space.endX, yPercent: space.endY });
@@ -178,7 +194,7 @@ export default function SpaceSelector({
     const width = Math.abs(end.x - start.x);
     const height = Math.abs(end.y - start.y);
 
-    setHoveredIndex(index);
+    setHoveredSpaceIndex(index);
     setPopupData({
       x: left + width / 2 + 10,
       y: top + height / 2 + 5,
@@ -187,14 +203,34 @@ export default function SpaceSelector({
     });
   };
 
-  const handleMouseLeave = () => {
-    setHoveredIndex(null);
+  const handlePieceMouseEnter = (index: number) => {
+    const piece = existingPieces[index];
+    const start = toPixel({ xPercent: piece.startX, yPercent: piece.startY });
+    const end = toPixel({ xPercent: piece.endX, yPercent: piece.endY });
+    const left = Math.min(start.x, end.x);
+    const top = Math.min(start.y, end.y);
+    const width = Math.abs(end.x - start.x);
+    const height = Math.abs(end.y - start.y);
+
+    setHoveredPieceIndex(index);
+    setPopupData({
+      x: left + width / 2 + 10,
+      y: top + height / 2 + 5,
+      title: piece.title,
+      description: piece.description,
+    });
+  };
+  const handleSpaceMouseLeave = () => {
+    setHoveredSpaceIndex(null);
+    setPopupData(null);
+  };
+
+  const handlePieceMouseLeave = () => {
+    setHoveredPieceIndex(null);
     setPopupData(null);
   };
 
   const handleBackClick = () => {
-    console.log(parentSpaceId, currentSpaceId);
-
     if (parentSpaceId == -1) {
       setParentSpaceId(-1);
       setCurrentSpaceId(-1);
@@ -247,8 +283,9 @@ export default function SpaceSelector({
 
           {/* 크로스헤어 */}
           {hoverPos &&
-            ((step === SpaceCreateEditStep.SetSizeOnCreate && !endPoint) ||
-              step === SpaceCreateEditStep.SetSizeOnEdit) &&
+            ((step === CreateEditStep.Space_SetSizeOnCreate && !endPoint) ||
+              step === CreateEditStep.Space_SetSizeOnEdit ||
+              step === CreateEditStep.Piece_SelectCoordinates) &&
             (() => {
               const { x, y } = toPixel(hoverPos);
               const left = `calc(50% - ${imageSize.width / 2}px + ${x}px)`;
@@ -321,20 +358,40 @@ export default function SpaceSelector({
           {/* 기존 스페이스 박스 */}
           {existingSpaces.map((space, index) => (
             <div
-              key={index}
+              key={`space-${index}`}
               className="absolute"
               style={calcBoxStyle(
                 { xPercent: space.startX, yPercent: space.startY },
                 { xPercent: space.endX, yPercent: space.endY }
               )}
-              onMouseEnter={() => handleMouseEnter(index)}
-              onMouseLeave={handleMouseLeave}
+              onMouseEnter={() => handleSpaceMouseEnter(index)}
+              onMouseLeave={handleSpaceMouseLeave}
             >
               <div
                 className={`w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
-                  hoveredIndex === index ? "opacity-100" : "opacity-30"
+                  hoveredSpaceIndex === index ? "opacity-100" : "opacity-30"
                 }`}
                 onClick={() => handleMoveToSpace(space)}
+              />
+            </div>
+          ))}
+
+          {existingPieces.map((piece, index) => (
+            <div
+              key={`piece-${index}`}
+              className="absolute"
+              style={calcBoxStyle(
+                { xPercent: piece.startX, yPercent: piece.startY },
+                { xPercent: piece.endX, yPercent: piece.endY }
+              )}
+              onMouseEnter={() => handlePieceMouseEnter(index)}
+              onMouseLeave={handlePieceMouseLeave}
+            >
+              <div
+                className={`w-full h-full border-3 border-blue-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
+                  hoveredPieceIndex === index ? "opacity-100" : "opacity-30"
+                }`}
+                onClick={() => handleMoveToPiece(piece)}
               />
             </div>
           ))}
@@ -352,6 +409,7 @@ export default function SpaceSelector({
               <div className="text-xs mt-1">{popupData.description}</div>
             </div>
           )}
+          <PieceDetailPanel piece={currentPiece} />
         </>
       )}
     </div>
