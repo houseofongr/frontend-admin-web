@@ -18,8 +18,8 @@ export const postPieceCreateByCoordinate = async (payload: object) => {
     pieceId: number,
     page: number,
     sizeValue: number,
-    sortType: string | null,
-    isAsc: string | null
+    sortType?: string | null,
+    isAsc?: string | null
   ) => {
     const query = new URLSearchParams({
       page: page.toString(),

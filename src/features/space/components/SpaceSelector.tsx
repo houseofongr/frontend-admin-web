@@ -47,7 +47,7 @@ export default function SpaceSelector({
     existingSpaces,
   } = useSpaceStore();
 
-  const { existingPieces } = usePieceStore();
+  const { existingPieces, currentPiece, setCurrentPiece } = usePieceStore();
 
   const [hoverPos, setHoverPos] = useState<PercentPoint | null>(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -61,7 +61,6 @@ export default function SpaceSelector({
   } | null>(null);
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [currentPiece, setCurrentPiece] = useState<PieceType | null>(null);
 
   const imgRef = useRef<HTMLImageElement>(null);
 
@@ -409,7 +408,11 @@ export default function SpaceSelector({
               <div className="text-xs mt-1">{popupData.description}</div>
             </div>
           )}
-          <PieceDetailPanel piece={currentPiece} />
+
+          <PieceDetailPanel
+            piece={currentPiece}
+            onClose={() => setCurrentPiece(null)}
+          />
         </>
       )}
     </div>

@@ -50,7 +50,10 @@ import {
 import SpaceCreateSetSizeModal from "../../space/components/SpaceCreateSetSizeModal";
 import SpaceInfoEditModal from "../../space/components/SpaceInfoEditModal";
 import { useSpaceStore } from "../../../context/useSpcaeStore";
-import { CreatePieceMethod } from "../../../context/usePieceStore";
+import {
+  CreatePieceMethod,
+  usePieceStore,
+} from "../../../context/usePieceStore";
 import { postPieceCreateByCoordinate } from "../../../service/pieceService";
 
 export default function UniverseEditInnerImg() {
@@ -78,6 +81,8 @@ export default function UniverseEditInnerImg() {
     setParentSpaceId,
     getParentSpaceInnerImageId,
   } = useSpaceStore();
+
+  const { currentPiece } = usePieceStore();
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [createStep, setCreateStep] = useState<CreateEditStep | null>(null);
@@ -486,38 +491,43 @@ export default function UniverseEditInnerImg() {
           {...(alert.subText ? { subText: alert.subText } : {})}
         />
       )}
+      {currentPiece == null && (
+        <>
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="z-10 absolute cursor-pointer top-2 right-2 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <BiDotsVerticalRounded size={20} />
+          </button>
 
-      <button
-        onClick={() => setMenuOpen(!menuOpen)}
-        className="z-10 absolute cursor-pointer top-2 right-2 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <BiDotsVerticalRounded size={20} />
-      </button>
+          <ContextMenu
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            items={menuItems}
+          />
 
-      <ContextMenu
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        items={menuItems}
-      />
-
-      <button
-        onClick={() => setCreateStep(CreateEditStep.Piece_SelectCoordinates)}
-        className="z-10 absolute cursor-pointer bottom-3 right-3 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <PiPuzzlePiece size={20} />
-      </button>
-      <button
-        onClick={() => setCreateStep(CreateEditStep.Space_SetSizeOnCreate)}
-        className="z-10 absolute cursor-pointer bottom-3 right-12 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <RiFunctionAddLine size={20} />
-      </button>
-      <button
-        onClick={() => {}}
-        className="z-10 absolute cursor-pointer bottom-3 right-22 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <MdOutlineFullscreen size={25} />
-      </button>
+          <button
+            onClick={() =>
+              setCreateStep(CreateEditStep.Piece_SelectCoordinates)
+            }
+            className="z-10 absolute cursor-pointer bottom-3 right-3 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <PiPuzzlePiece size={20} />
+          </button>
+          <button
+            onClick={() => setCreateStep(CreateEditStep.Space_SetSizeOnCreate)}
+            className="z-10 absolute cursor-pointer bottom-3 right-12 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <RiFunctionAddLine size={20} />
+          </button>
+          <button
+            onClick={() => {}}
+            className="z-10 absolute cursor-pointer bottom-3 right-22 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <MdOutlineFullscreen size={25} />
+          </button>
+        </>
+      )}
 
       <SpaceSelector
         step={createStep}
