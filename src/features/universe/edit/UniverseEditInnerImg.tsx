@@ -6,7 +6,12 @@ import {
   RiDeleteBin6Line,
 } from "react-icons/ri";
 import { MdOutlineFullscreen } from "react-icons/md";
-import { PiDownloadSimpleBold, PiGpsBold } from "react-icons/pi";
+import {
+  PiDownloadSimpleBold,
+  PiGpsBold,
+  PiPuzzlePiece,
+  PiPuzzlePieceBold,
+} from "react-icons/pi";
 import { IoPlanetOutline } from "react-icons/io5";
 import { TbPencilCog } from "react-icons/tb";
 import { BiDotsVerticalRounded } from "react-icons/bi";
@@ -15,6 +20,8 @@ import API_CONFIG from "../../../config/api";
 import {
   postSpaceCreate,
   patchSpaceInnerImageEdit,
+  patchSpaceInfoEdit,
+  patchSpacePositionEdit,
 } from "../../../service/spaceService";
 import {
   getUniverseTree,
@@ -30,43 +37,61 @@ import ModalAlertMessage, {
 import Button from "../../../components/buttons/Button";
 
 import SpaceSelector from "../../space/components/SpaceSelector";
-import SpaceDetailInfoStep from "../../space/create/SpaceDetailInfoStep";
+import DetailInfoStep from "../../space/create/DetailInfoStep";
 
-import { SpaceCreateStep } from "../../../constants/ProcessSteps";
+import { CreateEditStep } from "../../../constants/ProcessSteps";
 import { PercentPoint } from "../../../constants/image";
 import {
   SaveTargetType,
   UniverseType,
   useUniverseStore,
 } from "../../../context/useUniverseStore";
+
 import SpaceCreateSetSizeModal from "../../space/components/SpaceCreateSetSizeModal";
 import SpaceInfoEditModal from "../../space/components/SpaceInfoEditModal";
+import { useSpaceStore } from "../../../context/useSpcaeStore";
+import {
+  CreatePieceMethod,
+  usePieceStore,
+} from "../../../context/usePieceStore";
+import { postPieceCreateByCoordinate } from "../../../service/pieceService";
 
 export default function UniverseEditInnerImg() {
   const menuRef = useRef<HTMLDivElement>(null);
 
   const {
     universeId,
-    existingSpaces,
-    existingPieces,
     activeInnerImageId,
     rootUniverse,
-    currentSpaceId,
-    parentSpaceId,
-    getSpaceById,
-    setCurrentSpaceId,
     setRootUniverse,
     setUniverseData,
-    setParentSpaceId,
     setRootUniverseInnerImageId,
     setActiveInnerImageId,
+    refreshUniverseData,
   } = useUniverseStore();
 
+  const {
+    existingSpaces,
+    currentSpaceId,
+    parentSpaceId,
+    currentSpace,
+    getSpaceById,
+    setCurrentSpaceId,
+    setCurrentSpace,
+    setParentSpaceId,
+    getParentSpaceInnerImageId,
+  } = useSpaceStore();
+
+  const { currentPiece } = usePieceStore();
+
   const [menuOpen, setMenuOpen] = useState(false);
-  const [createStep, setCreateStep] = useState<SpaceCreateStep | null>(null);
+  const [createStep, setCreateStep] = useState<CreateEditStep | null>(null);
+
   const [startPoint, setStartPoint] = useState<PercentPoint | null>(null);
   const [endPoint, setEndPoint] = useState<PercentPoint | null>(null);
   const [innerImg, setInnerImg] = useState<File | null>(null);
+  const [pieceInnerImg, setPieceInnerImg] = useState<File | null>(null);
+
   const [alert, setAlert] = useState<{
     text: string;
     type: AlertType;
@@ -79,6 +104,18 @@ export default function UniverseEditInnerImg() {
   }>({ show: false, type: null, id: -1 });
 
   const [showInfoEdit, setShowInfoEdit] = useState<boolean>(false);
+  const [showCoordinatesEdit, setShowCoordinatesEdit] =
+    useState<boolean>(false);
+
+  const [createPieceData, setCreatePieceData] = useState<{
+    method: CreatePieceMethod;
+    title: string;
+    description: string;
+  }>({
+    method: "coordination",
+    title: "string",
+    description: "string",
+  });
 
   // currentSpaceId 변경 시마다 화면 데이터 설정
   useEffect(() => {
@@ -108,6 +145,7 @@ export default function UniverseEditInnerImg() {
           rootUniverse.pieces
         );
         setCurrentSpaceId(-1);
+        setCurrentSpace(null);
       }
     }
   }, [currentSpaceId, rootUniverse, universeId]);
@@ -122,6 +160,7 @@ export default function UniverseEditInnerImg() {
         setRootUniverse(data);
         setUniverseData(data.innerImageId, data.spaces, data.pieces);
         setCurrentSpaceId(-1);
+        setCurrentSpace(null);
         setParentSpaceId(-1);
       } else {
         setRootUniverse(data);
@@ -184,9 +223,6 @@ export default function UniverseEditInnerImg() {
     targetId: number
   ) => {
     try {
-      console.log(file, targetType, targetId);
-      console.log(rootUniverse);
-
       if (targetType === "universe") {
         const response = await patchUniverseInnerImageEdit(targetId, file);
         setRootUniverseInnerImageId(response.newInnerImageId);
@@ -204,8 +240,18 @@ export default function UniverseEditInnerImg() {
     }
   };
 
-  const handleCreateSubmit = (title: string, description: string) => {
+  const handleSpaceCreateSubmit = (title: string, description: string) => {
     if (startPoint && endPoint && innerImg) createSpace(title, description);
+  };
+
+  const handlePieceCreateSubmit = (title: string, description: string) => {
+    if (
+      startPoint &&
+      endPoint &&
+      createPieceData.title != "" &&
+      createPieceData.description != ""
+    )
+      createPiece(title, description);
   };
 
   const createSpace = async (
@@ -242,15 +288,58 @@ export default function UniverseEditInnerImg() {
     }
   };
 
+  const createPiece = async (
+    title: string,
+    description: string
+  ): Promise<void> => {
+    if (!startPoint || !endPoint) {
+      showAlert("피스 정보를 모두 입력해주세요.", "fail", null);
+      return;
+    }
+    const currentId =
+      currentSpaceId === rootUniverse?.universeId ? -1 : currentSpaceId;
+    const metadata = {
+      universeId: rootUniverse?.universeId,
+      parentSpaceId: currentId,
+      title,
+      description,
+      startX: startPoint.xPercent,
+      startY: startPoint.yPercent,
+      endX: endPoint.xPercent,
+      endY: endPoint.yPercent,
+      hidden: true,
+    };
+    try {
+      await postPieceCreateByCoordinate(metadata);
+      showAlert("피스가 생성되었습니다.", "success", null);
+      loadInitialData(currentId);
+    } catch (error: any) {
+      showAlert(
+        error?.message || "피스 생성 중 오류가 발생했습니다.",
+        "fail",
+        null
+      );
+    }
+  };
+
   const handleCreateInnerImage = (file: File) => {
     setInnerImg(file);
-    setCreateStep(SpaceCreateStep.FillDetails);
+    setCreateStep(CreateEditStep.Space_FillDetails);
   };
 
   const handleCreateModalClose = () => {
     setCreateStep(null);
     resetSelection();
     setInnerImg(null);
+    setStartPoint(null);
+    setEndPoint(null);
+  };
+
+  const handleEditModalClose = () => {
+    setCreateStep(null);
+    resetSelection();
+    setShowCoordinatesEdit(false);
+    setActiveInnerImageId(currentSpace?.innerImageId!);
   };
 
   const resetSelection = () => {
@@ -258,15 +347,75 @@ export default function UniverseEditInnerImg() {
     setEndPoint(null);
   };
 
-  const handleSaveInfo = (
+  const handleSaveInfo = async (
     title: string,
     description: string,
     hidden: boolean
   ) => {
-    console.log(title, description, hidden);
+    if (currentSpaceId == null) {
+      console.log("currentSpaceId가 null임");
+      return;
+    }
+
+    const payload = {
+      title: title,
+      description: description,
+      hidden: hidden,
+    };
+
+    await patchSpaceInfoEdit(currentSpaceId, payload);
+    refreshUniverseData();
+
+    showAlert("변경사항이 저장되었습니다.", "success", null);
+    setShowInfoEdit(false);
   };
 
-  const handleCoordinatesEdit = () => {};
+  const handleCoordinatesEdit = () => {
+    var start = {
+      xPercent: currentSpace?.startX!,
+      yPercent: currentSpace?.startY!,
+    };
+    var end = {
+      xPercent: currentSpace?.endX!,
+      yPercent: currentSpace?.endY!,
+    };
+
+    setStartPoint(start);
+    setEndPoint(end);
+    setShowCoordinatesEdit(true);
+    setCreateStep(CreateEditStep.Space_SetSizeOnEdit);
+    const parentImgId = useSpaceStore.getState().getParentSpaceInnerImageId();
+    if (parentImgId != null) setActiveInnerImageId(parentImgId);
+  };
+
+  const handleSaveCoordinates = async () => {
+    if (
+      startPoint == null ||
+      startPoint.xPercent == null ||
+      startPoint.yPercent == null ||
+      endPoint == null ||
+      endPoint.xPercent == null ||
+      endPoint.yPercent == null ||
+      currentSpaceId == null
+    ) {
+      return;
+    }
+
+    const payload = {
+      startX: startPoint.xPercent,
+      startY: startPoint.yPercent,
+      endX: endPoint.xPercent,
+      endY: endPoint.yPercent,
+    };
+
+    await patchSpacePositionEdit(currentSpaceId, payload);
+    refreshUniverseData();
+
+    showAlert("스페이스 좌표가 수정되었습니다.", "success", null);
+    setShowCoordinatesEdit(false);
+    setCreateStep(null);
+    resetSelection();
+  };
 
   const showAlert = (text: string, type: AlertType, subText: string | null) => {
     setAlert({ text, type, subText });
@@ -314,6 +463,10 @@ export default function UniverseEditInnerImg() {
           },
         ];
 
+  function handlePieceMethod() {
+    setCreateStep(CreateEditStep.Piece_FillDetails);
+  }
+
   return (
     <div
       ref={menuRef}
@@ -338,38 +491,43 @@ export default function UniverseEditInnerImg() {
           {...(alert.subText ? { subText: alert.subText } : {})}
         />
       )}
+      {currentPiece == null && (
+        <>
+          <button
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="z-10 absolute cursor-pointer top-2 right-2 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <BiDotsVerticalRounded size={20} />
+          </button>
 
-      <button
-        onClick={() => setMenuOpen(!menuOpen)}
-        className="z-10 absolute cursor-pointer top-2 right-2 w-7 h-7 flex items-center justify-center bg-white/20 backdrop-blur-sm rounded-full text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <BiDotsVerticalRounded size={20} />
-      </button>
+          <ContextMenu
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            items={menuItems}
+          />
 
-      <ContextMenu
-        open={menuOpen}
-        onClose={() => setMenuOpen(false)}
-        items={menuItems}
-      />
-
-      <button
-        onClick={() => {}}
-        className="z-10 absolute cursor-pointer bottom-3 right-3 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <PiDownloadSimpleBold size={20} />
-      </button>
-      <button
-        onClick={() => setCreateStep(SpaceCreateStep.SetSize)}
-        className="z-10 absolute cursor-pointer bottom-3 right-12 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <RiFunctionAddLine size={20} />
-      </button>
-      <button
-        onClick={() => {}}
-        className="z-10 absolute cursor-pointer bottom-3 right-22 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-      >
-        <MdOutlineFullscreen size={25} />
-      </button>
+          <button
+            onClick={() =>
+              setCreateStep(CreateEditStep.Piece_SelectCoordinates)
+            }
+            className="z-10 absolute cursor-pointer bottom-3 right-3 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <PiPuzzlePiece size={20} />
+          </button>
+          <button
+            onClick={() => setCreateStep(CreateEditStep.Space_SetSizeOnCreate)}
+            className="z-10 absolute cursor-pointer bottom-3 right-12 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <RiFunctionAddLine size={20} />
+          </button>
+          <button
+            onClick={() => {}}
+            className="z-10 absolute cursor-pointer bottom-3 right-22 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+          >
+            <MdOutlineFullscreen size={25} />
+          </button>
+        </>
+      )}
 
       <SpaceSelector
         step={createStep}
@@ -380,15 +538,18 @@ export default function UniverseEditInnerImg() {
         setEndPoint={setEndPoint}
       />
 
-      {createStep === SpaceCreateStep.SetSize && (
+      {createStep === CreateEditStep.Space_SetSizeOnCreate && (
         <SpaceCreateSetSizeModal
-          handleCreateModalClose={handleCreateModalClose}
+          title="스페이스 생성"
+          description="새로운 스페이스를 생성합니다."
+          handleModalClose={handleCreateModalClose}
           resetSelection={resetSelection}
-          setCreateStep={() => setCreateStep(SpaceCreateStep.UploadImage)}
+          onSubmit={() => setCreateStep(CreateEditStep.Space_UploadImage)}
+          // setCreateStep={() => setCreateStep(SpaceCreateStep.UploadImage)}
         />
       )}
 
-      {createStep === SpaceCreateStep.UploadImage && (
+      {createStep === CreateEditStep.Space_UploadImage && (
         <ImageUploadModal
           title="스페이스 생성"
           description="새로운 스페이스를 생성합니다."
@@ -401,7 +562,7 @@ export default function UniverseEditInnerImg() {
         />
       )}
 
-      {createStep === SpaceCreateStep.FillDetails && (
+      {createStep === CreateEditStep.Space_FillDetails && (
         <IconTitleModal
           onClose={handleCreateModalClose}
           title="스페이스 생성"
@@ -409,9 +570,9 @@ export default function UniverseEditInnerImg() {
           icon={<IoPlanetOutline size={20} />}
           bgColor="white"
         >
-          <SpaceDetailInfoStep
+          <DetailInfoStep
             innerImg={innerImg}
-            onSubmit={handleCreateSubmit}
+            onSubmit={handleSpaceCreateSubmit}
           />
         </IconTitleModal>
       )}
@@ -433,12 +594,66 @@ export default function UniverseEditInnerImg() {
 
       {showInfoEdit && (
         <SpaceInfoEditModal
-          initDescription=""
-          initTitle=""
+          initTitle={currentSpace?.title ?? ""}
+          initDescription={currentSpace?.description ?? ""}
           initHidden
           onClose={() => setShowInfoEdit(false)}
           handleSaveInfo={handleSaveInfo}
         />
+      )}
+
+      {showCoordinatesEdit && (
+        <SpaceCreateSetSizeModal
+          title="스페이스 수정"
+          description="스페이스의 좌표를 수정합니다."
+          handleModalClose={handleEditModalClose}
+          resetSelection={resetSelection}
+          onSubmit={handleSaveCoordinates}
+        />
+      )}
+
+      {createStep === CreateEditStep.Piece_UploadImage && (
+        <ImageUploadModal
+          title="피스 생성"
+          description="새로운 피스를 생성합니다."
+          labelText="피스 이미지"
+          maxFileSizeMB={5}
+          onClose={handleCreateModalClose}
+          onConfirm={(file) => {
+            setCreatePieceData((prev) => ({
+              ...prev,
+              image: file,
+            }));
+            setCreateStep(CreateEditStep.Piece_SelectCoordinates);
+          }}
+          confirmText="다음"
+          requireSquare={false}
+        />
+      )}
+
+      {createStep === CreateEditStep.Piece_SelectCoordinates && (
+        <SpaceCreateSetSizeModal
+          title="피스 생성"
+          description="새로운 피스를 생성합니다."
+          handleModalClose={handleCreateModalClose}
+          resetSelection={resetSelection}
+          onSubmit={handlePieceMethod}
+        />
+      )}
+
+      {createStep === CreateEditStep.Piece_FillDetails && (
+        <IconTitleModal
+          onClose={handleCreateModalClose}
+          title="피스 생성"
+          description="새로운 피스를 생성합니다."
+          icon={<IoPlanetOutline size={20} />}
+          bgColor="white"
+        >
+          <DetailInfoStep
+            innerImg={pieceInnerImg}
+            onSubmit={handlePieceCreateSubmit}
+          />
+        </IconTitleModal>
       )}
     </div>
   );

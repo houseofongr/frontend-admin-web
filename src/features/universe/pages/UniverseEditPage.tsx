@@ -332,7 +332,7 @@ export default function UniverseEditPage() {
         />
       )} */}
 
-      {showAuthorEdit && (
+      {showAuthorEdit && ( 
         <Modal onClose={() => setShowAuthorEdit(false)} bgColor="white">
           <UserSearch
             isOpen={showAuthorEdit}

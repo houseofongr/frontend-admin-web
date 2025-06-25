@@ -12,7 +12,7 @@ interface DetailInfoStepProps {
   ) => void;
 }
 
-export default function SpaceDetailInfoStep({
+export default function DetailInfoStep({
   innerImg,
   onSubmit,
 }: DetailInfoStepProps) {
@@ -25,6 +25,8 @@ export default function SpaceDetailInfoStep({
 
   // 미리보기 처리
   useEffect(() => {
+    console.log(innerImg);
+    
     if (innerImg) {
       const url = URL.createObjectURL(innerImg);
       setPreviewInnerImg(url);
