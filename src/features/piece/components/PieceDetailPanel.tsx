@@ -102,8 +102,6 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
   }, [piece?.pieceId]);
   // ⚙️ 이벤트 핸들러
   const handlePageChange = (newPage: number) => fetchPieceDetail(newPage);
-  const handleInnerImgEdit = () => console.log("이미지 수정");
-  const handleDownloadImage = () => console.log("이미지 다운로드");
   const handleSpaceDelete = () => console.log("피스 삭제");
 
   const handleInfoEdit = () => {

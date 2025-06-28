@@ -54,7 +54,7 @@ import {
   CreatePieceMethod,
   usePieceStore,
 } from "../../../context/usePieceStore";
-import { postPieceCreateByCoordinate } from "../../../service/pieceService";
+import { patchPieceCoordinatesEdit, postPieceCreateByCoordinate } from "../../../service/pieceService";
 import PieceDetailPanel from "../../piece/components/PieceDetailPanel";
 
 export default function UniverseEditInnerImg() {
@@ -346,7 +346,6 @@ export default function UniverseEditInnerImg() {
 
   const handlePieceEditModalClose = () => {
     setShowCoordinatesEdit(null);
-
     setEditStep(null);
     resetSelection();
   };
@@ -404,8 +403,7 @@ export default function UniverseEditInnerImg() {
       startPoint.yPercent == null ||
       endPoint == null ||
       endPoint.xPercent == null ||
-      endPoint.yPercent == null ||
-      currentSpaceId == null
+      endPoint.yPercent == null
     ) {
       return;
     }
@@ -417,10 +415,17 @@ export default function UniverseEditInnerImg() {
       endY: endPoint.yPercent,
     };
 
-    await patchSpacePositionEdit(currentSpaceId, payload);
-    refreshUniverseData();
+    if (type == "space" && currentSpaceId != null) {
+      await patchSpacePositionEdit(currentSpaceId, payload);
+      refreshUniverseData();
+      showAlert("스페이스 좌표가 수정되었습니다.", "success", null);
+    }else if (type == "piece" && currentPiece != null) {
+      await patchPieceCoordinatesEdit(currentPiece.pieceId, payload);
+      refreshUniverseData();
+      showAlert("피스 좌표가 수정되었습니다.", "success", null);
+    }
 
-    showAlert("스페이스 좌표가 수정되었습니다.", "success", null);
+
     setShowCoordinatesEdit(null);
     setEditStep(null);
     resetSelection();
