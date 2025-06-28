@@ -1,10 +1,16 @@
-
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { FiMoreHorizontal } from "react-icons/fi";
 import { LuFileMusic } from "react-icons/lu";
 import { convertUnixToDate } from "../../../utils/formatDate";
 import { useState } from "react";
-
+import {
+  RiDeleteBin6Line,
+  RiFileDownloadLine,
+  RiImageEditFill,
+} from "react-icons/ri";
+import { PiGpsBold } from "react-icons/pi";
+import { TbPencilCog } from "react-icons/tb";
+import ContextMenu from "../../../components/ContextMenu";
 
 interface SoundItemProps {
   index: number;
@@ -20,6 +26,56 @@ const SoundItem: React.FC<SoundItemProps> = ({
   createdTime,
 }) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const handleInnerImgEdit = (type: string) => {
+    console.log("이미지 수정", type);
+    setMenuOpen(false);
+  };
+  const handleDownloadImage = () => {
+    console.log("이미지 다운로드");
+    setMenuOpen(false);
+  };
+  const setShowInfoEdit = (show: boolean) => {
+    console.log("정보 수정 열기");
+    setMenuOpen(false);
+  };
+  const handleCoordinatesEdit = () => {
+    console.log("좌표 수정");
+    setMenuOpen(false);
+  };
+  const handleSpaceDelete = () => {
+    console.log("스페이스 삭제");
+    setMenuOpen(false);
+  };
+
+  const menuItems = [
+    {
+      label: "이미지 수정",
+      icon: <RiImageEditFill size={20} />,
+      onClick: () => handleInnerImgEdit("space"),
+    },
+    {
+      label: "이미지 다운로드",
+      icon: <RiFileDownloadLine size={20} />,
+      onClick: handleDownloadImage,
+    },
+    {
+      label: "정보 수정",
+      icon: <TbPencilCog size={20} />,
+      onClick: () => setShowInfoEdit(true),
+    },
+    {
+      label: "좌표 수정",
+      icon: <PiGpsBold size={20} />,
+      onClick: handleCoordinatesEdit,
+    },
+    {
+      label: "피스 삭제",
+      icon: <RiDeleteBin6Line size={20} />,
+      onClick: handleSpaceDelete,
+    },
+  ];
 
   return (
     <div
@@ -46,6 +102,8 @@ const SoundItem: React.FC<SoundItemProps> = ({
         <div
           className="absolute top-2 right-0 transition-opacity duration-400 cursor-pointer"
           style={{ opacity: hoveredIndex === index ? 1 : 0 }}
+                  onClick={() => setMenuOpen(true)}
+
         >
           <BiDotsVerticalRounded size={20} />
         </div>
@@ -54,6 +112,16 @@ const SoundItem: React.FC<SoundItemProps> = ({
         <div className="text-[11px]  absolute bottom-1 right-0">
           {convertUnixToDate(createdTime).default}
         </div>
+
+        {/* ContextMenu 렌더링 */}
+        {menuOpen && (
+          <ContextMenu
+            open={menuOpen}
+            onClose={() => setMenuOpen(false)}
+            items={menuItems}
+            position={{ right: 53, top: 37 }}
+          />
+        )}
       </div>
     </div>
   );

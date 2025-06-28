@@ -23,6 +23,7 @@ interface PieceStore {
 
   currentPiece: PieceType | null; // 현재 선택된 피스 상태 추가
   setCurrentPiece: (piece: PieceType | null) => void; // setter도 추가
+  setPieceInfo: (title: string, description: string, hidden: boolean) => void;
 }
 
 export const usePieceStore = create<PieceStore>((set) => ({
@@ -31,4 +32,17 @@ export const usePieceStore = create<PieceStore>((set) => ({
 
   currentPiece: null,
   setCurrentPiece: (piece) => set({ currentPiece: piece }),
+  setPieceInfo: (title, description, hidden) =>
+    set((state) => {
+      if (!state.currentPiece) return {};
+
+      const updatedPiece: PieceType = {
+        ...state.currentPiece,
+        title,
+        description,
+        // hidden,
+      };
+
+      return { currentPiece: updatedPiece };
+    }),
 }));

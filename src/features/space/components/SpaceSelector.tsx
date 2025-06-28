@@ -5,13 +5,12 @@ import {
 } from "../../../constants/ProcessSteps";
 import { useUniverseStore } from "../../../context/useUniverseStore";
 import { PieceType } from "../../../context/usePieceStore";
-import { SpaceType } from "../../../context/useSpcaeStore";
+import { SpaceType } from "../../../context/useSpaceStore";
 import { IoIosArrowBack } from "react-icons/io";
 import SpinnerIcon from "../../../components/icons/SpinnerIcon";
 import { ScaleLoader } from "react-spinners";
-import { useSpaceStore } from "../../../context/useSpcaeStore";
+import { useSpaceStore } from "../../../context/useSpaceStore";
 import { usePieceStore } from "../../../context/usePieceStore";
-import PieceDetailPanel from "../../piece/components/PieceDetailPanel";
 
 interface PercentPoint {
   xPercent: number;
@@ -19,7 +18,6 @@ interface PercentPoint {
 }
 
 interface SpaceSelectorProps {
-  step: CreateEditStep | null;
   innerImageId: number | null;
   startPoint: PercentPoint | null;
   endPoint: PercentPoint | null;
@@ -28,14 +26,13 @@ interface SpaceSelectorProps {
 }
 
 export default function SpaceSelector({
-  step,
   innerImageId,
   startPoint,
   endPoint,
   setStartPoint,
   setEndPoint,
 }: SpaceSelectorProps) {
-  const { rootUniverse } = useUniverseStore();
+  const { rootUniverse, editStep } = useUniverseStore();
 
   const {
     currentSpaceId,
@@ -47,7 +44,7 @@ export default function SpaceSelector({
     existingSpaces,
   } = useSpaceStore();
 
-  const { existingPieces, currentPiece, setCurrentPiece } = usePieceStore();
+  const { existingPieces, setCurrentPiece } = usePieceStore();
 
   const [hoverPos, setHoverPos] = useState<PercentPoint | null>(null);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -143,9 +140,10 @@ export default function SpaceSelector({
   // 이벤트 핸들러
   const handleMouseMove = (e: React.MouseEvent) => {
     if (
-      step === CreateEditStep.Space_SetSizeOnCreate ||
-      step === CreateEditStep.Space_SetSizeOnEdit ||
-      step === CreateEditStep.Piece_SelectCoordinates
+      editStep === CreateEditStep.Space_SetSizeOnCreate ||
+      editStep === CreateEditStep.Space_SetSizeOnEdit ||
+      editStep === CreateEditStep.Piece_SetSizeOnCreate ||
+      editStep === CreateEditStep.Piece_SetSizeOnEdit
     ) {
       setHoverPos(getRelativePercentPos(e));
     } else {
@@ -155,9 +153,10 @@ export default function SpaceSelector({
 
   const handleClick = (e: React.MouseEvent) => {
     if (
-      step !== CreateEditStep.Space_SetSizeOnCreate &&
-      step !== CreateEditStep.Space_SetSizeOnEdit &&
-      step !== CreateEditStep.Piece_SelectCoordinates
+      editStep !== CreateEditStep.Space_SetSizeOnCreate &&
+      editStep !== CreateEditStep.Space_SetSizeOnEdit &&
+      editStep !== CreateEditStep.Piece_SetSizeOnCreate &&
+      editStep !== CreateEditStep.Piece_SetSizeOnEdit
     )
       return;
     const pos = getRelativePercentPos(e);
@@ -282,9 +281,10 @@ export default function SpaceSelector({
 
           {/* 크로스헤어 */}
           {hoverPos &&
-            ((step === CreateEditStep.Space_SetSizeOnCreate && !endPoint) ||
-              step === CreateEditStep.Space_SetSizeOnEdit ||
-              step === CreateEditStep.Piece_SelectCoordinates) &&
+            ((editStep === CreateEditStep.Space_SetSizeOnCreate && !endPoint) ||
+              editStep === CreateEditStep.Space_SetSizeOnEdit ||
+              editStep === CreateEditStep.Piece_SetSizeOnCreate ||
+              editStep === CreateEditStep.Piece_SetSizeOnEdit) &&
             (() => {
               const { x, y } = toPixel(hoverPos);
               const left = `calc(50% - ${imageSize.width / 2}px + ${x}px)`;
@@ -355,45 +355,47 @@ export default function SpaceSelector({
           )}
 
           {/* 기존 스페이스 박스 */}
-          {existingSpaces.map((space, index) => (
-            <div
-              key={`space-${index}`}
-              className="absolute"
-              style={calcBoxStyle(
-                { xPercent: space.startX, yPercent: space.startY },
-                { xPercent: space.endX, yPercent: space.endY }
-              )}
-              onMouseEnter={() => handleSpaceMouseEnter(index)}
-              onMouseLeave={handleSpaceMouseLeave}
-            >
+          {editStep != CreateEditStep.Piece_SetSizeOnEdit &&
+            existingSpaces.map((space, index) => (
               <div
-                className={`w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
-                  hoveredSpaceIndex === index ? "opacity-100" : "opacity-30"
-                }`}
-                onClick={() => handleMoveToSpace(space)}
-              />
-            </div>
-          ))}
+                key={`space-${index}`}
+                className="absolute"
+                style={calcBoxStyle(
+                  { xPercent: space.startX, yPercent: space.startY },
+                  { xPercent: space.endX, yPercent: space.endY }
+                )}
+                onMouseEnter={() => handleSpaceMouseEnter(index)}
+                onMouseLeave={handleSpaceMouseLeave}
+              >
+                <div
+                  className={`w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
+                    hoveredSpaceIndex === index ? "opacity-100" : "opacity-30"
+                  }`}
+                  onClick={() => handleMoveToSpace(space)}
+                />
+              </div>
+            ))}
 
-          {existingPieces.map((piece, index) => (
-            <div
-              key={`piece-${index}`}
-              className="absolute"
-              style={calcBoxStyle(
-                { xPercent: piece.startX, yPercent: piece.startY },
-                { xPercent: piece.endX, yPercent: piece.endY }
-              )}
-              onMouseEnter={() => handlePieceMouseEnter(index)}
-              onMouseLeave={handlePieceMouseLeave}
-            >
+          {editStep != CreateEditStep.Piece_SetSizeOnEdit &&
+            existingPieces.map((piece, index) => (
               <div
-                className={`w-full h-full border-3 border-blue-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
-                  hoveredPieceIndex === index ? "opacity-100" : "opacity-30"
-                }`}
-                onClick={() => handleMoveToPiece(piece)}
-              />
-            </div>
-          ))}
+                key={`piece-${index}`}
+                className="absolute"
+                style={calcBoxStyle(
+                  { xPercent: piece.startX, yPercent: piece.startY },
+                  { xPercent: piece.endX, yPercent: piece.endY }
+                )}
+                onMouseEnter={() => handlePieceMouseEnter(index)}
+                onMouseLeave={handlePieceMouseLeave}
+              >
+                <div
+                  className={`w-full h-full border-3 border-blue-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
+                    hoveredPieceIndex === index ? "opacity-100" : "opacity-30"
+                  }`}
+                  onClick={() => handleMoveToPiece(piece)}
+                />
+              </div>
+            ))}
 
           {/* 팝업 */}
           {popupData && (
@@ -408,11 +410,6 @@ export default function SpaceSelector({
               <div className="text-xs mt-1">{popupData.description}</div>
             </div>
           )}
-
-          <PieceDetailPanel
-            piece={currentPiece}
-            onClose={() => setCurrentPiece(null)}
-          />
         </>
       )}
     </div>

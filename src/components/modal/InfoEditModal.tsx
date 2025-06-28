@@ -1,30 +1,32 @@
-import { IoLockOpenOutline, IoPlanetOutline } from "react-icons/io5";
-import IconTitleModal from "../../../components/modal/IconTitleModal";
-import { TextareaField } from "../../../components/Input/TextareaField";
-import { PublicStatusOption } from "../../../constants/UniverseData";
 import { useState } from "react";
-import { SelectableRadioField } from "../../../components/Input/SelectableRadioField";
-import { InputField } from "../../../components/Input/InputField";
+import { IoPlanetOutline } from "react-icons/io5";
 import { BiSave } from "react-icons/bi";
-import { TiLockClosed, TiLockOpen } from "react-icons/ti";
 import { TbLock, TbLockOpen2 } from "react-icons/tb";
 
+import IconTitleModal from "./IconTitleModal";
+import { InputField } from "../Input/InputField";
+import { TextareaField } from "../Input/TextareaField";
+import { SelectableRadioField } from "../Input/SelectableRadioField";
 
-interface SpaceInfoEditModalJProps {
+interface InfoEditModalProps {
   onClose: () => void;
   initTitle: string;
   initDescription: string;
   initHidden: boolean;
   handleSaveInfo: (title: string, description: string, hidden: boolean) => void;
+  modalTitle?: string;
+  modalDescription?: string;
 }
 
-export default function SpaceInfoEditModal({
+export default function InfoEditModal({
   initTitle,
   initDescription,
   initHidden,
   onClose,
   handleSaveInfo,
-}: SpaceInfoEditModalJProps) {
+  modalTitle = "세부정보 수정",
+  modalDescription = "정보를 변경할 수 있습니다.",
+}: InfoEditModalProps) {
   const [title, setTitle] = useState<string>(initTitle);
   const [description, setDescription] = useState<string>(initDescription);
   const [hidden, setHidden] = useState<boolean>(initHidden);
@@ -45,8 +47,8 @@ export default function SpaceInfoEditModal({
   return (
     <IconTitleModal
       onClose={onClose}
-      title="세부정보 수정"
-      description="스페이스의 세부 정보를 변경할 수 있습니다."
+      title={modalTitle}
+      description={modalDescription}
       icon={<IoPlanetOutline size={20} />}
       bgColor="white"
     >
@@ -71,19 +73,13 @@ export default function SpaceInfoEditModal({
         <SelectableRadioField
           label="공개여부"
           name="publicStatus"
-          value={hidden ? "true": "false"}
+          value={hidden ? "true" : "false"}
           onChange={(val) => setHidden(val == "true")}
           options={hiddenOptions}
         />
         <div className="flex justify-end mt-3 mr-1">
           <button
-            onClick={() =>
-              handleSaveInfo(
-                title,
-                description,
-                hidden
-              )
-            }
+            onClick={() => handleSaveInfo(title, description, hidden)}
             className="flex items-center gap-2 px-4 py-2 rounded-xl border-2 border-primary text-primary hover:opacity-70 transition"
           >
             <BiSave size={18} />
