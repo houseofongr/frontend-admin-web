@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import SoundItem from "./SoundItem";
 import Pagination from "../../../components/Pagination";
 import {
+  deletePiece,
   patchPieceInfoEdit,
 } from "../../../service/pieceService";
 import { IoIosClose } from "react-icons/io";
@@ -63,7 +64,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
   onSaveCoordinates,
 }) => {
   const { setPieceInfo } = usePieceStore();
-  const { setEditStep } = useUniverseStore();
+  const { setEditStep, refreshUniverseData } = useUniverseStore();
 
   const [sounds, setSounds] = useState<SoundType[]>([]);
   const [pagination, setPagination] = useState({
@@ -102,7 +103,12 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
   }, [piece?.pieceId]);
   // ⚙️ 이벤트 핸들러
   const handlePageChange = (newPage: number) => fetchPieceDetail(newPage);
-  const handleSpaceDelete = () => console.log("피스 삭제");
+  const handleSpaceDelete = () =>
+    showAlert(
+      "정말로 스페이스를 삭제하시겠습니까?",
+      "check",
+      "* 관련된 이미지와 음원이 모두 삭제됩니다."
+    );  ;
 
   const handleInfoEdit = () => {
     setShowInfoEdit(true);
@@ -158,6 +164,20 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
       onClick: handleSpaceDelete,
     },
   ];
+  const handelAlertOkBtn = async (type: string) => {
+    setAlert(null);
+    if(type == "check" && piece != null){
+      try {
+        await deletePiece(piece.pieceId);
+        showAlert("삭제가 완료되었습니다.", "success", null);
+        refreshUniverseData();
+      } catch (error) {
+        console.error("삭제 실패:", error);
+        showAlert("삭제에 실패했습니다.", "fail", "잠시 후 다시 시도해주세요.");
+      }
+    }
+  }
+
 
   if (!piece) return null;
   return (
@@ -169,7 +189,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
               text={alert.text}
               type={alert.type}
               onClose={() => setAlert(null)}
-              okButton={<Button label="확인" onClick={() => setAlert(null)} />}
+              okButton={<Button label="확인" onClick={() => handelAlertOkBtn(alert.type)} />}
               cancelButton={
                 alert.type === "check" ? (
                   <Button
