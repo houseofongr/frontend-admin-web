@@ -10,7 +10,7 @@ import { BiDotsVerticalRounded } from "react-icons/bi";
 import {
   RiDeleteBin6Line,
 } from "react-icons/ri";
-import { TbPencilCog } from "react-icons/tb";
+import { TbMusicPlus, TbPencilCog } from "react-icons/tb";
 import { PiGpsBold } from "react-icons/pi";
 import ContextMenu from "../../../components/ContextMenu";
 import InfoEditModal from "../../../components/modal/InfoEditModal";
@@ -22,6 +22,7 @@ import Button from "../../../components/buttons/Button";
 import SpaceCreateSetSizeModal from "../../space/components/SpaceCreateSetSizeModal";
 import { useUniverseStore } from "../../../context/useUniverseStore";
 import { CreateEditStep } from "../../../constants/ProcessSteps";
+import AudioUploadModal from "../../../components/modal/AudioUploadModal";
 
 interface PieceType {
   pieceId: number;
@@ -76,6 +77,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [showInfoEdit, setShowInfoEdit] = useState(false);
+  const [showAudioCreate, setShowAudioCreate] = useState(false);
   const [alert, setAlert] = useState<{
     text: string;
     type: AlertType;
@@ -108,7 +110,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
       "정말로 스페이스를 삭제하시겠습니까?",
       "check",
       "* 관련된 이미지와 음원이 모두 삭제됩니다."
-    );  ;
+    );
 
   const handleInfoEdit = () => {
     setShowInfoEdit(true);
@@ -166,7 +168,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
   ];
   const handelAlertOkBtn = async (type: string) => {
     setAlert(null);
-    if(type == "check" && piece != null){
+    if (type == "check" && piece != null) {
       try {
         await deletePiece(piece.pieceId);
         showAlert("삭제가 완료되었습니다.", "success", null);
@@ -176,8 +178,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
         showAlert("삭제에 실패했습니다.", "fail", "잠시 후 다시 시도해주세요.");
       }
     }
-  }
-
+  };
 
   if (!piece) return null;
   return (
@@ -189,7 +190,12 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
               text={alert.text}
               type={alert.type}
               onClose={() => setAlert(null)}
-              okButton={<Button label="확인" onClick={() => handelAlertOkBtn(alert.type)} />}
+              okButton={
+                <Button
+                  label="확인"
+                  onClick={() => handelAlertOkBtn(alert.type)}
+                />
+              }
               cancelButton={
                 alert.type === "check" ? (
                   <Button
@@ -234,7 +240,13 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
           )}
 
           {/* 사운드 리스트 */}
-          <div className="p-4 ">
+          <div className="relative p-4 pt-5">
+            <button
+              className="absolute top-0 right-5 text-white cursor-pointer hover:opacity-70"
+              onClick={() => setShowAudioCreate(true)}
+            >
+              <TbMusicPlus size={20} />
+            </button>
             {sounds.length === 0 ? (
               <div className="text-sm text-gray-300">
                 등록된 사운드가 없습니다.
@@ -268,6 +280,19 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
               initHidden
               onClose={() => setShowInfoEdit(false)}
               handleSaveInfo={handleSaveInfo}
+            />
+          )}
+
+          {showAudioCreate && (
+            <AudioUploadModal
+              onClose={() => setShowAudioCreate(false)}
+              onConfirm={(file) => console.log(file)}
+              title="오디오 업로드"
+              description="선택한 피스에 오디오를 입력합니다."
+              labelText="선택한 피스에 추가할 오디오를"
+              subLabelText="사운드는 50MB 이하의 MP3, WAV 파일만 가능합니다."
+              confirmText="다음"
+              maxFileSizeMB={50}
             />
           )}
         </div>

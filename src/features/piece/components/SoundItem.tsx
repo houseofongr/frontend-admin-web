@@ -9,7 +9,7 @@ import {
   RiImageEditFill,
 } from "react-icons/ri";
 import { PiGpsBold } from "react-icons/pi";
-import { TbPencilCog } from "react-icons/tb";
+import { TbMusic, TbPencilCog } from "react-icons/tb";
 import ContextMenu from "../../../components/ContextMenu";
 
 interface SoundItemProps {
@@ -88,8 +88,8 @@ const SoundItem: React.FC<SoundItemProps> = ({
       <div className="font-semibold text-primary">TRACK NO. {index + 1}</div>
       <div className="flex flex-row">
         {/* 아이콘 */}
-        <div className="mr-3 mt-1">
-          <LuFileMusic size={25} />
+        <div className="mr-3">
+          <TbMusic size={25} />
         </div>
 
         {/* 정보 영역 */}
@@ -102,8 +102,7 @@ const SoundItem: React.FC<SoundItemProps> = ({
         <div
           className="absolute top-2 right-0 transition-opacity duration-400 cursor-pointer"
           style={{ opacity: hoveredIndex === index ? 1 : 0 }}
-                  onClick={() => setMenuOpen(true)}
-
+          onClick={() => setMenuOpen(true)}
         >
           <BiDotsVerticalRounded size={20} />
         </div>
