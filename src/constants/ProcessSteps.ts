@@ -1,4 +1,4 @@
-export enum CreateEditStep {
+export enum SpacePiece_CreateEditStep {
   Space_SetSizeOnCreate,
   Space_SetSizeOnEdit,
   Space_UploadImage,
@@ -17,5 +17,10 @@ export enum UniverseCreateStep {
   Thumbnail,
   ThumbMusic,
   InnerImg,
+  DetailInfo,
+}
+
+export enum SoundCreateStep {
+  Sound,
   DetailInfo,
 }

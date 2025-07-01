@@ -16,7 +16,7 @@ export default function ThumbMusicEditModal({
 }: InnerImageEditModalProps) {
 
   const [thumbMusic, setThumbMusic] = useState<File | null>(null);
-  const [previewThumMusic, setPreviewThumbMusic] = useState<string | null>(null);
+  const [previewThumbMusic, setPreviewThumbMusic] = useState<string | null>(null);
 
   const [warning, setWarning] = useState("");
 
@@ -83,7 +83,7 @@ export default function ThumbMusicEditModal({
       >
         <ThumbMusicStep
           thumbMusic={thumbMusic}
-          previewMusic={previewThumMusic}
+          previewMusic={previewThumbMusic}
           warning={warning}
           onFileChange={handleFileChange}
         />

@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { getUniverseTree } from "../service/universeService";
 import { SpaceType, useSpaceStore } from "./useSpaceStore";
 import { PieceType, usePieceStore } from "./usePieceStore";
-import { CreateEditStep } from "../constants/ProcessSteps";
+import { SpacePiece_CreateEditStep } from "../constants/ProcessSteps";
 
 export interface UniverseType {
   universeId: number;
@@ -18,11 +18,11 @@ interface UniverseStore {
   universeId: number | null;
   rootUniverse: UniverseType | null;
   activeInnerImageId: number | null;
-  editStep: CreateEditStep | null;
+  editStep: SpacePiece_CreateEditStep | null;
 
   setUniverseId: (id: number) => void;
   setRootUniverse: (data: UniverseType) => void;
-  setEditStep: (step: CreateEditStep | null) => void;
+  setEditStep: (step: SpacePiece_CreateEditStep | null) => void;
 
   setUniverseData: (
     innerImgId: number,

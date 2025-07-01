@@ -155,7 +155,7 @@ const WaveformWithAudioLightRow: React.FC<WaveformProps> = ({
       </div>
 
       {/* 컨트롤러 */}
-      <div className="relative flex-1 py-5 px-4 bg-stone-800/90 rounded-xl min-w-[350px]">
+      <div className="relative flex-1 py-5 px-4 rounded-xl min-w-[350px]">
         <div className="text-center  text-neutral-200">{audioTitle}</div>
         <div className="w-full flex flex-col items-center gap-2 pt-4">
           <input

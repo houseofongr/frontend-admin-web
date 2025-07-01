@@ -7,7 +7,7 @@ import FileUploadButton from "../buttons/FileUploadButton";
 import Button from "../buttons/Button";
 import { SoundMetadata, SoundSource } from "../../types/sound";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { createSound, deleteSound, updateSound } from "../../service/soundService";
+import { prevCreateSound, prevDeleteSound, prevUpdateSound } from "../../service/prevSoundService";
 import { MdCancel } from "react-icons/md";
 import { bytesToKB } from "../../utils/formatFileSize";
 import { AUDIO_DESCRIPTION_MAX_LENGTH, AUDIO_NAME_MAX_LENGTH } from "../../constants/formDataMaxLength";
@@ -31,7 +31,7 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
   const queryClient = useQueryClient();
 
   const createMutation = useMutation({
-    mutationFn: (formData: FormData) => createSound(itemId, formData),
+    mutationFn: (formData: FormData) => prevCreateSound(itemId, formData),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["itemSounds", itemId],
@@ -44,7 +44,7 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
   });
 
   const updateMutation = useMutation({
-    mutationFn: () => updateSound(soundId!, soundMetaData),
+    mutationFn: () => prevUpdateSound(soundId!, soundMetaData),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["itemSounds", itemId],
@@ -56,7 +56,7 @@ export default function NewSoundForm({ itemId, soundOriginData, soundId }: Sound
   });
 
   const deleteMutation = useMutation({
-    mutationFn: () => deleteSound(soundId!),
+    mutationFn: () => prevDeleteSound(soundId!),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["itemSounds", itemId],

@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import API_CONFIG from "../../../config/api";
 import {
-  CreateEditStep,
+  SpacePiece_CreateEditStep,
 } from "../../../constants/ProcessSteps";
 import { useUniverseStore } from "../../../context/useUniverseStore";
 import { PieceType } from "../../../context/usePieceStore";
@@ -140,10 +140,10 @@ export default function SpaceSelector({
   // 이벤트 핸들러
   const handleMouseMove = (e: React.MouseEvent) => {
     if (
-      editStep === CreateEditStep.Space_SetSizeOnCreate ||
-      editStep === CreateEditStep.Space_SetSizeOnEdit ||
-      editStep === CreateEditStep.Piece_SetSizeOnCreate ||
-      editStep === CreateEditStep.Piece_SetSizeOnEdit
+      editStep === SpacePiece_CreateEditStep.Space_SetSizeOnCreate ||
+      editStep === SpacePiece_CreateEditStep.Space_SetSizeOnEdit ||
+      editStep === SpacePiece_CreateEditStep.Piece_SetSizeOnCreate ||
+      editStep === SpacePiece_CreateEditStep.Piece_SetSizeOnEdit
     ) {
       setHoverPos(getRelativePercentPos(e));
     } else {
@@ -153,10 +153,10 @@ export default function SpaceSelector({
 
   const handleClick = (e: React.MouseEvent) => {
     if (
-      editStep !== CreateEditStep.Space_SetSizeOnCreate &&
-      editStep !== CreateEditStep.Space_SetSizeOnEdit &&
-      editStep !== CreateEditStep.Piece_SetSizeOnCreate &&
-      editStep !== CreateEditStep.Piece_SetSizeOnEdit
+      editStep !== SpacePiece_CreateEditStep.Space_SetSizeOnCreate &&
+      editStep !== SpacePiece_CreateEditStep.Space_SetSizeOnEdit &&
+      editStep !== SpacePiece_CreateEditStep.Piece_SetSizeOnCreate &&
+      editStep !== SpacePiece_CreateEditStep.Piece_SetSizeOnEdit
     )
       return;
     const pos = getRelativePercentPos(e);
@@ -281,10 +281,10 @@ export default function SpaceSelector({
 
           {/* 크로스헤어 */}
           {hoverPos &&
-            ((editStep === CreateEditStep.Space_SetSizeOnCreate && !endPoint) ||
-              editStep === CreateEditStep.Space_SetSizeOnEdit ||
-              editStep === CreateEditStep.Piece_SetSizeOnCreate ||
-              editStep === CreateEditStep.Piece_SetSizeOnEdit) &&
+            ((editStep === SpacePiece_CreateEditStep.Space_SetSizeOnCreate && !endPoint) ||
+              editStep === SpacePiece_CreateEditStep.Space_SetSizeOnEdit ||
+              editStep === SpacePiece_CreateEditStep.Piece_SetSizeOnCreate ||
+              editStep === SpacePiece_CreateEditStep.Piece_SetSizeOnEdit) &&
             (() => {
               const { x, y } = toPixel(hoverPos);
               const left = `calc(50% - ${imageSize.width / 2}px + ${x}px)`;
@@ -355,7 +355,7 @@ export default function SpaceSelector({
           )}
 
           {/* 기존 스페이스 박스 */}
-          {editStep != CreateEditStep.Piece_SetSizeOnEdit &&
+          {editStep != SpacePiece_CreateEditStep.Piece_SetSizeOnEdit &&
             existingSpaces.map((space, index) => (
               <div
                 key={`space-${index}`}
@@ -376,7 +376,7 @@ export default function SpaceSelector({
               </div>
             ))}
 
-          {editStep != CreateEditStep.Piece_SetSizeOnEdit &&
+          {editStep != SpacePiece_CreateEditStep.Piece_SetSizeOnEdit &&
             existingPieces.map((piece, index) => (
               <div
                 key={`piece-${index}`}

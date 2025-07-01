@@ -1,15 +1,10 @@
 import React, { useEffect, useState } from "react";
 import SoundItem from "./SoundItem";
 import Pagination from "../../../components/Pagination";
-import {
-  deletePiece,
-  patchPieceInfoEdit,
-} from "../../../service/pieceService";
+import { deletePiece, getPieceDetail, patchPieceInfoEdit } from "../../../service/pieceService";
 import { IoIosClose } from "react-icons/io";
 import { BiDotsVerticalRounded } from "react-icons/bi";
-import {
-  RiDeleteBin6Line,
-} from "react-icons/ri";
+import { RiDeleteBin6Line } from "react-icons/ri";
 import { TbMusicPlus, TbPencilCog } from "react-icons/tb";
 import { PiGpsBold } from "react-icons/pi";
 import ContextMenu from "../../../components/ContextMenu";
@@ -21,8 +16,15 @@ import ModalAlertMessage, {
 import Button from "../../../components/buttons/Button";
 import SpaceCreateSetSizeModal from "../../space/components/SpaceCreateSetSizeModal";
 import { useUniverseStore } from "../../../context/useUniverseStore";
-import { CreateEditStep } from "../../../constants/ProcessSteps";
+import {
+  SoundCreateStep,
+  SpacePiece_CreateEditStep,
+} from "../../../constants/ProcessSteps";
 import AudioUploadModal from "../../../components/modal/AudioUploadModal";
+import IconTitleModal from "../../../components/modal/IconTitleModal";
+import { IoPlanetOutline } from "react-icons/io5";
+import DetailInfoStep from "../../space/create/DetailInfoStep";
+import { createSound } from "../../../service/soundService";
 
 interface PieceType {
   pieceId: number;
@@ -47,7 +49,7 @@ interface PieceDetailPanelProps {
   hidden: boolean;
   piece: PieceType | null;
   showCoordinatesEdit: boolean;
-  setShowCoordinatesEdit: (type:string) => void;
+  setShowCoordinatesEdit: (type: string) => void;
   onClose: () => void;
   onCloseCoordinateModal: () => void;
   onResetSelection: () => void;
@@ -77,7 +79,9 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [showInfoEdit, setShowInfoEdit] = useState(false);
-  const [showAudioCreate, setShowAudioCreate] = useState(false);
+  const [showAudioCreate, setShowAudioCreate] =
+    useState<SoundCreateStep | null>(null);
+  const [createSoundData, setCreateSoundData] = useState<File | null>(null);
   const [alert, setAlert] = useState<{
     text: string;
     type: AlertType;
@@ -87,7 +91,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
   const fetchPieceDetail = async (page: number) => {
     if (!piece) return;
     try {
-      const data = dummyPieceData; // 실제 API 연결 시 교체
+      const data = await getPieceDetail(piece.pieceId, page, pagination.size);
       setSounds(data.sounds);
       setPagination({
         size: data.pagination.size,
@@ -103,6 +107,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
   useEffect(() => {
     fetchPieceDetail(1);
   }, [piece?.pieceId]);
+
   // ⚙️ 이벤트 핸들러
   const handlePageChange = (newPage: number) => fetchPieceDetail(newPage);
   const handleSpaceDelete = () =>
@@ -118,7 +123,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
   };
 
   const handleCoordinatesEdit = () => {
-    setEditStep(CreateEditStep.Piece_SetSizeOnEdit);
+    setEditStep(SpacePiece_CreateEditStep.Piece_SetSizeOnEdit);
     setShowCoordinatesEdit("piece");
     setMenuOpen(false);
   };
@@ -178,6 +183,46 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
         showAlert("삭제에 실패했습니다.", "fail", "잠시 후 다시 시도해주세요.");
       }
     }
+  };
+
+  const fetchCreateSound = async (
+      title: string,
+      description: string,
+      hidden:boolean
+    ): Promise<void> => {
+    if (createSoundData == null) return;
+  
+    const currentPiece = piece?.pieceId;
+      const metadata = {
+        pieceId: currentPiece,
+        title,
+        description,
+        hidden,
+      };
+      try {
+        await createSound(metadata, createSoundData);
+        showAlert("사운드가 생성되었습니다.", "success", null);
+
+      } catch (error: any) {
+        showAlert(
+          error?.message || "사운드 생성 중 오류가 발생했습니다.",
+          "fail",
+          null
+        );
+      }
+    };
+
+  const handleSoundStepSubmit = (file: File) => {
+    setCreateSoundData(file);
+    setShowAudioCreate(SoundCreateStep.DetailInfo);
+  };
+
+  const handleInfoStepSubmit = (
+    title: string,
+    description: string,
+    hidden: boolean
+  ) => {
+    fetchCreateSound(title, description, hidden);
   };
 
   if (!piece) return null;
@@ -242,8 +287,8 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
           {/* 사운드 리스트 */}
           <div className="relative p-4 pt-5">
             <button
-              className="absolute top-0 right-5 text-white cursor-pointer hover:opacity-70"
-              onClick={() => setShowAudioCreate(true)}
+              className="absolute top-0 right-5 text-white cursor-pointer hover:opacity-70 overflow-visible"
+              onClick={() => setShowAudioCreate(SoundCreateStep.Sound)}
             >
               <TbMusicPlus size={20} />
             </button>
@@ -283,10 +328,10 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
             />
           )}
 
-          {showAudioCreate && (
+          {showAudioCreate == SoundCreateStep.Sound && (
             <AudioUploadModal
-              onClose={() => setShowAudioCreate(false)}
-              onConfirm={(file) => console.log(file)}
+              onClose={() => setShowAudioCreate(null)}
+              onConfirm={handleSoundStepSubmit}
               title="오디오 업로드"
               description="선택한 피스에 오디오를 입력합니다."
               labelText="선택한 피스에 추가할 오디오를"
@@ -294,6 +339,21 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
               confirmText="다음"
               maxFileSizeMB={50}
             />
+          )}
+
+          {showAudioCreate == SoundCreateStep.DetailInfo && (
+            <IconTitleModal
+              onClose={() => setShowAudioCreate(null)}
+              title="스페이스 생성"
+              description="새로운 스페이스를 생성합니다."
+              icon={<IoPlanetOutline size={20} />}
+              bgColor="white"
+            >
+              <DetailInfoStep
+                sound={createSoundData}
+                onSubmit={handleInfoStepSubmit}
+              />
+            </IconTitleModal>
           )}
         </div>
       )}
@@ -312,66 +372,3 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
 };
 
 export default PieceDetailPanel;
-
-const dummyPieceData = {
-  pieceId: 1,
-  title: "조각",
-  description: "피스는 조각입니다.",
-  hidden: false,
-  createdTime: 1750749753,
-  updatedTime: 1750749753,
-  sounds: [
-    {
-      soundId: 11,
-      audioId: 11,
-      title: "기차역",
-      description: "기차가 도착하고 출발하는 생동감 있는 역 소리입니다.",
-      hidden: true,
-      createdTime: 1749465600,
-      updatedTime: 1749465600,
-    },
-    {
-      soundId: 10,
-      audioId: 10,
-      title: "명상 종소리",
-      description: "마음을 가라앉히는 명상용 종소리입니다.",
-      hidden: true,
-      createdTime: 1749465540,
-      updatedTime: 1749465540,
-    },
-    {
-      soundId: 9,
-      audioId: 9,
-      title: "바람 소리",
-      description: "들판을 스치는 부드러운 바람 소리입니다.",
-      hidden: true,
-      createdTime: 1749465480,
-      updatedTime: 1749465480,
-    },
-    {
-      soundId: 8,
-      audioId: 8,
-      title: "도시의 아침",
-      description:
-        "도시에서 아침에 들리는 자동차 소리와 사람들의 움직임입니다.",
-      hidden: true,
-      createdTime: 1749465420,
-      updatedTime: 1749465420,
-    },
-    {
-      soundId: 11,
-      audioId: 11,
-      title: "기차역",
-      description: "기차가 도착하고 출발하는 생동감 있는 역 소리입니다.",
-      hidden: true,
-      createdTime: 1749465600,
-      updatedTime: 1749465600,
-    },
-  ],
-  pagination: {
-    size: 5,
-    pageNumber: 1,
-    totalPages: 5,
-    totalElements: 30,
-  },
-};

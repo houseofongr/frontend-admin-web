@@ -11,6 +11,7 @@ interface ContextMenuProps {
   onClose: () => void;
   items: MenuItem[];
   position?: { top?: number; right?: number; left?: number; bottom?: number };
+  positionMode?: "absolute" | "fixed";
 }
 
 export default function ContextMenu({
@@ -18,12 +19,13 @@ export default function ContextMenu({
   onClose,
   items,
   position = { right: 8, top: 33 },
+  positionMode = "absolute",
 }: ContextMenuProps) {
   if (!open) return null;
 
   return (
     <div
-      className="absolute z-50 bg-white/90 shadow-lg rounded-md"
+      className={`${positionMode} z-50 bg-white/90 shadow-lg rounded-md`}
       style={{
         top: position.top,
         right: position.right,
