@@ -13,27 +13,8 @@ import {
 import { TbPencilCog } from "react-icons/tb";
 import { PiGpsBold } from "react-icons/pi";
 import ContextMenu from "../../../components/ContextMenu";
-<<<<<<< Updated upstream
-=======
-import InfoEditModal from "../../../components/modal/InfoEditModal";
-import { usePieceStore } from "../../../context/usePieceStore";
-import ModalAlertMessage, {
-  AlertType,
-} from "../../../components/modal/ModalAlertMessage";
-import Button from "../../../components/buttons/Button";
-import SpaceCreateSetSizeModal from "../../space/components/SpaceCreateSetSizeModal";
-import { useUniverseStore } from "../../../context/useUniverseStore";
-import {
-  SoundCreateStep,
-  SpacePiece_CreateEditStep,
-} from "../../../constants/ProcessSteps";
-import AudioUploadModal from "../../../components/modal/AudioUploadModal";
-import IconTitleModal from "../../../components/modal/IconTitleModal";
-import { IoPlanetOutline } from "react-icons/io5";
-import DetailInfoStep from "../../space/create/DetailInfoStep";
-import { createSound } from "../../../service/soundService";
 import { SoundType } from "../../../context/useSoundStore";
->>>>>>> Stashed changes
+
 
 interface PieceType {
   pieceId: number;
@@ -172,7 +153,6 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
         <div className="text-sm pr-10 pt-1">{piece.description}</div>
       </div>
 
-<<<<<<< Updated upstream
       {/* ContextMenu 렌더링 */}
       {menuOpen && (
         <ContextMenu
@@ -180,123 +160,6 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
           onClose={() => setMenuOpen(false)}
           items={menuItems}
           position={{ right: 53, top: 37 }}
-=======
-          {/* 상단 제목/설명 */}
-          <div className="text-xl px-8 mb-4 text-white">
-            {/* 수정 아이콘 버튼 (닫기 버튼 왼쪽) */}
-            <button
-              className="absolute top-4 right-12 text-white hover:text-gray-400 transition cursor-pointer"
-              onClick={() => setMenuOpen(true)}
-            >
-              <BiDotsVerticalRounded size={21} />
-            </button>
-            {/* 닫기 버튼 */}
-            <button
-              onClick={onClose}
-              className="absolute top-3 right-3 text-white hover:text-rose-300 transition cursor-pointer"
-            >
-              <IoIosClose size={30} />
-            </button>
-            <div className="font-bold">{piece.title}</div>
-            <div className="text-sm pr-10 pt-1">{piece.description}</div>
-          </div>
-
-          {/* ContextMenu 렌더링 */}
-          {menuOpen && (
-            <ContextMenu
-              open={menuOpen}
-              onClose={() => setMenuOpen(false)}
-              items={menuItems}
-              position={{ right: 53, top: 37 }}
-            />
-          )}
-
-          {/* 사운드 리스트 */}
-          <div className="relative p-4 pt-5">
-            <button
-              className="absolute top-0 right-5 text-white cursor-pointer hover:opacity-70 overflow-visible"
-              onClick={() => setShowAudioCreate(SoundCreateStep.Sound)}
-            >
-              <TbMusicPlus size={20} />
-            </button>
-            {sounds.length === 0 ? (
-              <div className="text-sm text-gray-300">
-                등록된 사운드가 없습니다.
-              </div>
-            ) : (
-              sounds.map((s, i) => (
-                <SoundItem
-                  key={`${s.soundId}-${i}`}
-                  soundData={s}
-                  index={i + (pagination.currentPage - 1) * pagination.size}
-                  // soundId={s.soundId}
-                  // audioId={s.audioId}
-                  // index={i + (pagination.currentPage - 1) * pagination.size}
-                  // title={s.title}
-                  // description={s.description}
-                  // createdTime={s.createdTime}
-                />
-              ))
-            )}
-          </div>
-          {/* 페이지네이션 */}
-          {pagination.totalPages >= 1 && (
-            <Pagination
-              currentPage={pagination.currentPage}
-              totalPages={pagination.totalPages}
-              onPageChange={handlePageChange}
-            />
-          )}
-          {showInfoEdit && (
-            <InfoEditModal
-              modalTitle="세부정보 수정"
-              modalDescription="피스의 세부 정보를 변경할 수 있습니다."
-              initTitle={piece.title ?? ""}
-              initDescription={piece.description ?? ""}
-              initHidden
-              onClose={() => setShowInfoEdit(false)}
-              handleSaveInfo={handleSaveInfo}
-            />
-          )}
-
-          {showAudioCreate == SoundCreateStep.Sound && (
-            <AudioUploadModal
-              onClose={() => setShowAudioCreate(null)}
-              onConfirm={handleSoundStepSubmit}
-              title="오디오 업로드"
-              description="선택한 피스에 오디오를 입력합니다."
-              labelText="선택한 피스에 추가할 오디오를"
-              subLabelText="사운드는 50MB 이하의 MP3, WAV 파일만 가능합니다."
-              confirmText="다음"
-              maxFileSizeMB={50}
-            />
-          )}
-
-          {showAudioCreate == SoundCreateStep.DetailInfo && (
-            <IconTitleModal
-              onClose={() => setShowAudioCreate(null)}
-              title="스페이스 생성"
-              description="새로운 스페이스를 생성합니다."
-              icon={<IoPlanetOutline size={20} />}
-              bgColor="white"
-            >
-              <DetailInfoStep
-                sound={createSoundData}
-                onSubmit={handleInfoStepSubmit}
-              />
-            </IconTitleModal>
-          )}
-        </div>
-      )}
-
-      {showCoordinatesEdit && (
-        <SpaceCreateSetSizeModal
-          title="피스 수정"
-          description="피스의 좌표를 수정합니다."
-          handleModalClose={onCloseCoordinateModal}
-          resetSelection={onResetSelection}
-          onSubmit={onSaveCoordinates}
->>>>>>> Stashed changes
         />
       )}
 
