@@ -95,10 +95,10 @@ const SoundItem: React.FC<SoundItemProps> = ({ index, soundData }) => {
     const payload = { title, description };
     // const payload = { title, description, hidden };
 
-    // await patchSoundInfoEdit(soundData.soundId, payload);
-    // setPieceInfo(title, description, hidden);
-    // showAlert("변경사항이 저장되었습니다.", "success", null);
-    // setShowInfoEdit(false);
+    await patchSoundInfoEdit(soundData.soundId, payload);
+    setPieceInfo(title, description, hidden);
+    showAlert("변경사항이 저장되었습니다.", "success", null);
+    setShowInfoEdit(false);
 
     setAlert({
       text: "오디오 정보 수정이 완료되었습니다.",
@@ -222,6 +222,7 @@ const SoundItem: React.FC<SoundItemProps> = ({ index, soundData }) => {
             onClose={() => setMenuOpen(false)}
             items={menuItems}
             position={menuPosition}
+            positionMode="fixed"
           />
         </div>
       )}

@@ -302,9 +302,10 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
                 <SoundItem
                   key={`${s.soundId}-${i}`}
                   index={i + (pagination.currentPage - 1) * pagination.size}
-                  title={s.title}
-                  description={s.description}
-                  createdTime={s.createdTime}
+                  soundData={s}
+                  // title={s.title}
+                  // description={s.description}
+                  // createdTime={s.createdTime}
                 />
               ))
             )}
