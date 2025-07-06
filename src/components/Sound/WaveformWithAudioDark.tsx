@@ -13,7 +13,10 @@ interface WaveformProps {
   audioTitle: string;
 }
 
-const WaveformWithAudioDark: React.FC<WaveformProps> = ({ audioUrl, audioTitle }) => {
+const WaveformWithAudioDark: React.FC<WaveformProps> = ({
+  audioUrl,
+  audioTitle,
+}) => {
   const waveformRef = useRef<HTMLDivElement>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
   const [waveSurfer, setWaveSurfer] = useState<WaveSurfer | null>(null);
@@ -60,7 +63,7 @@ const WaveformWithAudioDark: React.FC<WaveformProps> = ({ audioUrl, audioTitle }
       console.error("WaveSurfer error:", error);
     });
     console.log(audioUrl);
-    
+
     return () => waveSurferInstance.destroy();
   }, [audioUrl]);
 
@@ -112,7 +115,8 @@ const WaveformWithAudioDark: React.FC<WaveformProps> = ({ audioUrl, audioTitle }
       let newTime = audioRef.current.currentTime + seconds;
 
       if (newTime < 0) newTime = 0;
-      if (newTime > audioRef.current.duration) newTime = audioRef.current.duration;
+      if (newTime > audioRef.current.duration)
+        newTime = audioRef.current.duration;
 
       audioRef.current.currentTime = newTime;
     }
@@ -147,15 +151,13 @@ const WaveformWithAudioDark: React.FC<WaveformProps> = ({ audioUrl, audioTitle }
   };
 
   return (
-    <div className="flex flex-col px-5 max-w-[450px]">
+    <div className="flex flex-col max-w-[450px] bg-stone-800/95">
       {/* 파형/오디오 */}
-      <div ref={waveformRef} className=" bg-stone-800/90 " />
-      <div className="mb-8">
-        <audio ref={audioRef} controls src={audioUrl} className="hidden" />
-      </div>
+      <div ref={waveformRef} className=" " />
+      <audio ref={audioRef} controls src={audioUrl} className="hidden" />
 
       {/* 컨트롤러 */}
-      <div className="w-full py-5 px-4  bg-stone-800/90">
+      <div className="w-full py-5 px-4">
         <div className="text-center  text-neutral-200">{audioTitle}</div>
         <div className="w-full flex flex-col items-center gap-2 pt-4 ">
           <input
@@ -168,8 +170,12 @@ const WaveformWithAudioDark: React.FC<WaveformProps> = ({ audioUrl, audioTitle }
             className="w-full h-1.5 bg-[#f3f3f3] appearance-none cursor-pointer"
           />
           <div className="w-full flex justify-between">
-            <span className="text-xs text-gray-500">{formatTime(currentTime)}</span>
-            <span className="text-xs text-gray-500">{formatTime(duration)}</span>
+            <span className="text-xs text-gray-500">
+              {formatTime(currentTime)}
+            </span>
+            <span className="text-xs text-gray-500">
+              {formatTime(duration)}
+            </span>
           </div>
         </div>
         <div className="w-full flex justify-center pl-18 gap-4">
@@ -196,7 +202,11 @@ const WaveformWithAudioDark: React.FC<WaveformProps> = ({ audioUrl, audioTitle }
           {/* 음소거 */}
           <div className=" flex justify-end items-center">
             <button onClick={toggleMute} className="p-2 ">
-              {isMuted ? <VscMute size={18} color="#f3f3f3" /> : <VscUnmute size={18} color="#f3f3f3" />}
+              {isMuted ? (
+                <VscMute size={18} color="#f3f3f3" />
+              ) : (
+                <VscUnmute size={18} color="#f3f3f3" />
+              )}
             </button>
 
             <div className=" w-[35%] flex flex-col items-center gap-2 py-1">

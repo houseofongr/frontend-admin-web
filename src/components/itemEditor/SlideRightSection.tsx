@@ -3,7 +3,7 @@ import NewSoundForm from "./NewSoundForm";
 import ItemSoundList from "./ItemSoundList";
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { fetchSoundDetails } from "../../service/soundService";
+import { prevFetchSoundDetails } from "../../service/prevSoundService";
 
 type SoundListProps = {
   sounds: ItemSoundsData;
@@ -15,7 +15,7 @@ export default function SlideRightSection({ sounds, itemId }: SoundListProps) {
   //   음원 한 개 상세 데이터 조회
   const { data: soundMetadata, isLoading } = useQuery({
     queryKey: ["soundDetails", selectedSoundId],
-    queryFn: () => fetchSoundDetails(selectedSoundId!),
+    queryFn: () => prevFetchSoundDetails(selectedSoundId!),
     enabled: !!selectedSoundId,
   });
 

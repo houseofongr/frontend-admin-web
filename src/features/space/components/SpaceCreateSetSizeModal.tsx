@@ -13,13 +13,13 @@ interface SpaceCreateSetSizeModalProps {
 export default function SpaceCreateSetSizeModal({
   title,
   description,
-  handleModalClose: handleCreateModalClose,
+  handleModalClose,
   resetSelection,
   onSubmit,
 }: SpaceCreateSetSizeModalProps) {
   return (
     <DraggableIconTitleModal
-      onClose={handleCreateModalClose}
+      onClose={handleModalClose}
       title={title}
       description={description}
       icon={<IoPlanetOutline className="text-blue-950" size={20} />}
@@ -50,7 +50,7 @@ export default function SpaceCreateSetSizeModal({
           </button>
           <button
             className="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
-            onClick={handleCreateModalClose}
+            onClick={handleModalClose}
           >
             취소
           </button>

@@ -1,8 +1,9 @@
 // stores/useUniverseStore.ts
 import { create } from "zustand";
 import { getUniverseTree } from "../service/universeService";
-import { SpaceType, useSpaceStore } from "./useSpcaeStore";
+import { SpaceType, useSpaceStore } from "./useSpaceStore";
 import { PieceType, usePieceStore } from "./usePieceStore";
+import { SpacePiece_CreateEditStep } from "../constants/ProcessSteps";
 
 export interface UniverseType {
   universeId: number;
@@ -17,9 +18,11 @@ interface UniverseStore {
   universeId: number | null;
   rootUniverse: UniverseType | null;
   activeInnerImageId: number | null;
+  editStep: SpacePiece_CreateEditStep | null;
 
   setUniverseId: (id: number) => void;
   setRootUniverse: (data: UniverseType) => void;
+  setEditStep: (step: SpacePiece_CreateEditStep | null) => void;
 
   setUniverseData: (
     innerImgId: number,
@@ -36,6 +39,7 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
   universeId: null,
   rootUniverse: null,
   activeInnerImageId: null,
+  editStep: null,
 
   setUniverseId: (id) => set({ universeId: id }),
 
@@ -43,6 +47,7 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
     set({ rootUniverse: data });
     console.log(data);
   },
+  setEditStep: (step) => set({ editStep: step }),
 
   setUniverseData: (
     innerImgId: number,

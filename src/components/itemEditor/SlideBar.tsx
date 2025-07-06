@@ -4,7 +4,7 @@ import { ShapeData } from "../../types/items";
 import ColorTag from "./ColorTag";
 import { useQuery } from "@tanstack/react-query";
 import CircleButton from "../buttons/CircleButton";
-import { fetchItemSounds } from "../../service/soundService";
+import { prevFetchItemSounds } from "../../service/prevSoundService";
 import SlideRightSection from "./SlideRightSection";
 import {
   FaSave,
@@ -44,7 +44,7 @@ export default function SlideBar({
 
   const { data } = useQuery({
     queryKey: ["itemSounds", targetItemId],
-    queryFn: () => fetchItemSounds(targetItemId!),
+    queryFn: () => prevFetchItemSounds(targetItemId!),
     enabled: !!targetItemId, // selectedId가 있을 때만 쿼리 실행
     retry: 1, // 실패 시 한 번만 재시도
     refetchOnWindowFocus: false,
