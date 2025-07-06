@@ -2,12 +2,13 @@ import { useState, useRef, useEffect } from "react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import API_CONFIG from "../../../config/api";
 import { RiImageEditFill, RiFileDownloadLine } from "react-icons/ri";
-import WaveformWithAudioLightRow from "../../../components/Sound/WaveformWithAudioLightRow";
+import WaveformWithAudioDarkRow from "../../../components/Sound/WaveformWithAudioDarkRow";
 import ContextMenu from "../../../components/ContextMenu";
 import ThumbMusicEditModal from "./ThumbMusicEditModal";
 import { patchUniverseThumbMusicEdit } from "../../../service/universeService";
 import { useUniverseStore } from "../../../context/useUniverseStore";
 import { AlertType } from "../../../components/modal/ModalAlertMessage";
+import WaveformWithAudioDark from "../../../components/Sound/WaveformWithAudioDark";
 
 interface UniverseEditMusicProps {
   showAlert: (
@@ -104,7 +105,7 @@ export default function UniverseEditMusic({
 
       <div className="w-full">
         {thumbMusicId != -1 && (
-          <WaveformWithAudioLightRow
+          <WaveformWithAudioDarkRow
             audioUrl={`${API_CONFIG.PUBLIC_AUDIO_LOAD_API}/${thumbMusicId}`}
             audioTitle={thumbMusicId == null ? "" : ""}
           />

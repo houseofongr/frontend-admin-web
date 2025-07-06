@@ -25,6 +25,7 @@ import { UniverseCategoryOptions } from "../../../constants/UniverseData";
 import SpinnerIcon from "../../../components/icons/SpinnerIcon";
 import { useUniverseStore } from "../../../context/useUniverseStore";
 import { deleteUniverse, getUniverse, patchUniverseThumbnailEdit } from "../../../service/universeService";
+import { ScaleLoader } from "react-spinners";
 
 
 export default function UniverseListPage() {
@@ -262,13 +263,14 @@ export default function UniverseListPage() {
         </div>
 
         {/* 유니버스 리스트 */}
-        <div className="flex items-center flex-col lg:py-4">
+        <div className="relative flex items-center flex-col lg:py-4 min-h-70">
           <GridHeader headerTitles={universeListHeaderTitles} />
           {loading && (
-            <div className="absolute inset-0 z-50 flex items-center justify-center">
-              <SpinnerIcon />
+            <div className="absolute inset-0 z-50 mt-20 flex items-center justify-center">
+              <ScaleLoader width={2} height={40} color="#F5946D" />
             </div>
           )}
+
           {!loading && universeList.length === 0 && (
             <div className="py-10 ">유니버스가 존재하지 않습니다.</div>
           )}

@@ -5,6 +5,8 @@ type NotepadProps = {
 };
 
 export default function NotePadContent({ name, description, updatedDate }: NotepadProps) {
+  console.log("sdsssssssssss");
+  
   return (
     <section className="flex justify-center items-center w-1/2">
       <div
