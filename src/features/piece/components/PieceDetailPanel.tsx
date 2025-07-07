@@ -115,9 +115,9 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
 
   // ⚙️ 이벤트 핸들러
   const handlePageChange = (newPage: number) => fetchPieceDetail(newPage);
-  const handleSpaceDelete = () =>
+  const handlePieceDelete = () =>
     showAlert(
-      "정말로 스페이스를 삭제하시겠습니까?",
+      "정말로 피스를 삭제하시겠습니까?",
       "check",
       "* 관련된 이미지와 음원이 모두 삭제됩니다."
     );
@@ -173,7 +173,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
     {
       label: "피스 삭제",
       icon: <RiDeleteBin6Line size={20} />,
-      onClick: handleSpaceDelete,
+      onClick: handlePieceDelete,
     },
   ];
   const handelAlertOkBtn = async (type: string) => {
@@ -218,7 +218,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
       };
 
       setSounds((prev) => [newSound, ...prev]);
-      
+
       showAlert("사운드가 생성되었습니다.", "success", null);
       setShowAudioCreate(null);
 

@@ -22,6 +22,7 @@ import {
   patchSpaceInnerImageEdit,
   patchSpaceInfoEdit,
   patchSpacePositionEdit,
+  deleteSpace,
 } from "../../../service/spaceService";
 import {
   getUniverseTree,
@@ -101,7 +102,6 @@ export default function UniverseEditInnerImg() {
   const [alert, setAlert] = useState<{
     text: string;
     type: AlertType;
-    subText: string | null;
   } | null>(null);
   const [showInnerImgEdit, setShowInnerImgEdit] = useState<{
     show: boolean;
@@ -179,8 +179,7 @@ export default function UniverseEditInnerImg() {
     } catch (error: any) {
       showAlert(
         error?.message || "유니버스 조회 중 오류가 발생했습니다.",
-        "fail",
-        null
+        "fail"
       );
     }
   };
@@ -212,11 +211,7 @@ export default function UniverseEditInnerImg() {
   };
 
   const handleSpaceDelete = () => {
-    showAlert(
-      "정말로 스페이스를 삭제하시겠습니까?",
-      "check",
-      "* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다."
-    );
+    setEditStep(SpacePiece_CreateEditStep.Space_Delete);
   };
 
   const handleEditInnerImage = (file: File) => {
@@ -240,10 +235,10 @@ export default function UniverseEditInnerImg() {
       } else {
         throw new Error("잘못된 대상 유형입니다.");
       }
-      showAlert("변경사항이 저장되었습니다.", "success", null);
+      showAlert("변경사항이 저장되었습니다.", "success");
     } catch (error) {
       console.error("저장 에러:", error);
-      showAlert("저장 중 오류가 발생했습니다.", "fail", null);
+      showAlert("저장 중 오류가 발생했습니다.", "fail");
     }
   };
 
@@ -273,10 +268,10 @@ export default function UniverseEditInnerImg() {
   const createSpace = async (
     title: string,
     description: string,
-    hidden:boolean
+    hidden: boolean
   ): Promise<void> => {
     if (!startPoint || !endPoint || !innerImg) {
-      showAlert("스페이스 정보를 모두 입력해주세요.", "fail", null);
+      showAlert("스페이스 정보를 모두 입력해주세요.", "fail");
       return;
     }
     const currentId =
@@ -294,13 +289,12 @@ export default function UniverseEditInnerImg() {
     };
     try {
       await postSpaceCreate(metadata, innerImg);
-      showAlert("스페이스가 생성되었습니다.", "success", null);
+      showAlert("스페이스가 생성되었습니다.", "success");
       loadInitialData(currentId);
     } catch (error: any) {
       showAlert(
         error?.message || "스페이스 생성 중 오류가 발생했습니다.",
-        "fail",
-        null
+        "fail"
       );
     }
   };
@@ -308,10 +302,10 @@ export default function UniverseEditInnerImg() {
   const createPiece = async (
     title: string,
     description: string,
-    hidden:boolean
+    hidden: boolean
   ): Promise<void> => {
     if (!startPoint || !endPoint) {
-      showAlert("피스 정보를 모두 입력해주세요.", "fail", null);
+      showAlert("피스 정보를 모두 입력해주세요.", "fail");
       return;
     }
     const currentId =
@@ -329,14 +323,10 @@ export default function UniverseEditInnerImg() {
     };
     try {
       await postPieceCreateByCoordinate(metadata);
-      showAlert("피스가 생성되었습니다.", "success", null);
+      showAlert("피스가 생성되었습니다.", "success");
       loadInitialData(currentId);
     } catch (error: any) {
-      showAlert(
-        error?.message || "피스 생성 중 오류가 발생했습니다.",
-        "fail",
-        null
-      );
+      showAlert(error?.message || "피스 생성 중 오류가 발생했습니다.", "fail");
     }
   };
 
@@ -390,7 +380,7 @@ export default function UniverseEditInnerImg() {
     await patchSpaceInfoEdit(currentSpaceId, payload);
     refreshUniverseData();
 
-    showAlert("변경사항이 저장되었습니다.", "success", null);
+    showAlert("변경사항이 저장되었습니다.", "success");
     setShowInfoEdit(false);
   };
 
@@ -434,11 +424,11 @@ export default function UniverseEditInnerImg() {
     if (type == "space" && currentSpaceId != null) {
       await patchSpacePositionEdit(currentSpaceId, payload);
       refreshUniverseData();
-      showAlert("스페이스 좌표가 수정되었습니다.", "success", null);
+      showAlert("스페이스 좌표가 수정되었습니다.", "success");
     } else if (type == "piece" && currentPiece != null) {
       await patchPieceCoordinatesEdit(currentPiece.pieceId, payload);
       refreshUniverseData();
-      showAlert("피스 좌표가 수정되었습니다.", "success", null);
+      showAlert("피스 좌표가 수정되었습니다.", "success");
     }
 
     setShowCoordinatesEdit(null);
@@ -446,8 +436,8 @@ export default function UniverseEditInnerImg() {
     resetSelection();
   };
 
-  const showAlert = (text: string, type: AlertType, subText: string | null) => {
-    setAlert({ text, type, subText });
+  const showAlert = (text: string, type: AlertType) => {
+    setAlert({ text, type });
   };
 
   const menuItems =
@@ -492,14 +482,26 @@ export default function UniverseEditInnerImg() {
           },
         ];
 
-  function handlePieceMethod() {
+  const handlePieceMethod = () => {
     setEditStep(SpacePiece_CreateEditStep.Piece_FillDetails);
-  }
+  };
 
-  function closePiecePanel(): void {
+  const closePiecePanel = () => {
     setCurrentPiece(null);
     setEditStep(null);
-  }
+  };
+
+  const handleDeleteSpace = async () => {
+    currentSpaceId;
+    if (currentSpaceId == null) {
+      showAlert("삭제 중 문제가 발생했습니다. ", "warning");
+      return;
+    }
+
+    await deleteSpace(currentSpaceId);
+    refreshUniverseData();
+    setEditStep(null);
+  };
 
   return (
     <div
@@ -514,15 +516,12 @@ export default function UniverseEditInnerImg() {
           onClose={() => setAlert(null)}
           okButton={<Button label="확인" onClick={() => setAlert(null)} />}
           cancelButton={
-            alert.type === "check" ? (
-              <Button
-                label="취소"
-                variant="gray"
-                onClick={() => setAlert(null)}
-              />
-            ) : undefined
+            <Button
+              label="취소"
+              variant="gray"
+              onClick={() => setAlert(null)}
+            />
           }
-          {...(alert.subText ? { subText: alert.subText } : {})}
         />
       )}
       {currentPiece == null && (
@@ -564,7 +563,6 @@ export default function UniverseEditInnerImg() {
           </button>
         </>
       )}
-
       <SpaceSelector
         innerImageId={activeInnerImageId}
         startPoint={startPoint}
@@ -572,7 +570,6 @@ export default function UniverseEditInnerImg() {
         setStartPoint={setStartPoint}
         setEndPoint={setEndPoint}
       />
-
       <PieceDetailPanel
         hidden={editStep == SpacePiece_CreateEditStep.Piece_SetSizeOnEdit}
         piece={currentPiece}
@@ -583,7 +580,6 @@ export default function UniverseEditInnerImg() {
         onResetSelection={resetSelection}
         onSaveCoordinates={() => handleSaveCoordinates("piece")}
       />
-
       {editStep === SpacePiece_CreateEditStep.Space_SetSizeOnCreate && (
         <SpaceCreateSetSizeModal
           title="스페이스 생성"
@@ -596,7 +592,6 @@ export default function UniverseEditInnerImg() {
           // setCreateStep={() => setCreateStep(SpaceCreateStep.UploadImage)}
         />
       )}
-
       {editStep === SpacePiece_CreateEditStep.Space_UploadImage && (
         <ImageUploadModal
           title="스페이스 생성"
@@ -609,7 +604,6 @@ export default function UniverseEditInnerImg() {
           requireSquare
         />
       )}
-
       {editStep === SpacePiece_CreateEditStep.Space_FillDetails && (
         <IconTitleModal
           onClose={handleCreateModalClose}
@@ -624,7 +618,6 @@ export default function UniverseEditInnerImg() {
           />
         </IconTitleModal>
       )}
-
       {showInnerImgEdit.show && (
         <ImageUploadModal
           title="이미지 수정"
@@ -639,7 +632,6 @@ export default function UniverseEditInnerImg() {
           requireSquare
         />
       )}
-
       {showInfoEdit && (
         <InfoEditModal
           modalTitle="세부정보 수정"
@@ -651,7 +643,6 @@ export default function UniverseEditInnerImg() {
           handleSaveInfo={handleSaveInfo}
         />
       )}
-
       {showCoordinatesEdit && showCoordinatesEdit == "space" && (
         <SpaceCreateSetSizeModal
           title="스페이스 수정"
@@ -659,6 +650,23 @@ export default function UniverseEditInnerImg() {
           handleModalClose={handleSpaceEditModalClose}
           resetSelection={resetSelection}
           onSubmit={() => handleSaveCoordinates("space")}
+        />
+      )}
+
+      {editStep === SpacePiece_CreateEditStep.Space_Delete && (
+        <ModalAlertMessage
+          text="정말로 스페이스를 삭제하시겠습니까?"
+          type="check"
+          subText="* 관련된 이미지와 음원, 내부 스페이스 및 요소가 모두 삭제됩니다."
+          onClose={() => setEditStep(null)}
+          okButton={<Button label="확인" onClick={handleDeleteSpace} />}
+          cancelButton={
+            <Button
+              label="취소"
+              variant="gray"
+              onClick={() => setEditStep(null)}
+            />
+          }
         />
       )}
 
@@ -680,7 +688,6 @@ export default function UniverseEditInnerImg() {
           requireSquare={false}
         />
       )}
-
       {editStep === SpacePiece_CreateEditStep.Piece_SetSizeOnCreate && (
         <SpaceCreateSetSizeModal
           title="피스 생성"
@@ -690,7 +697,6 @@ export default function UniverseEditInnerImg() {
           onSubmit={handlePieceMethod}
         />
       )}
-
       {editStep === SpacePiece_CreateEditStep.Piece_FillDetails && (
         <IconTitleModal
           onClose={handleCreateModalClose}

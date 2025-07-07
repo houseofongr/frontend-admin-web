@@ -3,6 +3,7 @@ export enum SpacePiece_CreateEditStep {
   Space_SetSizeOnEdit,
   Space_UploadImage,
   Space_FillDetails,
+  Space_Delete,
 
   Piece_SelectMethod, // 좌표 방식 또는 이미지 방식 선택
   Piece_UploadImage, // 이미지 업로드
@@ -11,6 +12,7 @@ export enum SpacePiece_CreateEditStep {
   Piece_FillDetails, // 세부 정보 입력
 
   Piece_SetSizeOnEdit,
+  Piece_Delete
 }
 
 export enum UniverseCreateStep {
