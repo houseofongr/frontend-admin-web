@@ -11,7 +11,6 @@ type SoundDetailProps = {
 
 export default function SoundDetailModal({ onClose, data }: SoundDetailProps) {
   const { soundId, title, description, audioId, createdTime, hidden } = data;
-
   return (
     <Modal onClose={onClose} bgColor="dark">
       <div className="flex flex-col gap-5 min-h-[400px] sm:min-h-[550px] min-w-[330px] md:min-w-[500px] lg:min-w-[900px]">

@@ -18,11 +18,23 @@ import ModalAlertMessage, {
   AlertType,
 } from "../../../components/modal/ModalAlertMessage";
 import Button from "../../../components/buttons/Button";
-import { patchSoundInfoEdit } from "../../../service/soundService";
+import {
+  deleteSound,
+  patchSoundEdit,
+  patchSoundInfoEdit,
+} from "../../../service/soundService";
 
 interface SoundItemProps {
   index: number;
   soundData: SoundType;
+  onUpdateSound: (soundId: number, newAudioId: number) => void;
+  onUpdateSoundInfo: (
+    soundId: number,
+    title: string,
+    description: string,
+    hidden: boolean
+  ) => void;
+  onDeleteSound:(soundId:number) => void;
 }
 
 enum ModalType {
@@ -32,7 +44,13 @@ enum ModalType {
   DeleteSound,
 }
 
-const SoundItem: React.FC<SoundItemProps> = ({ index, soundData }) => {
+const SoundItem: React.FC<SoundItemProps> = ({
+  index,
+  soundData,
+  onUpdateSound,
+  onUpdateSoundInfo,
+  onDeleteSound
+}) => {
   const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
   const [menuOpen, setMenuOpen] = useState(false);
   const [menuPosition, setMenuPosition] = useState({ top: 0, left: 0 });
@@ -66,12 +84,27 @@ const SoundItem: React.FC<SoundItemProps> = ({ index, soundData }) => {
     };
   }, [menuOpen]);
 
-  const handleSoundEdit = () => {
+  const ShowSoundDetailModal = () => {
+    if (!menuOpen) {
+      setShowModal(ModalType.SoundDetail);
+    }
+  };
+
+  const ShowSoundEditModal = () => {
     setShowModal(ModalType.EditSound);
     setMenuOpen(false);
   };
 
-  const handleEditSoundSubmit = (file: File) => {
+  const handleSoundEditSubmit = async (file: File) => {
+    var res = await patchSoundEdit(soundData.soundId, file);
+    const { newAudioId } = res;
+    setShowModal(null);
+    onUpdateSound(soundData.soundId, newAudioId);
+    setAlert({
+      text: "변경사항이 저장되었습니다.",
+      type: "success",
+    });
+
     setAlert({
       text: "오디오 수정이 완료되었습니다.",
       type: "success",
@@ -82,46 +115,51 @@ const SoundItem: React.FC<SoundItemProps> = ({ index, soundData }) => {
     console.log("이미지 다운로드");
     setMenuOpen(false);
   };
-  const setShowInfoEdit = (show: boolean) => {
+
+  const ShowInfoEditModal = () => {
     setShowModal(ModalType.EditInfo);
     setMenuOpen(false);
   };
 
-  const handleSaveInfo = async (
+
+  const handleInfoEditSubmit = async (
     title: string,
     description: string,
     hidden: boolean
   ) => {
-    const payload = { title, description };
-    // const payload = { title, description, hidden };
-
+    const payload = { title, description, hidden };
     await patchSoundInfoEdit(soundData.soundId, payload);
-    setPieceInfo(title, description, hidden);
-    showAlert("변경사항이 저장되었습니다.", "success", null);
-    setShowInfoEdit(false);
+    onUpdateSoundInfo(soundData.soundId, title, description, hidden); // 부모에 업데이트 알림
 
+    setShowModal(null);
     setAlert({
-      text: "오디오 정보 수정이 완료되었습니다.",
+      text: "변경사항이 저장되었습니다.",
       type: "success",
     });
   };
 
-  const handleSoundDelete = () => {
+  const ShowSoundDeleteModal = () => {
     setShowModal(ModalType.DeleteSound);
     setMenuOpen(false);
   };
-  const handleSoundDetail = () => {
-    if (!menuOpen) {
-      console.log(soundData.title, soundData.description);
-      setShowModal(ModalType.SoundDetail);
-    }
+
+  const handleSoundDeleteSubmit = async () => {
+    await deleteSound(soundData.soundId);
+    onDeleteSound(soundData.soundId); // 부모에 업데이트 알림
+
+    setShowModal(null);
+    setAlert({
+      text: "사운드가 삭제되었습니다.",
+      type: "success",
+    });
   };
+
 
   const menuItems = [
     {
       label: "오디오 수정",
       icon: <MdOutlineAudioFile size={20} />,
-      onClick: () => handleSoundEdit(),
+      onClick: () => ShowSoundEditModal(),
     },
     {
       label: "오디오 다운로드",
@@ -131,12 +169,12 @@ const SoundItem: React.FC<SoundItemProps> = ({ index, soundData }) => {
     {
       label: "정보 수정",
       icon: <TbPencilCog size={20} />,
-      onClick: () => setShowInfoEdit(true),
+      onClick: ShowInfoEditModal,
     },
     {
       label: "사운드 삭제",
       icon: <RiDeleteBin6Line size={20} />,
-      onClick: handleSoundDelete,
+      onClick: ShowSoundDeleteModal,
     },
   ];
 
@@ -154,12 +192,12 @@ const SoundItem: React.FC<SoundItemProps> = ({ index, soundData }) => {
   return (
     <div
       key={index}
-      onClick={handleSoundDetail}
+      onClick={ShowSoundDetailModal}
       onMouseEnter={() => setHoveredIndex(index)}
       onMouseLeave={() => setHoveredIndex(null)}
       className="relative overflow-visible"
     >
-      {alert && alert.type != "info" && (
+      {alert && (
         <ModalAlertMessage
           text={alert.text}
           type={alert.type}
@@ -232,7 +270,7 @@ const SoundItem: React.FC<SoundItemProps> = ({ index, soundData }) => {
       {showModal == ModalType.EditSound && (
         <AudioUploadModal
           onClose={() => setShowModal(null)}
-          onConfirm={handleEditSoundSubmit}
+          onConfirm={handleSoundEditSubmit}
           title="오디오 수정"
           description="선택한 오디오 파일을 수정합니다."
           labelText="수정할 오디오 파일을"
@@ -249,7 +287,23 @@ const SoundItem: React.FC<SoundItemProps> = ({ index, soundData }) => {
           initDescription={soundData.description ?? ""}
           initHidden={soundData.hidden}
           onClose={() => setShowModal(null)}
-          handleSaveInfo={handleSaveInfo}
+          handleSaveInfo={handleInfoEditSubmit}
+        />
+      )}
+      {showModal == ModalType.DeleteSound && (
+        <ModalAlertMessage
+          text="정말로 사운드를 삭제하시겠습니까?"
+          type="check"
+          subText="* 관련된 음원이 삭제됩니다."
+          onClose={() => setShowModal(null)}
+          okButton={<Button label="확인" onClick={handleSoundDeleteSubmit} />}
+          cancelButton={
+            <Button
+              label="취소"
+              variant="gray"
+              onClick={() => setShowModal(null)}
+            />
+          }
         />
       )}
     </div>

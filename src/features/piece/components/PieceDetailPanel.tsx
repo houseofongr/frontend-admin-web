@@ -1,11 +1,15 @@
 import React, { useEffect, useState } from "react";
 import SoundItem from "../../sound/components/SoundItem";
 import Pagination from "../../../components/Pagination";
-import { deletePiece, getPieceDetail, patchPieceInfoEdit } from "../../../service/pieceService";
+import {
+  deletePiece,
+  getPieceDetail,
+  patchPieceInfoEdit,
+} from "../../../service/pieceService";
 import { IoIosClose } from "react-icons/io";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import { RiDeleteBin6Line } from "react-icons/ri";
-import { TbMusicPlus, TbPencilCog } from "react-icons/tb";
+import { TbMusic, TbMusicPlus, TbPencilCog } from "react-icons/tb";
 import { PiGpsBold } from "react-icons/pi";
 import ContextMenu from "../../../components/ContextMenu";
 import InfoEditModal from "../../../components/modal/InfoEditModal";
@@ -187,31 +191,45 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
   };
 
   const fetchCreateSound = async (
-      title: string,
-      description: string,
-      hidden:boolean
-    ): Promise<void> => {
+    title: string,
+    description: string,
+    hidden: boolean
+  ): Promise<void> => {
     if (createSoundData == null) return;
-  
-    const currentPiece = piece?.pieceId;
-      const metadata = {
-        pieceId: currentPiece,
-        title,
-        description,
-        hidden,
-      };
-      try {
-        await createSound(metadata, createSoundData);
-        showAlert("사운드가 생성되었습니다.", "success", null);
 
-      } catch (error: any) {
-        showAlert(
-          error?.message || "사운드 생성 중 오류가 발생했습니다.",
-          "fail",
-          null
-        );
-      }
+    const currentPiece = piece?.pieceId;
+    const metadata = {
+      pieceId: currentPiece,
+      title,
+      description,
+      hidden,
     };
+    try {
+      var res = await createSound(metadata, createSoundData);
+
+      const newSound: SoundType = {
+        soundId: res.soundId,
+        audioId: res.audioFileId,
+        title: res.title,
+        description: res.description,
+        hidden: res.hidden,
+        createdTime: Math.floor(Date.now() / 1000),
+        updatedTime: Math.floor(Date.now() / 1000),
+      };
+
+      setSounds((prev) => [newSound, ...prev]);
+      
+      showAlert("사운드가 생성되었습니다.", "success", null);
+      setShowAudioCreate(null);
+
+    } catch (error: any) {
+      showAlert(
+        error?.message || "사운드 생성 중 오류가 발생했습니다.",
+        "fail",
+        null
+      );
+    }
+  };
 
   const handleSoundStepSubmit = (file: File) => {
     setCreateSoundData(file);
@@ -224,6 +242,43 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
     hidden: boolean
   ) => {
     fetchCreateSound(title, description, hidden);
+  };
+
+  const updateSound = (soundId: number, newAudioId: number) => {
+    setSounds((prev) =>
+      prev.map((sound) =>
+        sound.soundId === soundId
+          ? {
+              ...sound,
+              audioId: newAudioId,
+            }
+          : sound
+      )
+    );
+  };
+
+  const updateSoundInfo = (
+    soundId: number,
+    title: string,
+    description: string,
+    hidden: boolean
+  ) => {
+    setSounds((prev) =>
+      prev.map((sound) =>
+        sound.soundId === soundId
+          ? {
+              ...sound,
+              title,
+              description,
+              hidden,
+            }
+          : sound
+      )
+    );
+  };
+
+  const deleteSound = (soundId: number) => {
+    setSounds((prev) => prev.filter((sound) => sound.soundId !== soundId));
   };
 
   if (!piece) return null;
@@ -303,15 +358,15 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
                   key={`${s.soundId}-${i}`}
                   index={i + (pagination.currentPage - 1) * pagination.size}
                   soundData={s}
-                  // title={s.title}
-                  // description={s.description}
-                  // createdTime={s.createdTime}
+                  onUpdateSound={updateSound}
+                  onUpdateSoundInfo={updateSoundInfo}
+                  onDeleteSound={deleteSound}
                 />
               ))
             )}
           </div>
           {/* 페이지네이션 */}
-          {pagination.totalPages > 1 && (
+          {pagination.totalPages >= 1 && (
             <Pagination
               currentPage={pagination.currentPage}
               totalPages={pagination.totalPages}
@@ -346,9 +401,9 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
           {showAudioCreate == SoundCreateStep.DetailInfo && (
             <IconTitleModal
               onClose={() => setShowAudioCreate(null)}
-              title="스페이스 생성"
-              description="새로운 스페이스를 생성합니다."
-              icon={<IoPlanetOutline size={20} />}
+              title="사운드 생성"
+              description="새로운 사운드를 생성합니다."
+              icon={<TbMusic size={20} />}
               bgColor="white"
             >
               <DetailInfoStep
