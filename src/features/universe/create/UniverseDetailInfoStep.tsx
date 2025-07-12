@@ -1,21 +1,20 @@
 import { useState, useEffect } from "react";
 import { HiGlobeAsiaAustralia } from "react-icons/hi2";
 import { TbShieldLock } from "react-icons/tb";
-import {
-  UniverseCategory,
-  UniverseCategoryOptions,
-} from "../../../constants/UniverseData";
 import { FiSearch } from "react-icons/fi";
 import UserSearch from "../../universe/create/UserSearch";
 import Modal from "../../../components/modal/Modal";
 import { UserV2 } from "../../../types/user";
 import AudioLight from "../../../components/Sound/AudioLight";
-import { PublicStatusOption } from "../../../constants/UniverseData";
+import { Category } from "../../../types/universe";
+import { PublicStatusOption } from "../../../constants/PublicStatusOption";
 import { InputField } from "../../../components/Input/InputField";
 import { TextareaField } from "../../../components/Input/TextareaField";
-import { SelectField } from "../../../components/Input/SelectField";
+import { CategorySelectField } from "../../../components/Input/SelectField";
 import { AuthorSelectField } from "../../../components/Input/AuthorSelectField";
 import { SelectableRadioField } from "../../../components/Input/SelectableRadioField";
+import { useUniverseStore } from "../../../context/useUniverseStore";
+import { useCategories } from "../../../context/useCategoryStore";
 
 interface DetailInfoStepProps {
   innerImg: File | null;
@@ -24,7 +23,7 @@ interface DetailInfoStepProps {
     title: string;
     description: string;
     authorId: UserV2 | null;
-    category: string;
+    category: Category | null;
     publicStatus: string;
     hashtags: string[];
   };
@@ -32,7 +31,7 @@ interface DetailInfoStepProps {
     title: string;
     description: string;
     authorId: UserV2;
-    category: string;
+    category: Category;
     publicStatus: string;
     hashtags: string[];
   }) => void;
@@ -44,6 +43,7 @@ export default function UniverseDetailInfoStep({
   detailInfo,
   onChange,
 }: DetailInfoStepProps) {
+  const categories = useCategories(); // 자동 로딩됨
   // 미리보기
   const [previewInnerImg, setPreviewInnerImg] = useState<string | null>(null);
   const [previewMusic, setPreviewMusic] = useState<string | null>(null);
@@ -58,7 +58,9 @@ export default function UniverseDetailInfoStep({
   );
   const [tags, setTags] = useState<string>(detailInfo.hashtags.join(" "));
   const [tagList, setTagList] = useState<string[]>([]);
-  const [category, setCategory] = useState(detailInfo.category);
+  const [category, setCategory] = useState<Category | null>(
+    detailInfo.category
+  );
   const [authorId, setAuthorId] = useState<UserV2 | null>(detailInfo.authorId);
 
   // 작성자 선택 모달
@@ -135,7 +137,7 @@ export default function UniverseDetailInfoStep({
 
   // 상위 컴포넌트로 값 전달
   useEffect(() => {
-    if (authorId !== null) {
+    if (authorId !== null && category !== null) {
       onChange({
         title,
         description,
@@ -234,11 +236,11 @@ export default function UniverseDetailInfoStep({
 
           <div className="flex flex-row gap-3">
             {/* 카테고리 */}
-            <SelectField
+            <CategorySelectField
               label="카테고리"
-              value={category}
+              value={category!}
               onChange={(val) => setCategory(val)}
-              options={UniverseCategoryOptions}
+              options={categories}
               placeholder="카테고리를 선택하세요"
             />
 

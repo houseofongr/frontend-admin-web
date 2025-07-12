@@ -18,6 +18,7 @@ import { UserV2 } from "../../../types/user";
 import { UniverseCreateStep } from "../../../constants/ProcessSteps";
 import SpinnerIcon from "../../../components/icons/SpinnerIcon";
 import { postUniverse } from "../../../service/universeService";
+import { Category } from "../../../types/universe";
 
 interface ThumbnailEditProps {
   onClose: () => void;
@@ -40,14 +41,14 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
     title: string;
     description: string;
     authorId: UserV2 | null;
-    category: string;
+    category: Category|null;
     publicStatus: string;
     hashtags: string[];
   }>({
     title: "",
     description: "",
     authorId: null,
-    category: "",
+    category: null,
     publicStatus: "",
     hashtags: [],
   });
@@ -67,7 +68,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
       !title.trim() ||
       !description.trim() ||
       !authorId ||
-      !category.trim() ||
+      !category ||
       !publicStatus.trim()
     ) {
       return false;
@@ -164,7 +165,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
     title: string;
     description: string;
     authorId: UserV2;
-    category: string;
+    category: Category;
     publicStatus: string;
     hashtags: string[];
   }) => {
@@ -243,7 +244,7 @@ export default function UniverseCreate({ onClose }: ThumbnailEditProps) {
       title: detailInfo.title,
       description: detailInfo.description,
       authorId: detailInfo.authorId?.id,
-      category: detailInfo.category,
+      categoryId: detailInfo.category?.id,
       publicStatus: detailInfo.publicStatus,
       hashtags: detailInfo.hashtags,
     };

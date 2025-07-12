@@ -8,12 +8,10 @@ import SearchComponent from "../../../components/SearchComponent";
 import PageLayout from "../../../components/layout/PageLayout";
 import UniverseListItem from "../components/UniverseListItem";
 import { GoPlusCircle } from "react-icons/go";
-import CategorySelect from "../components/CategorySelect";
 import { AOO_COLOR } from "../../../constants/color";
 import IconTitleModal from "../../../components/modal/IconTitleModal";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import UniverseCreate from "./UniverseCreate";
-import API_CONFIG from "../../../config/api";
 import ImageUploadModal from "../../../components/modal/ImageUploadModal";
 import ModalAlertMessage, {
   AlertType,
@@ -21,8 +19,6 @@ import ModalAlertMessage, {
 import Button from "../../../components/buttons/Button";
 import { universeSearchOptions } from "../../../constants/searchOptions";
 import ThumbMusicPreview from "../components/ThumbMusicPreview";
-import { UniverseCategoryOptions } from "../../../constants/UniverseData";
-import SpinnerIcon from "../../../components/icons/SpinnerIcon";
 import { useUniverseStore } from "../../../context/useUniverseStore";
 import { deleteUniverse, getUniverse, patchUniverseThumbnailEdit } from "../../../service/universeService";
 import { ScaleLoader } from "react-spinners";
@@ -30,9 +26,7 @@ import { ScaleLoader } from "react-spinners";
 
 export default function UniverseListPage() {
   const navigate = useNavigate();
-  const {
-    resetUniverse
-  } = useUniverseStore();
+  const { resetUniverse } = useUniverseStore();
 
   const [universeList, setUniverseList] = useState<Universe[]>([]);
 
@@ -40,7 +34,6 @@ export default function UniverseListPage() {
   const [totalPages, setTotalPages] = useState<number>(0);
   const [searchType, setSearchType] = useState("");
   const [keyword, setKeyword] = useState("");
-  const [category, setCategory] = useState("");
 
   const [totalItems, setTotalItems] = useState<number>(0);
   const [size, setSize] = useState<number>(0);
@@ -78,6 +71,7 @@ export default function UniverseListPage() {
       setTotalPages(pagination.totalPages);
       setTotalItems(pagination.totalElements);
       setSize(pagination.size);
+      
     } catch (error) {
       console.error("Failed to fetch universes:", error);
     }
@@ -249,12 +243,12 @@ export default function UniverseListPage() {
 
           {/* 카테고리 선택 & 검색 */}
           <div className="flex items-center mb-3">
-            <CategorySelect
+            {/* <CategorySelect
               onSearch={(a, b) => {
                 console.log(a, b);
               }}
               options={UniverseCategoryOptions}
-            />
+            /> */}
             <SearchComponent
               onSearch={handleSearch}
               options={universeSearchOptions}

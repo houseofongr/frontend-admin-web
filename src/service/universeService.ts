@@ -82,6 +82,7 @@ export const patchUniverseInfoEdit = async (
       body: JSON.stringify(payload),
     }
   );
+
   if (!response.ok) throw new Error("Failed to edit universe info");
   return response.json();
 };

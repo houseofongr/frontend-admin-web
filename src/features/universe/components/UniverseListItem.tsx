@@ -1,5 +1,4 @@
 import { Universe } from "../../../types/universe";
-import { UniverseCategory } from "../../../constants/UniverseData";
 import { universeListHeaderTitles } from "../../../constants/headerList";
 import {
   RiDeleteBin6Line,
@@ -44,10 +43,11 @@ export default function UniverseListItem({
     author,
     authorId,
   } = universe;
-  function getCategoryLabel(key?: string): string {
-    if (!key) return "";
-    return UniverseCategory[key as keyof typeof UniverseCategory] ?? key;
-  }
+
+  // function getCategoryLabel(key?: string): string {
+  //   if (!key) return "";
+  //   return UniverseCategory[key as keyof typeof UniverseCategory] ?? key;
+  // }
 
   return (
     <>
@@ -99,7 +99,7 @@ export default function UniverseListItem({
 
         {/* 카테고리 */}
         <div style={{ width: universeListHeaderTitles[5].width }}>
-          {getCategoryLabel(category)}
+          {category.kor}
         </div>
 
         {/* 조회수 */}
@@ -178,7 +178,7 @@ export default function UniverseListItem({
           {/* 공개여부 */}
           <div className="w-[15%]">{publicStatus}</div>
           {/* 카테고리 */}
-          <div className="w-[15%]">{getCategoryLabel(category)}</div>
+          <div className="w-[15%]">{category.kor}</div>
         </div>
 
         {/* ✅ 3. 생성일, 조회수, 좋아요, 편집, 삭제 → 다음줄에 분리 */}
@@ -233,7 +233,7 @@ export default function UniverseListItem({
         <div className="flex flex-row items-center text-sm gap-3 justify-end mb-1">
           <div className="w-[20%]">{author}</div>
           <div className="w-[20%]">{publicStatus}</div>
-          <div className="w-[20%]">{getCategoryLabel(category)}</div>
+          <div className="w-[20%]">{category.kor}</div>
         </div>
 
         {/* ✅ 3. 생성일, 조회수, 좋아요, 편집, 삭제 → 다음줄에 분리 */}

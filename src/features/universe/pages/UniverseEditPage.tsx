@@ -9,10 +9,7 @@ import UniverseEditInnerImg from "../edit/UniverseEditInnerImg";
 import UniverseEditMusic from "../edit/UniverseEditMusic";
 import ThumbMusicEditModal from "../edit/ThumbMusicEditModal";
 
-import {
-  PublicStatusOption,
-  UniverseCategoryOptions,
-} from "../../../constants/UniverseData";
+import { PublicStatusOption } from "../../../constants/PublicStatusOption";
 import { Universe } from "../../../types/universe";
 import Modal from "../../../components/modal/Modal";
 import UserSearch from "../create/UserSearch";
@@ -25,7 +22,7 @@ import { InputField } from "../../../components/Input/InputField";
 import { TextareaField } from "../../../components/Input/TextareaField";
 import { AuthorSelectField } from "../../../components/Input/AuthorSelectField";
 import { SelectableRadioField } from "../../../components/Input/SelectableRadioField";
-import { SelectField } from "../../../components/Input/SelectField";
+import { CategorySelectField } from "../../../components/Input/SelectField";
 
 import { useUniverseStore } from "../../../context/useUniverseStore";
 import {
@@ -34,6 +31,7 @@ import {
   patchUniverseThumbMusicEdit,
   patchUniverseThumbnailEdit,
 } from "../../../service/universeService";
+import { useCategories } from "../../../context/useCategoryStore";
 
 export default function UniverseEditPage() {
   const { universeId } = useParams();
@@ -51,7 +49,11 @@ export default function UniverseEditPage() {
     like: 0,
     title: "",
     description: "",
-    category: "",
+    category: {
+      id: -1,
+      eng: "",
+      kor: "",
+    },
     publicStatus: "PRIVATE",
     hashtags: [],
     authorId: 0,
@@ -68,6 +70,7 @@ export default function UniverseEditPage() {
   } | null>(null);
 
   const { setUniverseId } = useUniverseStore();
+  const categories = useCategories();
 
   useEffect(() => {
     if (!isNaN(universeIdParsed) && universeIdParsed > 0) {
@@ -93,7 +96,7 @@ export default function UniverseEditPage() {
       title: universe.title,
       description: universe.description,
       authorId: universe.authorId,
-      category: universe.category,
+      categoryId: universe.category.id,
       publicStatus: universe.publicStatus,
       hashtags: universe.hashtags,
     };
@@ -273,13 +276,14 @@ export default function UniverseEditPage() {
               maxLength={500}
               placeholder="설명을 입력하세요"
             />
-            <SelectField
+            <CategorySelectField
               label="카테고리"
               value={universe.category}
-              onChange={(val) =>
-                setUniverse((prev) => ({ ...prev, category: val }))
+              onChange={(val) =>{
+                setUniverse((prev) => ({ ...prev, category: val }));
+                }
               }
-              options={UniverseCategoryOptions}
+              options={categories}
               placeholder="카테고리를 선택하세요"
             />
             <SelectableRadioField

@@ -18,12 +18,14 @@ import InitPage from "./pages/Init";
 import UserRoomItemEditorPage from "./features/user/pages/UserRoomItemEditor";
 import UniverseListPage from "./features/universe/pages/UniverseListPage";
 import UniverseEditPage from "./features/universe/pages/UniverseEditPage";
+import TestPage from "./features/testPage";
 
 function App() {
   return (
     <BrowserRouter>
       <RootLayout>
         <Routes>
+          <Route path="/test" element={<TestPage />} />
           <Route path="/" element={<InitPage />} />
           {/* 어드민 검증 페이지 */}
           <Route path="/login" element={<FirstAuthenticationLogin />} />

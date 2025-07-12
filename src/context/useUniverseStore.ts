@@ -45,7 +45,6 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
 
   setRootUniverse: (data) => {
     set({ rootUniverse: data });
-    console.log(data);
   },
   setEditStep: (step) => set({ editStep: step }),
 
