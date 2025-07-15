@@ -31,8 +31,8 @@ interface UniverseStore {
   ) => void;
   setActiveInnerImageId: (id: number) => void;
   setRootUniverseInnerImageId: (id: number) => void;
-  resetUniverse: () => void;
   refreshUniverseData: () => Promise<void>;
+  resetUniverse: () => void;
 }
 
 export const useUniverseStore = create<UniverseStore>((set, get) => ({
@@ -70,11 +70,6 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
       },
     })),
 
-  resetUniverse: () => {
-    set({ universeId: null });
-    set({ rootUniverse: null });
-  },
-
   refreshUniverseData: async () => {
     const universeId = get().universeId;
     if (universeId == null) return;
@@ -82,5 +77,11 @@ export const useUniverseStore = create<UniverseStore>((set, get) => ({
     const data: UniverseType = await getUniverseTree(universeId);
     set({ rootUniverse: data });
   },
-}));
 
+  resetUniverse: () => {
+    set({ universeId: null });
+    set({ rootUniverse: null });
+    set({ activeInnerImageId: null });
+    set({ editStep: null });
+  },
+}));

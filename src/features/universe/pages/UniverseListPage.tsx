@@ -20,13 +20,22 @@ import Button from "../../../components/buttons/Button";
 import { universeSearchOptions } from "../../../constants/searchOptions";
 import ThumbMusicPreview from "../components/ThumbMusicPreview";
 import { useUniverseStore } from "../../../context/useUniverseStore";
-import { deleteUniverse, getUniverse, patchUniverseThumbnailEdit } from "../../../service/universeService";
+import { usePieceStore } from "../../../context/usePieceStore";
+import { useSpaceStore } from "../../../context/useSpaceStore";
+import { useSoundStore } from "../../../context/useSoundStore";
+import {
+  deleteUniverse,
+  getUniverse,
+  patchUniverseThumbnailEdit,
+} from "../../../service/universeService";
 import { ScaleLoader } from "react-spinners";
-
 
 export default function UniverseListPage() {
   const navigate = useNavigate();
   const { resetUniverse } = useUniverseStore();
+  const { resetPiece } = usePieceStore();
+  const { resetSpace } = useSpaceStore();
+  const { resetSound } = useSoundStore();
 
   const [universeList, setUniverseList] = useState<Universe[]>([]);
 
@@ -48,11 +57,14 @@ export default function UniverseListPage() {
   );
 
   const [deleteId, setDeleteId] = useState<number>();
-  const [showThumbMusic, setShowThumbMusic] = useState<number>(-1);;
+  const [showThumbMusic, setShowThumbMusic] = useState<number>(-1);
   const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     resetUniverse();
+    resetPiece();
+    resetSpace();
+    resetSound();
   }, []);
 
   const fetchUniverse = async (
@@ -71,7 +83,6 @@ export default function UniverseListPage() {
       setTotalPages(pagination.totalPages);
       setTotalItems(pagination.totalElements);
       setSize(pagination.size);
-      
     } catch (error) {
       console.error("Failed to fetch universes:", error);
     }
@@ -103,7 +114,7 @@ export default function UniverseListPage() {
 
   const closeThumbMusicModal = () => {
     setShowThumbMusic(-1);
-  }
+  };
   const saveThumbnailHandler = async (file: File) => {
     if (!file) {
       setAlert({
@@ -128,7 +139,6 @@ export default function UniverseListPage() {
       });
     }
   };
-  
 
   const deleteUniverseHandler = async () => {
     try {
@@ -169,7 +179,7 @@ export default function UniverseListPage() {
     });
   };
 
-  const handlePlayMusic = (page: number) => { };
+  const handlePlayMusic = (page: number) => {};
 
   return (
     <PageLayout>

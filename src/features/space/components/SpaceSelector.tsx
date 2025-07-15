@@ -61,6 +61,7 @@ export default function SpaceSelector({
 
   const imgRef = useRef<HTMLImageElement>(null);
 
+
   // 이미지 크기 추적
   useEffect(() => {
     if (!imgRef.current) return;
@@ -266,6 +267,19 @@ export default function SpaceSelector({
               </div>
             )}
 
+          {/* <video
+            src="/video/videoTest.mp4"
+            autoPlay
+            muted
+            loop
+            className="absolute top-1/2 left-1/2 max-h-full max-w-full object-contain"
+            style={{
+              transform: "translate(-50%, -50%)",
+              pointerEvents: "none",
+              userSelect: "none",
+            }}
+            draggable={false}
+          /> */}
           {/* 이미지 */}
           {imgSrc && (
             <img
@@ -281,7 +295,8 @@ export default function SpaceSelector({
 
           {/* 크로스헤어 */}
           {hoverPos &&
-            ((editStep === SpacePiece_CreateEditStep.Space_SetSizeOnCreate && !endPoint) ||
+            ((editStep === SpacePiece_CreateEditStep.Space_SetSizeOnCreate &&
+              !endPoint) ||
               editStep === SpacePiece_CreateEditStep.Space_SetSizeOnEdit ||
               editStep === SpacePiece_CreateEditStep.Piece_SetSizeOnCreate ||
               editStep === SpacePiece_CreateEditStep.Piece_SetSizeOnEdit) &&
@@ -291,15 +306,16 @@ export default function SpaceSelector({
               const top = `calc(50% - ${imageSize.height / 2}px + ${y}px)`;
               return (
                 <>
+                  {console.log("ddd")}
                   <div
-                    className="absolute w-3 h-3 bg-blue-400 rounded-full pointer-events-none"
+                    className="absolute w-3 h-3 bg-blue-400 rounded-full pointer-events-none z-10"
                     style={{
                       left: `calc(${left} - 6px)`,
                       top: `calc(${top} - 6px)`,
                     }}
                   />
                   <div
-                    className="absolute h-[1px] bg-blue-400 pointer-events-none"
+                    className="absolute h-[1px] bg-blue-400 pointer-events-none z-10"
                     style={{
                       top,
                       left: `calc(50% - ${imageSize.width / 2}px)`,
@@ -307,7 +323,7 @@ export default function SpaceSelector({
                     }}
                   />
                   <div
-                    className="absolute w-[1px] bg-blue-400 pointer-events-none"
+                    className="absolute w-[1px] bg-blue-400 pointer-events-none z-10"
                     style={{
                       left,
                       top: `calc(50% - ${imageSize.height / 2}px)`,
