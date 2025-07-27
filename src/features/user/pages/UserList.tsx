@@ -19,7 +19,7 @@ export default function UserList() {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/users?page=${currentPage}&size=${size}`);
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/users?page=${currentPage}&size=${size}`);
       const { users, pagination } = await response.json();
       setUsers(users);
       setTotalPages(pagination.totalPages);

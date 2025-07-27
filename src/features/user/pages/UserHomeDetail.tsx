@@ -27,7 +27,7 @@ export default function UserHomeDetail() {
     if (!params.homeId) return;
     const fetchUserHomeData = async () => {
       try {
-        const response = await fetch(`${API_CONFIG.BACK_API}/homes/${params.homeId}`);
+        const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/homes/${params.homeId}`);
         const { homeId, homeName, createdDate, updatedDate, house, rooms } = await response.json();
         setInfo({ homeId, homeName, createdDate, updatedDate });
         setHomeData({ house, rooms });

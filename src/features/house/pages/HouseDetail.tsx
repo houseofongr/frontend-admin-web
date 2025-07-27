@@ -38,7 +38,7 @@ export default function HouseDetail() {
 
   const houseDeleteHandler = async () => {
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/houses/${houseId}`, {
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/houses/${houseId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
@@ -81,7 +81,7 @@ export default function HouseDetail() {
     }
 
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/houses/${houseId}`, {
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/houses/${houseId}`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +132,7 @@ export default function HouseDetail() {
     }
 
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/houses/rooms`, {
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/houses/rooms`, {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
@@ -189,7 +189,7 @@ export default function HouseDetail() {
   useEffect(() => {
     const fetchHouseData = async () => {
       try {
-        const response = await fetch(`${API_CONFIG.BACK_API}/houses/${houseId}`);
+        const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/houses/${houseId}`);
 
         const data = await response.json();
         const roomsEditableData = data.rooms.map((room: Room) => ({
@@ -224,7 +224,7 @@ export default function HouseDetail() {
   useEffect(() => {
     const fetchHouseData = async () => {
       try {
-        const response = await fetch(`${API_CONFIG.BACK_API}/houses/${houseId}`);
+        const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/houses/${houseId}`);
         const data = await response.json();
 
         setHouseData(data);

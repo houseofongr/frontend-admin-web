@@ -1,8 +1,7 @@
 import API_CONFIG from "../../../config/api";
-import { formatDate } from "../../../utils/formatDate";
-import WaveformWithAudioDark from "../../../components/Sound/WaveformWithAudioDark";
 import Modal from "../../../components/modal/Modal";
 import { SoundType } from "../../../context/useSoundStore";
+import AudioWaveform from "../../../components/Sound/V2/AudioWaveform";
 
 type SoundDetailProps = {
   onClose: () => void;
@@ -75,10 +74,14 @@ export default function SoundDetailModal({ onClose, data }: SoundDetailProps) {
             </div>
           </div>
           {/* 파형 섹션 */}
-          <div className="w-full lg:w-1/2 flex-center sm:mt-14 md:mt-10 lg:mt-0">
-            <WaveformWithAudioDark
+          <div className="w-full lg:w-1/2 flex-center sm:mt-14 md:mt-10 lg:mt-0 p-3">
+            {/* <WaveformWithAudioDark
               audioUrl={`${API_CONFIG.PUBLIC_AUDIO_LOAD_API}/${audioId}`}
               audioTitle={""}
+            /> */}
+            <AudioWaveform
+              audioUrl={`${API_CONFIG.PUBLIC_AUDIO_LOAD_API}/${audioId}`}
+              mode="transparent"
             />
           </div>
         </div>

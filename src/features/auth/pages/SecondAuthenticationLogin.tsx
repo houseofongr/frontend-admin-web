@@ -9,7 +9,7 @@ export default function SecondAuthenticationLogin() {
   // const [searchParams] = useSearchParams();
   // const navigate = useNavigate();
   const handleLogin = async (provider: string) => {
-    window.location.href = `${API_CONFIG.BACK_API}/authn/login/${provider}`;
+    window.location.href = `${API_CONFIG.BACK_ADMIN_API}/authn/login/${provider}`;
   };
 
   // 1차 검증 여부 확인

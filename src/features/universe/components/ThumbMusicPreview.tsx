@@ -1,4 +1,4 @@
-import AudioLight from "../../../components/Sound/AudioLight";
+import AudioWaveform from "../../../components/Sound/V2/AudioWaveform";
 import API_CONFIG from "../../../config/api";
 
 interface ThumbnailEditProps {
@@ -9,10 +9,10 @@ interface ThumbnailEditProps {
 export default function ThumbMusicPreview({ thumbMusicId, onClose }: ThumbnailEditProps) {
 
   return (
-    <div>
-      <AudioLight
-        audioUrl={`${API_CONFIG.PUBLIC_AUDIO_LOAD_API}/${thumbMusicId}`}
-        audioTitle={"썸네일 음악 미리듣기"}
+    <div className="p-5">
+      <AudioWaveform
+        audioUrl={`${API_CONFIG.FILE_API}/public/audios/${thumbMusicId}`}
+        mode="light"
       />
     </div>
   );

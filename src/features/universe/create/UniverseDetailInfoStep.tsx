@@ -5,7 +5,6 @@ import { FiSearch } from "react-icons/fi";
 import UserSearch from "../../universe/create/UserSearch";
 import Modal from "../../../components/modal/Modal";
 import { UserV2 } from "../../../types/user";
-import AudioLight from "../../../components/Sound/AudioLight";
 import { Category } from "../../../types/universe";
 import { PublicStatusOption } from "../../../constants/PublicStatusOption";
 import { InputField } from "../../../components/Input/InputField";
@@ -15,6 +14,7 @@ import { AuthorSelectField } from "../../../components/Input/AuthorSelectField";
 import { SelectableRadioField } from "../../../components/Input/SelectableRadioField";
 import { useUniverseStore } from "../../../context/useUniverseStore";
 import { useCategories } from "../../../context/useCategoryStore";
+import AudioWaveform from "../../../components/Sound/V2/AudioWaveform";
 
 interface DetailInfoStepProps {
   innerImg: File | null;
@@ -193,10 +193,16 @@ export default function UniverseDetailInfoStep({
           </div>
           <div className="shrink-0 min-w-[300px] min-h-[150px] flex justify-center center items-center border border-gray-300 rounded-xl p-1">
             {previewMusic && (
-              <div className="flex w-[100%]">
-                <AudioLight
+              <div className="flex w-[100%] justify-center px-5">
+                {/* <AudioLight
                   audioUrl={previewMusic}
                   audioTitle={thumbMusic?.name || "썸네일 음악 미리듣기"}
+                /> */}
+                <AudioWaveform
+                  audioUrl={previewMusic}
+                  mode="light"
+                  audioTitle={thumbMusic?.name || "썸뮤직 음악 미리듣기"}
+                  waveVisible={false}
                 />
               </div>
             )}

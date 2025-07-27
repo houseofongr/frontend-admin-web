@@ -240,7 +240,7 @@ export default function UniverseEditPage() {
             <div className="grow bg-black rounded-xl">
               <UniverseEditInnerImg />
             </div>
-            <div className="lg:min-h-[130px] flex-col min-h-[280px]">
+            <div className="lg:min-h-[130px] flex-col min-h-[280px] rounded-xl">
               <UniverseEditMusic
                 showAlert={showAlert}
                 thumbMusicId={universe.thumbMusicId}
@@ -279,10 +279,9 @@ export default function UniverseEditPage() {
             <CategorySelectField
               label="카테고리"
               value={universe.category}
-              onChange={(val) =>{
+              onChange={(val) => {
                 setUniverse((prev) => ({ ...prev, category: val }));
-                }
-              }
+              }}
               options={categories}
               placeholder="카테고리를 선택하세요"
             />
@@ -314,7 +313,7 @@ export default function UniverseEditPage() {
         </div>
       </section>
 
-      {showAuthorEdit && ( 
+      {showAuthorEdit && (
         <Modal onClose={() => setShowAuthorEdit(false)} bgColor="white">
           <UserSearch
             isOpen={showAuthorEdit}

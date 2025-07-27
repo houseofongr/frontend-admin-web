@@ -2,7 +2,7 @@ import API_CONFIG from "../config/api";
 
 // 피스 좌표방식 생성 API
 export const postPieceCreateByCoordinate = async (payload: object) => {
-  const response = await fetch(`${API_CONFIG.BACK_API}/pieces/position `, {
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/pieces/position `, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -30,7 +30,7 @@ export const postPieceCreateByCoordinate = async (payload: object) => {
       query.append("keyword", isAsc);
     }
     const response = await fetch(
-      `${API_CONFIG.BACK_API}/pieces/${pieceId}?${query.toString()}`
+      `${API_CONFIG.BACK_ADMIN_API}/pieces/${pieceId}?${query.toString()}`
     );
 
     if (!response.ok) throw new Error("Failed to fetch piece.");
@@ -41,7 +41,7 @@ export const postPieceCreateByCoordinate = async (payload: object) => {
 
 // 특정 피스 정보 수정 API
 export const patchPieceInfoEdit = async (pieceId: number, payload: object) => {
-  const response = await fetch(`${API_CONFIG.BACK_API}/pieces/${pieceId}`, {
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/pieces/${pieceId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -57,7 +57,7 @@ export const patchPieceCoordinatesEdit = async (
   payload: object
 ) => {
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/pieces/position/${pieceId}`,
+    `${API_CONFIG.BACK_ADMIN_API}/pieces/position/${pieceId}`,
     {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -71,7 +71,7 @@ export const patchPieceCoordinatesEdit = async (
 
 // 특정 피스 삭제 API
 export const deletePiece = async (pieceId: number) => {
-  const response = await fetch(`${API_CONFIG.BACK_API}/pieces/${pieceId}`, {
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/pieces/${pieceId}`, {
     method: "DELETE",
   });
 

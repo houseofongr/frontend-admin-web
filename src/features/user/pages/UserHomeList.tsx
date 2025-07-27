@@ -42,7 +42,7 @@ export default function UserHomeList() {
 
   const fetchUserHomes = async (userId: string) => {
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/users/${userId}/homes`);
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/users/${userId}/homes`);
       const data = await response.json();
 
       setUserHomes(data.homes);
@@ -54,7 +54,7 @@ export default function UserHomeList() {
 
   const getAdminHouseList = async () => {
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/houses`);
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/houses`);
       const { houses } = await response.json();
       // 유저가 가지고 있는 하우스 ID 리스트 추출
       const houseTemplateIds = userHomes ? userHomes.map((home) => home.baseHouse.id) : [];
@@ -74,7 +74,7 @@ export default function UserHomeList() {
       return;
     }
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/homes`, {
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/homes`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -129,7 +129,7 @@ export default function UserHomeList() {
       return;
     }
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/homes/${homeId}`, {
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/homes/${homeId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

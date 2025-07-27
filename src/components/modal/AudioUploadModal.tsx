@@ -2,7 +2,7 @@ import React, { ChangeEvent, ReactNode, useState } from "react";
 import { PiMusicNotesPlusLight } from "react-icons/pi";
 import { BiSave } from "react-icons/bi";
 import IconTitleModal from "./IconTitleModal";
-import AudioLight from "../Sound/AudioLight";
+import AudioWaveform from "../Sound/V2/AudioWaveform";
 
 interface AudioUploadModalProps {
   onClose: () => void;
@@ -117,18 +117,25 @@ export default function AudioUploadModal({
             )}
           </label>
 
-          {thumbMusic && (
+          {/* {thumbMusic && (
             <div className="mt-2 text-green-700 text-sm font-medium">
               {thumbMusic.name} 업로드됨
             </div>
-          )}
+          )} */}
 
           {previewMusic && (
             <div className="w-[80%] min-w-[300px] mt-4">
-              <AudioLight
+              <AudioWaveform
+                audioUrl={previewMusic}
+                mode="light"
+                audioTitle={thumbMusic?.name || "썸네일 음악 미리듣기"}
+                waveVisible={false}
+              />
+
+              {/* <AudioLight
                 audioUrl={previewMusic}
                 audioTitle={thumbMusic?.name || "썸네일 음악 미리듣기"}
-              />
+              /> */}
             </div>
           )}
 

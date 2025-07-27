@@ -2,13 +2,14 @@ import { useState, useRef, useEffect } from "react";
 import { BiDotsVerticalRounded } from "react-icons/bi";
 import API_CONFIG from "../../../config/api";
 import { RiImageEditFill, RiFileDownloadLine } from "react-icons/ri";
-import WaveformWithAudioDarkRow from "../../../components/Sound/WaveformWithAudioDarkRow";
+// import WaveformWithAudioDarkRow from "../../../components/Sound/WaveformWithAudioDarkRow";
 import ContextMenu from "../../../components/ContextMenu";
 import ThumbMusicEditModal from "./ThumbMusicEditModal";
 import { patchUniverseThumbMusicEdit } from "../../../service/universeService";
 import { useUniverseStore } from "../../../context/useUniverseStore";
 import { AlertType } from "../../../components/modal/ModalAlertMessage";
-import WaveformWithAudioDark from "../../../components/Sound/WaveformWithAudioDark";
+import AudioWaveform from "../../../components/Sound/V2/AudioWaveform";
+import WaveformWithAudioDarkRow from "../../../components/Sound/WaveformWithAudioDarkRow";
 
 interface UniverseEditMusicProps {
   showAlert: (
@@ -105,10 +106,17 @@ export default function UniverseEditMusic({
 
       <div className="w-full">
         {thumbMusicId != -1 && (
-          <WaveformWithAudioDarkRow
-            audioUrl={`${API_CONFIG.PUBLIC_AUDIO_LOAD_API}/${thumbMusicId}`}
-            audioTitle={thumbMusicId == null ? "" : ""}
-          />
+          <>
+            {/* <WaveformWithAudioDarkRow
+              audioUrl={`${API_CONFIG.PUBLIC_AUDIO_LOAD_API}/${thumbMusicId}`}
+              audioTitle={thumbMusicId == null ? "" : ""}
+            /> */}
+            <AudioWaveform
+              audioUrl={`${API_CONFIG.PUBLIC_AUDIO_LOAD_API}/${thumbMusicId}`}
+              mode="dark"
+              layoutDirection="row"
+            />
+          </>
         )}
       </div>
 

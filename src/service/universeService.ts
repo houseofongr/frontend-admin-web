@@ -14,7 +14,7 @@ export const postUniverse = async (
   formData.append("thumbMusic", thumbMusic);
   formData.append("metadata", JSON.stringify(metadata));
 
-  const response = await fetch(`${API_CONFIG.BACK_API}/universes`, {
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/universes`, {
     method: "POST",
     body: formData,
   });
@@ -41,7 +41,7 @@ export const getUniverse = async (
     query.append("keyword", word);
   }
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/universes?${query.toString()}`
+    `${API_CONFIG.BACK_ADMIN_API}/universes?${query.toString()}`
   );
 
   if (!response.ok) throw new Error("Failed to fetch universe.");
@@ -52,7 +52,7 @@ export const getUniverse = async (
 // 관리자 유니버스 상세정보 조회 API
 export const getUniverseDetail = async (universeId: number) => {
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/universes/${universeId}`
+    `${API_CONFIG.BACK_ADMIN_API}/universes/${universeId}`
   );
   if (!response.ok) throw new Error("Failed to fetch universe.");
 
@@ -62,7 +62,7 @@ export const getUniverseDetail = async (universeId: number) => {
 // 관리자 유니버스 트리정보 조회 API
 export const getUniverseTree = async (universeId: number) => {
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/universes/tree/${universeId}`
+    `${API_CONFIG.BACK_ADMIN_API}/universes/tree/${universeId}`
   );
 
   if (!response.ok) throw new Error("Failed to create sound");
@@ -75,7 +75,7 @@ export const patchUniverseInfoEdit = async (
   payload: object
 ) => {
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/universes/${universeId}`,
+    `${API_CONFIG.BACK_ADMIN_API}/universes/${universeId}`,
     {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -96,7 +96,7 @@ export const patchUniverseThumbnailEdit = async (
   formData.append("thumbnail", thumbnail);
 
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/universes/thumbnail/${universeId}`,
+    `${API_CONFIG.BACK_ADMIN_API}/universes/thumbnail/${universeId}`,
     {
       method: "POST",
       body: formData,
@@ -116,7 +116,7 @@ export const patchUniverseThumbMusicEdit = async (
   formData.append("thumbMusic", thumbMusic);
 
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/universes/thumb-music/${universeId}`,
+    `${API_CONFIG.BACK_ADMIN_API}/universes/thumb-music/${universeId}`,
     {
       method: "POST",
       body: formData,
@@ -135,12 +135,12 @@ export const patchUniverseInnerImageEdit = async (
   const formData = new FormData();
   formData.append("innerImage", innerImg);
 
-  console.log(`${API_CONFIG.BACK_API}/universes/inner-image/${universeId}`);
+  console.log(`${API_CONFIG.BACK_ADMIN_API}/universes/inner-image/${universeId}`);
   console.log(formData);
 
 
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/universes/inner-image/${universeId}`,
+    `${API_CONFIG.BACK_ADMIN_API}/universes/inner-image/${universeId}`,
     {
       method: "POST",
       body: formData,
@@ -154,7 +154,7 @@ export const patchUniverseInnerImageEdit = async (
 // 특정 유니버스 삭제 API
 export const deleteUniverse = async (universeId: number) => {
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/universes/${universeId}`,
+    `${API_CONFIG.BACK_ADMIN_API}/universes/${universeId}`,
     {
       method: "DELETE",
     }

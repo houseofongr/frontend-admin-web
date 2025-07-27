@@ -1,16 +1,15 @@
 import { useState, useEffect } from "react";
 import { InputField } from "../../../components/Input/InputField";
 import { TextareaField } from "../../../components/Input/TextareaField";
-import { FaRegSave } from "react-icons/fa";
 import { FiSave } from "react-icons/fi";
-import WaveformWithAudioDark from "../../../components/Sound/WaveformWithAudioDark";
 import { TbLock, TbLockOpen2 } from "react-icons/tb";
 import { SelectableRadioField } from "../../../components/Input/SelectableRadioField";
+import AudioWaveform from "../../../components/Sound/V2/AudioWaveform";
 
 interface DetailInfoStepProps {
   innerImg?: File | null;
   sound?: File | null;
-  onSubmit: (title: string, description: string, hidden:boolean) => void;
+  onSubmit: (title: string, description: string, hidden: boolean) => void;
 }
 
 export default function DetailInfoStep({
@@ -24,19 +23,19 @@ export default function DetailInfoStep({
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [hidden, setHidden] = useState<boolean>(true);
-  
-    const hiddenOptions = [
-      {
-        value: "false",
-        icon: <TbLockOpen2 size={20} />,
-        label: "표시",
-      },
-      {
-        value: "true",
-        icon: <TbLock size={20} />,
-        label: "숨김",
-      },
-    ];
+
+  const hiddenOptions = [
+    {
+      value: "false",
+      icon: <TbLockOpen2 size={20} />,
+      label: "표시",
+    },
+    {
+      value: "true",
+      icon: <TbLock size={20} />,
+      label: "숨김",
+    },
+  ];
 
   // 미리보기 처리
   useEffect(() => {
@@ -79,7 +78,11 @@ export default function DetailInfoStep({
 
           {previewSound ? (
             <div className="max-w-full max-h-full border border-gray-300 rounded-xl overflow-hidden">
-              <WaveformWithAudioDark audioUrl={previewSound} audioTitle={""} />
+              {/* <WaveformWithAudioDark audioUrl={previewSound} audioTitle={""} /> */}
+              <AudioWaveform
+                audioUrl={previewSound}
+                mode="dark"
+              />
             </div>
           ) : (
             <></>

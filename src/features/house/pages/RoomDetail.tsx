@@ -44,7 +44,7 @@ export default function RoomDetail() {
 
     const fetchRoomData = async () => {
       try {
-        const response = await fetch(`${API_CONFIG.BACK_API}/houses/rooms/${roomId}`);
+        const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/houses/rooms/${roomId}`);
         if (!response.ok) {
           throw new Error("Failed to fetch room data");
         }

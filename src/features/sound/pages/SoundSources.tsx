@@ -19,7 +19,7 @@ export default function SoundSources() {
 
   const fetchSoundsdata = async () => {
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/sound-sources?page=${currentPage}&size=${size}`);
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/sound-sources?page=${currentPage}&size=${size}`);
       const { soundSources, pagination } = await response.json();
       console.log("soundSources", soundSources);
       console.log("pagination", pagination);

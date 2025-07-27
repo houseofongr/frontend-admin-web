@@ -91,7 +91,7 @@ export default function HouseEditorPage() {
     // }
 
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/houses`, {
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/houses`, {
         method: "POST",
         body: formData,
       });

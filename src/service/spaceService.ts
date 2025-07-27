@@ -7,7 +7,7 @@ export const postSpaceCreate = async (metadata: object, innerImg: File) => {
   formData.append("metadata", JSON.stringify(metadata));
   formData.append("innerImage", innerImg);
 
-  const response = await fetch(`${API_CONFIG.BACK_API}/spaces`, {
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/spaces`, {
     method: "POST",
     body: formData,
   });
@@ -19,7 +19,7 @@ export const postSpaceCreate = async (metadata: object, innerImg: File) => {
 
 // 특정 스페이스 정보 수정 API
 export const patchSpaceInfoEdit = async (spaceId: number, payload: object) => {
-  const response = await fetch(`${API_CONFIG.BACK_API}/spaces/${spaceId}`, {
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/spaces/${spaceId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -33,7 +33,7 @@ export const patchSpaceInfoEdit = async (spaceId: number, payload: object) => {
 // 특정 스페이스 좌표 수정 API
 export const patchSpacePositionEdit = async (spaceId: number, payload: object) => {
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/spaces/position/${spaceId}`,
+    `${API_CONFIG.BACK_ADMIN_API}/spaces/position/${spaceId}`,
     {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
@@ -53,7 +53,7 @@ export const patchSpaceInnerImageEdit = async (
   formData.append("innerImage", innerImg);
 
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/spaces/inner-image/${spaceId}`,
+    `${API_CONFIG.BACK_ADMIN_API}/spaces/inner-image/${spaceId}`,
     {
       method: "POST",
       body: formData,
@@ -66,7 +66,7 @@ export const patchSpaceInnerImageEdit = async (
 
 // 특정 스페이스 삭제 API
 export const deleteSpace = async (spaceId: number) => {
-  const response = await fetch(`${API_CONFIG.BACK_API}/spaces/${spaceId}`, {
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/spaces/${spaceId}`, {
     method: "DELETE",
   });
 

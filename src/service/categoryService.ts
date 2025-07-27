@@ -3,7 +3,7 @@ import API_CONFIG from "../config/api";
 
 export const getCategory = async (
 ) => {
-  const response = await fetch(`${API_CONFIG.BACK_API}/categories`);
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/categories`);
 
   if (!response.ok) throw new Error("Failed to fetch category.");
 

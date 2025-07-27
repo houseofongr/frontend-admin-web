@@ -47,7 +47,7 @@ export default function UserSearch({
       }
 
       const response = await fetch(
-        `${API_CONFIG.BACK_API}/users/v2?${searchParams}`
+        `${API_CONFIG.BACK_ADMIN_API}/users/v2?${searchParams}`
       );
       const { users, pagination } = await response.json();
       setUsers(users);

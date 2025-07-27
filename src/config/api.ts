@@ -1,5 +1,7 @@
 const API_CONFIG = {
-  BACK_API: import.meta.env.VITE_BACK_API || "",
+  BACK_ADMIN_API: import.meta.env.VITE_BACK_ADMIN_API || "",
+  BACK_USER_API: import.meta.env.VITE_BACK_USER_API || "",
+  FILE_API: import.meta.env.VITE_FILE_API || "",
   PRIVATE_IMAGE_LOAD_API: import.meta.env.VITE_IMAGE_LOAD_PRIVATE || "",
   PUBLIC_IMAGE_LOAD_API: import.meta.env.VITE_IMAGE_LOAD_PUBLIC || "",
   PRIVATE_AUDIO_LOAD_API: import.meta.env.VITE_AUDIO_LOAD_PRIVATE || "",

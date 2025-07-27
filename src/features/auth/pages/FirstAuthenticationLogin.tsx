@@ -57,7 +57,7 @@ export default function FirstAuthenticationLogin() {
     // navigate("/login/2nd"); // 2차 관리자 검증 페이지로 이동
 
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/authn/login`, {
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/authn/login`, {
         method: "POST",
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",

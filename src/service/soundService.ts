@@ -7,7 +7,7 @@ export const createSound = async (soundData: object, audio: File) => {
   formData.append("metadata", JSON.stringify(soundData));
   formData.append("audio", audio);
 
-  const response = await fetch(`${API_CONFIG.BACK_API}/sounds`, {
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/sounds`, {
     method: "POST",
     body: formData,
   });
@@ -19,7 +19,7 @@ export const createSound = async (soundData: object, audio: File) => {
 
 // 특정 사운드 정보 수정 API
 export const patchSoundInfoEdit = async (soundId: number, payload: object) => {
-  const response = await fetch(`${API_CONFIG.BACK_API}/sounds/${soundId}`, {
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/sounds/${soundId}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(payload),
@@ -36,7 +36,7 @@ export const patchSoundEdit = async (soundId: number, audio: File) => {
   formData.append("audio", audio);
 
   const response = await fetch(
-    `${API_CONFIG.BACK_API}/sounds/audio/${soundId}`,
+    `${API_CONFIG.BACK_ADMIN_API}/sounds/audio/${soundId}`,
     {
       method: "POST",
       body: formData,
@@ -50,7 +50,7 @@ export const patchSoundEdit = async (soundId: number, audio: File) => {
 
 // 특정 사운드 삭제 API
 export const deleteSound = async (soundId: number) => {
-  const response = await fetch(`${API_CONFIG.BACK_API}/sounds/${soundId}`, {
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/sounds/${soundId}`, {
     method: "DELETE",
   });
 

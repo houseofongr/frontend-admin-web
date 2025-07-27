@@ -20,7 +20,7 @@ export default function HouseList() {
 
   const fetchHouses = async () => {
     try {
-      const response = await fetch(`${API_CONFIG.BACK_API}/houses?page=${pageNum + 1}&size=${size}`);
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/houses?page=${pageNum + 1}&size=${size}`);
 
       if (!response.ok) {
         throw new Error("Failed to fetch houses");

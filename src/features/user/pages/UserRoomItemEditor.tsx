@@ -37,7 +37,7 @@ export default function UserRoomItemEditorPage() {
     queryFn: async ({ queryKey }) => {
       const homeId = queryKey[1];
       const roomId = queryKey[2];
-      const response = await fetch(`${API_CONFIG.BACK_API}/homes/${homeId}/rooms/${roomId}/items`);
+      const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/homes/${homeId}/rooms/${roomId}/items`);
       const result = await response.json();
       return result;
     },
@@ -48,7 +48,7 @@ export default function UserRoomItemEditorPage() {
     const targetItem = originData.find((shape) => shape.id === id);
     if (isExistingItem) {
       try {
-        const response = await fetch(`${API_CONFIG.BACK_API}/items/${id}`, {
+        const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/items/${id}`, {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
         });
@@ -66,7 +66,7 @@ export default function UserRoomItemEditorPage() {
   };
 
   const updateItemData = async ({ createdItems, updatedItems }: UpdateItemsPayload) => {
-    const apiUrl = `${API_CONFIG.BACK_API}/users/${userId}/homes/${homeId}/rooms/${roomId}/items/v2`;
+    const apiUrl = `${API_CONFIG.BACK_ADMIN_API}/users/${userId}/homes/${homeId}/rooms/${roomId}/items/v2`;
 
     const response = await fetch(apiUrl, {
       method: "POST",
