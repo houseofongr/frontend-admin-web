@@ -83,7 +83,7 @@ function App() {
           <Route path="*" element={<NotFoundPage />} />
 
           {/* TEST */}
-          <Route path="/test" element={<TestPage />} />
+          <Route path="/test2" element={<TestPage />} />
         </Routes>
       </RootLayout>
     </BrowserRouter>

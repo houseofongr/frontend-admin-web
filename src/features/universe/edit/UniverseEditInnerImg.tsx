@@ -60,6 +60,7 @@ import {
   postPieceCreateByCoordinate,
 } from "../../../service/pieceService";
 import PieceDetailPanel from "../../piece/components/PieceDetailPanel";
+import SpaceSelector_MultiSelect from "../../space/components/SpaceSelector_multiSelect";
 
 export default function UniverseEditInnerImg() {
   const menuRef = useRef<HTMLDivElement>(null);
@@ -78,9 +79,7 @@ export default function UniverseEditInnerImg() {
   } = useUniverseStore();
 
   const {
-    existingSpaces,
     currentSpaceId,
-    parentSpaceId,
     currentSpace,
     getSpaceById,
     setCurrentSpaceId,
@@ -89,10 +88,11 @@ export default function UniverseEditInnerImg() {
     getParentSpaceInnerImageId,
   } = useSpaceStore();
 
-  const { existingPieces, currentPiece, setCurrentPiece } = usePieceStore();
+  const { currentPiece, setCurrentPiece } = usePieceStore();
 
   const [menuOpen, setMenuOpen] = useState(false);
-  // const [createStep, setCreateStep] = useState<CreateEditStep | null>(null);
+
+  const [selectedPoints, setSelectedPoints] = useState<PercentPoint[]>([]);
 
   const [startPoint, setStartPoint] = useState<PercentPoint | null>(null);
   const [endPoint, setEndPoint] = useState<PercentPoint | null>(null);
@@ -570,6 +570,12 @@ export default function UniverseEditInnerImg() {
         setStartPoint={setStartPoint}
         setEndPoint={setEndPoint}
       />
+      
+      {/* <SpaceSelector_MultiSelect
+        innerImageId={activeInnerImageId}
+        selectedPoints={selectedPoints}
+        setSelectedPoints={setSelectedPoints}
+      /> */}
       <PieceDetailPanel
         hidden={editStep == SpacePiece_CreateEditStep.Piece_SetSizeOnEdit}
         piece={currentPiece}
