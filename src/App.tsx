@@ -18,20 +18,18 @@ import InitPage from "./pages/Init";
 import UserRoomItemEditorPage from "./features/user/pages/UserRoomItemEditor";
 import UniverseListPage from "./features/universe/pages/UniverseListPage";
 import UniverseEditPage from "./features/universe/pages/UniverseEditPage";
-import TestPage from "./features/testPage";
+import TestPage from "./pages/test";
 
 function App() {
   return (
     <BrowserRouter>
       <RootLayout>
         <Routes>
-          <Route path="/test" element={<TestPage />} />
           <Route path="/" element={<InitPage />} />
           {/* 어드민 검증 페이지 */}
           <Route path="/login" element={<FirstAuthenticationLogin />} />
           <Route path="/login/2nd" element={<SecondAuthenticationLogin />} />
           <Route path="/login/3rd" element={<ThirdAuthenticationLogin />} />
-
           {/* 하우스 템플릿 리스트 */}
           <Route path="/houses" element={<HouseList />} />
           {/* 템플릿 하우스 생성 */}
@@ -74,18 +72,18 @@ function App() {
             path="/users/:userId/:homeId/:roomId"
             element={<UserRoomItemEditorPage />}
           />
-
           {/* 유니버스 메인화면 */}
           <Route path="/universe" element={<UniverseListPage />} />
-
           {/* 유니버스 수정화면 */}
           <Route
             path="/universe/edit/:universeId"
             element={<UniverseEditPage />}
           />
-
           {/* 404 */}
           <Route path="*" element={<NotFoundPage />} />
+
+          {/* TEST */}
+          <Route path="/test" element={<TestPage />} />
         </Routes>
       </RootLayout>
     </BrowserRouter>
