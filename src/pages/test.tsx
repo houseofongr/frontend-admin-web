@@ -25,7 +25,7 @@ export default function TestPage() {
   return (
     <div>
       <div
-        className="w-300 h-300 bg-amber-200"
+        className="w-200 h-200 bg-amber-200"
         onClick={() => console.log(editStep?.toString())}
       >
         <SpaceSelector_MultiSelect

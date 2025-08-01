@@ -78,6 +78,13 @@ export default function AudioWaveform({
   );
   const [showColorPicker, setShowColorPicker] = useState(false);
   const [setupPickedColor, setSetupPickedColor] = useState(false);
+  const [propsColor, setPropsColor] = useState<{
+    color1: string | null;
+    color2: string | null;
+  }>({
+    color1: null,
+    color2: null
+  })
   const colors = getAudioColors(mode);
 
   // 오디오 로드 후 peaks 계산
@@ -161,7 +168,7 @@ export default function AudioWaveform({
       ctx.stroke();
 
       // 재생되지 않은 부분
-      ctx.strokeStyle = colors.unplayedWave;
+      ctx.strokeStyle = pickedPlayedColor == null ? colors.playedWave : pickedPlayedColor;
       ctx.lineWidth = lineWidth;
       ctx.beginPath();
       for (let i = playedCount; i < peaks.length; i++) {
@@ -186,6 +193,11 @@ export default function AudioWaveform({
     }
 
     draw();
+
+    setPropsColor({
+      color1: pickedPlayedColor,
+      color2: pickedCursorColor
+    })
 
     if (setupPickedColor) setSetupPickedColor(false);
 
@@ -386,6 +398,8 @@ export default function AudioWaveform({
             onSkip={handleSkip}
             onToggleMute={toggleMute}
             onVolumeChange={handleVolumeChange}
+            color1={propsColor.color1}
+            color2={propsColor.color2}
             mode={mode}
           />
         </div>

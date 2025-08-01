@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { VscMute, VscUnmute } from "react-icons/vsc";
 import { getAudioColors } from "../../../constants/color";
 import { RiForward10Fill, RiReplay10Fill } from "react-icons/ri";
@@ -18,7 +18,8 @@ interface AudioControllerProps {
   onSkip: (seconds: number) => void;
   onToggleMute: () => void;
   onVolumeChange: (volume: number) => void;
-
+  color1: string | null;
+  color2: string | null;
   mode?: "light" | "dark" | "transparent";
 }
 
@@ -35,8 +36,11 @@ const AudioController: React.FC<AudioControllerProps> = ({
   onSkip,
   onToggleMute,
   onVolumeChange,
+  color1,
+  color2,
   mode = "light",
 }) => {
+
   const colors = getAudioColors(mode);
 
   const formatTime = (time: number) => {
@@ -78,9 +82,11 @@ const AudioController: React.FC<AudioControllerProps> = ({
             onChange={(e) => onVolumeChange(parseFloat(e.target.value))}
             style={
               {
-                backgroundColor: colors.range,
-                "--value": `${volume * 100}%`,
-              } as React.CSSProperties
+                background: `linear-gradient(to right, ${color2 ?? colors.slider
+                  } 0%, ${color2 ?? colors.slider} ${volume * 100}%, #ddd ${volume * 100}%, #ddd 100%)`,
+                height: "6px",
+                borderRadius: "0px",
+              }
             }
             className="w-full h-1.5 appearance-none cursor-pointer custom-fill-slider"
           />
@@ -95,14 +101,16 @@ const AudioController: React.FC<AudioControllerProps> = ({
           step={0.1}
           value={currentTime}
           onChange={(e) => onSeek(parseFloat(e.target.value))}
-          style={
-            {
-              backgroundColor: colors.range,
-              "--value": `${(currentTime / duration) * 100}%`,
-            } as React.CSSProperties
-          }
-          className="w-full h-1.5 appearance-none cursor-pointer custom-fill-slider "
+          style={{
+            background: `linear-gradient(to right, ${color2 ?? colors.slider
+              } 0%, ${color2 ?? colors.slider} ${(currentTime / duration) * 100}%, #ddd ${(currentTime / duration) * 100}%, #ddd 100%)`,
+            height: "6px",
+            borderRadius: "0px",
+          }}
+          className="w-full h-1.5 appearance-none cursor-pointer range-thumb"
         />
+
+
         <div className="w-full flex justify-between">
           <span style={{ color: colors.timeText }} className="text-xs">
             {formatTime(currentTime)}
@@ -150,17 +158,6 @@ const AudioController: React.FC<AudioControllerProps> = ({
       </div>
       <style>
         {`
-          .custom-fill-slider {
-            background: linear-gradient(
-              to right,
-              ${colors.slider} 0%,
-              ${colors.slider} var(--value, 50%),
-              #ddd var(--value, 50%),
-              #ddd 100%
-            );
-            height: 6px;
-            border-radius: 0px;
-          }
           .custom-fill-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
@@ -176,6 +173,18 @@ const AudioController: React.FC<AudioControllerProps> = ({
             background: transparent;
             border: none;
           }
+            
+          .range-thumb::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            border: none;
+            width: 10px;
+            height: 10px;
+            background: ${color1 == null ? "rgb(245, 148, 109)" : color1};
+            border-radius: 24px;
+          }
+
+          
         `}
       </style>
     </div>
