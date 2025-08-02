@@ -17,6 +17,23 @@ export const postSpaceCreate = async (metadata: object, innerImg: File) => {
   return response.json();
 };
 
+// 스페이스 생성 API V2
+export const postSpaceCreateV2 = async (metadata: object, innerImg: File) => {
+  const formData = new FormData();
+
+  formData.append("metadata", JSON.stringify(metadata));
+  formData.append("innerImage", innerImg);
+
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/spaces/outline`, {
+    method: "POST",
+    body: formData,
+  });
+
+  if (!response.ok) throw new Error("Failed to create space");
+
+  return response.json();
+};
+
 // 특정 스페이스 정보 수정 API
 export const patchSpaceInfoEdit = async (spaceId: number, payload: object) => {
   const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/spaces/${spaceId}`, {

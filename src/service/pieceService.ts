@@ -13,6 +13,20 @@ export const postPieceCreateByCoordinate = async (payload: object) => {
   return response.json();
 };
 
+// 피스 좌표방식 생성 API V2
+export const postPieceCreateByCoordinateV2 = async (payload: object) => {
+  const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/pieces/outline`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!response.ok) throw new Error("Failed to create space");
+
+  return response.json();
+};
+
+
 // 관리자 특정 피스 내부 조회 API
   export const getPieceDetail = async (
     pieceId: number,

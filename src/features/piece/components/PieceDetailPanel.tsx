@@ -13,7 +13,7 @@ import { TbMusic, TbMusicPlus, TbPencilCog } from "react-icons/tb";
 import { PiGpsBold } from "react-icons/pi";
 import ContextMenu from "../../../components/ContextMenu";
 import InfoEditModal from "../../../components/modal/InfoEditModal";
-import { usePieceStore } from "../../../context/usePieceStore";
+import { PieceType, usePieceStore } from "../../../context/usePieceStore";
 import ModalAlertMessage, {
   AlertType,
 } from "../../../components/modal/ModalAlertMessage";
@@ -31,16 +31,16 @@ import DetailInfoStep from "../../space/create/DetailInfoStep";
 import { createSound } from "../../../service/soundService";
 import { SoundType } from "../../../context/useSoundStore";
 
-interface PieceType {
-  pieceId: number;
-  title: string;
-  description: string;
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
-  [key: string]: any;
-}
+// interface PieceType {
+//   pieceId: number;
+//   title: string;
+//   description: string;
+//   startX: number;
+//   startY: number;
+//   endX: number;
+//   endY: number;
+//   [key: string]: any;
+// }
 
 // interface SoundType {
 //   soundId: number;
@@ -419,6 +419,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
         <SpaceCreateSetSizeModal
           title="피스 수정"
           description="피스의 좌표를 수정합니다."
+          showSaveModal={piece.points.length > 2}
           handleModalClose={onCloseCoordinateModal}
           resetSelection={onResetSelection}
           onSubmit={onSaveCoordinates}

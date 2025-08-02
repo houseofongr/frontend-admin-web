@@ -9,22 +9,23 @@ import SpinnerIcon from "../../../components/icons/SpinnerIcon";
 import { ScaleLoader } from "react-spinners";
 import { useSpaceStore } from "../../../context/useSpaceStore";
 import { usePieceStore } from "../../../context/usePieceStore";
-
-interface PercentPoint {
-  xPercent: number;
-  yPercent: number;
-}
+import { PercentPoint } from "../../../constants/image";
 
 interface SpaceSelectorProps {
-  innerImageId: string | null;
+  innerImageId: number | null;
   selectedPoints: PercentPoint[];
+  isSelectedComplete: boolean;
   setSelectedPoints: React.Dispatch<React.SetStateAction<PercentPoint[]>>;
+  setIsSelectedComplete: () => void;
 }
 
 export default function SpaceSelector_MultiSelect({
   innerImageId,
   selectedPoints,
+  isSelectedComplete,
   setSelectedPoints,
+  setIsSelectedComplete,
+
 }: SpaceSelectorProps) {
   const { rootUniverse, editStep } = useUniverseStore();
 
@@ -57,8 +58,6 @@ export default function SpaceSelector_MultiSelect({
   const [imgSrc, setImgSrc] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  const [isDrawing, setIsDrawing] = useState(true);
-
   const imgRef = useRef<HTMLImageElement>(null);
 
   // 이미지 크기 추적
@@ -87,15 +86,12 @@ export default function SpaceSelector_MultiSelect({
 
   // 이미지 로딩
   useEffect(() => {
-    // if (innerImageId === -1 || innerImageId === null) {
-    //   setImgSrc(null);
-    //   return;
-    // }
+    if (innerImageId === -1 || innerImageId === null) {
+      setImgSrc(null);
+      return;
+    }
 
-    // const url = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${innerImageId}`;
-    if (innerImageId == null) return;
-
-    const url = innerImageId;
+    const url = `${API_CONFIG.PUBLIC_IMAGE_LOAD_API}/${innerImageId}`;
     const img = new Image();
 
     img.src = url;
@@ -111,8 +107,8 @@ export default function SpaceSelector_MultiSelect({
 
   // 유틸 함수
   const toPixel = (point: PercentPoint) => ({
-    x: point.xPercent * imageSize.width,
-    y: point.yPercent * imageSize.height,
+    x: point.x * imageSize.width,
+    y: point.y * imageSize.height,
   });
 
   const getRelativePercentPos = (e: React.MouseEvent): PercentPoint | null => {
@@ -121,7 +117,7 @@ export default function SpaceSelector_MultiSelect({
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     if (x < 0 || y < 0 || x > rect.width || y > rect.height) return null;
-    return { xPercent: x / rect.width, yPercent: y / rect.height };
+    return { x: x / rect.width, y: y / rect.height };
   };
 
   const calcBoxStyle = (start: PercentPoint, end: PercentPoint) => {
@@ -163,7 +159,7 @@ export default function SpaceSelector_MultiSelect({
     )
       return;
 
-    if (!isDrawing) return;
+    if (isSelectedComplete) return;
 
     const pos = getRelativePercentPos(e);
     if (!pos) return;
@@ -178,7 +174,7 @@ export default function SpaceSelector_MultiSelect({
 
       if (distance < 10) {
         // 10px 이내 클릭 시 종료
-        setIsDrawing(false);
+        setIsSelectedComplete();
         return;
       }
     }
@@ -197,21 +193,60 @@ export default function SpaceSelector_MultiSelect({
 
   const handleMoveToPiece = (piece: PieceType) => {
     setCurrentPiece(piece);
-    console.log(piece);
   };
+
+  const pointInPolygon = (point: { x: number; y: number }, polygon: { x: number; y: number }[]) => {
+    let inside = false;
+    const { x, y } = point;
+
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i].x, yi = polygon[i].y;
+      const xj = polygon[j].x, yj = polygon[j].y;
+
+      const intersect =
+        yi > y !== yj > y &&
+        x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+
+      if (intersect) inside = !inside;
+    }
+
+    return inside;
+  }
+
+  function isPointInPolygon(point: { x: number; y: number }, polygon: { x: number; y: number }[]) {
+    let inside = false;
+    const { x, y } = point;
+
+    for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+      const xi = polygon[i].x,
+        yi = polygon[i].y;
+      const xj = polygon[j].x,
+        yj = polygon[j].y;
+
+      const intersect =
+        yi > y !== yj > y &&
+        x < ((xj - xi) * (y - yi)) / (yj - yi) + xi;
+
+      if (intersect) inside = !inside;
+    }
+
+    return inside;
+  }
+
+
+
   const handleSpaceMouseEnter = (index: number) => {
     const space = existingSpaces[index];
-    const start = toPixel({ xPercent: space.startX, yPercent: space.startY });
-    const end = toPixel({ xPercent: space.endX, yPercent: space.endY });
-    const left = Math.min(start.x, end.x);
-    const top = Math.min(start.y, end.y);
-    const width = Math.abs(end.x - start.x);
-    const height = Math.abs(end.y - start.y);
+    const firstPoint = space.points[0];
+
+    if (!firstPoint) return;
+
+    const pixel = toPixel(firstPoint);
 
     setHoveredSpaceIndex(index);
     setPopupData({
-      x: left + width / 2 + 10,
-      y: top + height / 2 + 5,
+      x: pixel.x + 10, // 살짝 오른쪽
+      y: pixel.y + 5,  // 살짝 아래
       title: space.title,
       description: space.description,
     });
@@ -219,21 +254,21 @@ export default function SpaceSelector_MultiSelect({
 
   const handlePieceMouseEnter = (index: number) => {
     const piece = existingPieces[index];
-    const start = toPixel({ xPercent: piece.startX, yPercent: piece.startY });
-    const end = toPixel({ xPercent: piece.endX, yPercent: piece.endY });
-    const left = Math.min(start.x, end.x);
-    const top = Math.min(start.y, end.y);
-    const width = Math.abs(end.x - start.x);
-    const height = Math.abs(end.y - start.y);
+    const firstPoint = piece.points[0];
+
+    if (!firstPoint) return;
+
+    const pixel = toPixel(firstPoint);
 
     setHoveredPieceIndex(index);
     setPopupData({
-      x: left + width / 2 + 10,
-      y: top + height / 2 + 5,
+      x: pixel.x + 10, // 오른쪽으로 살짝
+      y: pixel.y + 5,  // 아래로 살짝
       title: piece.title,
       description: piece.description,
     });
   };
+
   const handleSpaceMouseLeave = () => {
     setHoveredSpaceIndex(null);
     setPopupData(null);
@@ -314,15 +349,14 @@ export default function SpaceSelector_MultiSelect({
             const top = `calc(50% - ${imageSize.height / 2}px + ${y}px)`;
 
             const isFirst =
-              index === 0 && isDrawing && selectedPoints.length >= 3;
+              index === 0 && !isSelectedComplete && selectedPoints.length >= 3;
 
             return (
               <div
                 key={`selected-point-${index}`}
-                className={`absolute z-20 w-3 h-3 rounded-full cursor-pointer transition-transform
-                          ${
-                            isFirst ? "bg-red-300 animate-pulse" : "bg-red-500"
-                          } hover:scale-125`}
+                className={`absolute z-10 w-3 h-3 rounded-full cursor-pointer transition-transform
+                          ${isFirst ? "bg-red-300 animate-pulse" : "bg-red-500"
+                  } hover:scale-125`}
                 style={{
                   left: `calc(${left} - 6px)`,
                   top: `calc(${top} - 6px)`,
@@ -330,8 +364,8 @@ export default function SpaceSelector_MultiSelect({
                 onClick={(e) => {
                   e.stopPropagation();
 
-                  if (isFirst && isDrawing && selectedPoints.length >= 3) {
-                    setIsDrawing(false);
+                  if (isFirst && !isSelectedComplete && selectedPoints.length >= 3) {
+                    setIsSelectedComplete();
                   } else {
                     setSelectedPoints((prev) =>
                       prev.filter((_, i) => i !== index)
@@ -344,36 +378,40 @@ export default function SpaceSelector_MultiSelect({
           })}
 
           {/* 선 연결 SVG */}
-          <svg
-            className="absolute top-1/2 left-1/2 z-10 pointer-events-none"
-            style={{
-              transform: "translate(-50%, -50%)",
-              width: imageSize.width,
-              height: imageSize.height,
-            }}
-          >
-            <polyline
-              points={(isDrawing
-                ? selectedPoints
-                : [...selectedPoints, selectedPoints[0]]
-              ) // 마무리되었으면 마지막에 첫 점을 한 번 더 추가
-                .map((point) => {
-                  const { x, y } = toPixel(point);
-                  return `${x},${y}`;
-                })
-                .join(" ")}
-              fill="none"
-              stroke="#ef4444"
-              strokeWidth="2"
-            />
-          </svg>
+          {selectedPoints.length > 0 && (
+            <svg
+              className="absolute top-1/2 left-1/2 z-10 pointer-events-none"
+              style={{
+                transform: "translate(-50%, -50%)",
+                width: imageSize.width,
+                height: imageSize.height,
+              }}
+            >
+              <polyline
+                points={(!isSelectedComplete
+                  ? selectedPoints
+                  : [...selectedPoints, selectedPoints[0]]
+                )
+                  .map((point) => {
+                    const { x, y } = toPixel(point);
+                    return `${x},${y}`;
+                  })
+                  .join(" ")}
+                fill="none"
+                stroke="#ef4444"
+                strokeWidth="2"
+              />
+            </svg>
+          )}
+
 
           {/* 크로스헤어 */}
           {hoverPos &&
-            (editStep === SpacePiece_CreateEditStep.Space_SetSizeOnCreate ||
+            (!isSelectedComplete && (
+              editStep === SpacePiece_CreateEditStep.Space_SetSizeOnCreate ||
               editStep === SpacePiece_CreateEditStep.Space_SetSizeOnEdit ||
               editStep === SpacePiece_CreateEditStep.Piece_SetSizeOnCreate ||
-              editStep === SpacePiece_CreateEditStep.Piece_SetSizeOnEdit) &&
+              editStep === SpacePiece_CreateEditStep.Piece_SetSizeOnEdit)) &&
             (() => {
               const { x, y } = toPixel(hoverPos);
               const left = `calc(50% - ${imageSize.width / 2}px + ${x}px)`;
@@ -408,47 +446,86 @@ export default function SpaceSelector_MultiSelect({
             })()}
 
           {/* 기존 스페이스 박스 */}
-          {editStep != SpacePiece_CreateEditStep.Piece_SetSizeOnEdit &&
-            existingSpaces.map((space, index) => (
-              <div
-                key={`space-${index}`}
-                className="absolute"
-                style={calcBoxStyle(
-                  { xPercent: space.startX, yPercent: space.startY },
-                  { xPercent: space.endX, yPercent: space.endY }
-                )}
-                onMouseEnter={() => handleSpaceMouseEnter(index)}
-                onMouseLeave={handleSpaceMouseLeave}
-              >
-                <div
-                  className={`w-full h-full border-3 border-amber-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
-                    hoveredSpaceIndex === index ? "opacity-100" : "opacity-30"
-                  }`}
-                  onClick={() => handleMoveToSpace(space)}
-                />
-              </div>
-            ))}
+          {editStep !== SpacePiece_CreateEditStep.Piece_SetSizeOnEdit && (
+            <svg
+              className="absolute top-1/2 left-1/2 z-10"
+              style={{
+                transform: "translate(-50%, -50%)",
+                width: imageSize.width,
+                height: imageSize.height,
+                pointerEvents: "none", // 개별 polygon에만 이벤트 적용
+              }}
+            >
+              {existingSpaces.map((space, index) => {
+                const points = space.points
+                  .map((point) => {
+                    const { x, y } = toPixel(point);
+                    return `${x},${y}`;
+                  })
+                  .join(" ");
 
-          {editStep != SpacePiece_CreateEditStep.Piece_SetSizeOnEdit &&
-            existingPieces.map((piece, index) => (
-              <div
-                key={`piece-${index}`}
-                className="absolute"
-                style={calcBoxStyle(
-                  { xPercent: piece.startX, yPercent: piece.startY },
-                  { xPercent: piece.endX, yPercent: piece.endY }
-                )}
-                onMouseEnter={() => handlePieceMouseEnter(index)}
-                onMouseLeave={handlePieceMouseLeave}
-              >
-                <div
-                  className={`w-full h-full border-3 border-blue-600 bg-white/70 cursor-pointer transition-opacity duration-300 ${
-                    hoveredPieceIndex === index ? "opacity-100" : "opacity-30"
-                  }`}
-                  onClick={() => handleMoveToPiece(piece)}
-                />
-              </div>
-            ))}
+                const isHovered = hoveredSpaceIndex === index;
+
+                return (
+                  <polygon
+                    key={`space-${index}`}
+                    points={points}
+                    fill="white"
+                    fillOpacity={isHovered ? 0.7 : 0.3}
+                    stroke="#f59e0b" // amber-600
+                    strokeWidth={3}
+                    className="cursor-pointer transition-opacity duration-300"
+                    onMouseEnter={() => handleSpaceMouseEnter(index)}
+                    onMouseLeave={handleSpaceMouseLeave}
+                    onClick={() => handleMoveToSpace(space)}
+                    style={{ pointerEvents: "auto" }}
+                  />
+                );
+              })}
+            </svg>
+          )}
+
+
+          {/* 기존 피스 박스 */}
+          {editStep !== SpacePiece_CreateEditStep.Piece_SetSizeOnEdit && (
+            <svg
+              className="absolute top-1/2 left-1/2 z-10"
+              style={{
+                transform: "translate(-50%, -50%)",
+                width: imageSize.width,
+                height: imageSize.height,
+                pointerEvents: "none", // polygon에만 이벤트 적용
+              }}
+            >
+              {existingPieces.map((piece, index) => {
+                const points = piece.points
+                  .map((point) => {
+                    const { x, y } = toPixel(point);
+                    return `${x},${y}`;
+                  })
+                  .join(" ");
+
+                const isHovered = hoveredPieceIndex === index;
+
+                return (
+                  <polygon
+                    key={`piece-${index}`}
+                    points={points}
+                    fill="white"
+                    fillOpacity={isHovered ? 0.7 : 0.3}
+                    stroke="#2563eb" // blue-600
+                    strokeWidth={3}
+                    className="cursor-pointer transition-opacity duration-300"
+                    onMouseEnter={() => handlePieceMouseEnter(index)}
+                    onMouseLeave={handlePieceMouseLeave}
+                    onClick={() => handleMoveToPiece(piece)}
+                    style={{ pointerEvents: "auto" }}
+                  />
+                );
+              })}
+            </svg>
+          )}
+
 
           {/* 팝업 */}
           {popupData && (

@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { PercentPoint } from "../constants/image";
 
 export interface PieceType {
   pieceId: number;
@@ -7,10 +8,7 @@ export interface PieceType {
   depth: number;
   title: string;
   description: string;
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
+  points: PercentPoint[];
   createdTime: number;
   updatedTime: number;
 }

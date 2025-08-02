@@ -7,10 +7,8 @@ import {
 } from "react-icons/ri";
 import { MdOutlineFullscreen } from "react-icons/md";
 import {
-  PiDownloadSimpleBold,
   PiGpsBold,
   PiPuzzlePiece,
-  PiPuzzlePieceBold,
 } from "react-icons/pi";
 import { IoPlanetOutline } from "react-icons/io5";
 import { TbPencilCog } from "react-icons/tb";
@@ -18,11 +16,10 @@ import { BiDotsVerticalRounded } from "react-icons/bi";
 
 import API_CONFIG from "../../../config/api";
 import {
-  postSpaceCreate,
   patchSpaceInnerImageEdit,
   patchSpaceInfoEdit,
-  patchSpacePositionEdit,
   deleteSpace,
+  postSpaceCreateV2,
 } from "../../../service/spaceService";
 import {
   getUniverseTree,
@@ -37,7 +34,6 @@ import ModalAlertMessage, {
 } from "../../../components/modal/ModalAlertMessage";
 import Button from "../../../components/buttons/Button";
 
-import SpaceSelector from "../../space/components/SpaceSelector";
 import DetailInfoStep from "../../space/create/DetailInfoStep";
 
 import { SpacePiece_CreateEditStep } from "../../../constants/ProcessSteps";
@@ -56,8 +52,7 @@ import {
   usePieceStore,
 } from "../../../context/usePieceStore";
 import {
-  patchPieceCoordinatesEdit,
-  postPieceCreateByCoordinate,
+  postPieceCreateByCoordinateV2,
 } from "../../../service/pieceService";
 import PieceDetailPanel from "../../piece/components/PieceDetailPanel";
 import SpaceSelector_MultiSelect from "../../space/components/SpaceSelector_multiSelect";
@@ -93,9 +88,8 @@ export default function UniverseEditInnerImg() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [selectedPoints, setSelectedPoints] = useState<PercentPoint[]>([]);
+  const [isSelectedComplete, setIsSelectedComplete] = useState(false);
 
-  const [startPoint, setStartPoint] = useState<PercentPoint | null>(null);
-  const [endPoint, setEndPoint] = useState<PercentPoint | null>(null);
   const [innerImg, setInnerImg] = useState<File | null>(null);
   const [pieceInnerImg, setPieceInnerImg] = useState<File | null>(null);
 
@@ -103,6 +97,7 @@ export default function UniverseEditInnerImg() {
     text: string;
     type: AlertType;
   } | null>(null);
+  
   const [showInnerImgEdit, setShowInnerImgEdit] = useState<{
     show: boolean;
     type: SaveTargetType;
@@ -247,7 +242,7 @@ export default function UniverseEditInnerImg() {
     description: string,
     hidden: boolean
   ) => {
-    if (startPoint && endPoint && innerImg)
+    if (isSelectedComplete && innerImg)
       createSpace(title, description, hidden);
   };
 
@@ -257,11 +252,11 @@ export default function UniverseEditInnerImg() {
     hidden: boolean
   ) => {
     if (
-      startPoint &&
-      endPoint &&
+      isSelectedComplete &&
       createPieceData.title != "" &&
       createPieceData.description != ""
     )
+
       createPiece(title, description, hidden);
   };
 
@@ -270,7 +265,7 @@ export default function UniverseEditInnerImg() {
     description: string,
     hidden: boolean
   ): Promise<void> => {
-    if (!startPoint || !endPoint || !innerImg) {
+    if (!isSelectedComplete || !innerImg) {
       showAlert("스페이스 정보를 모두 입력해주세요.", "fail");
       return;
     }
@@ -281,14 +276,12 @@ export default function UniverseEditInnerImg() {
       parentSpaceId: currentId,
       title,
       description,
-      startX: startPoint.xPercent,
-      startY: startPoint.yPercent,
-      endX: endPoint.xPercent,
-      endY: endPoint.yPercent,
+      points: selectedPoints,
       hidden: hidden,
     };
+
     try {
-      await postSpaceCreate(metadata, innerImg);
+      await postSpaceCreateV2(metadata, innerImg);
       showAlert("스페이스가 생성되었습니다.", "success");
       loadInitialData(currentId);
     } catch (error: any) {
@@ -304,10 +297,6 @@ export default function UniverseEditInnerImg() {
     description: string,
     hidden: boolean
   ): Promise<void> => {
-    if (!startPoint || !endPoint) {
-      showAlert("피스 정보를 모두 입력해주세요.", "fail");
-      return;
-    }
     const currentId =
       currentSpaceId === rootUniverse?.universeId ? -1 : currentSpaceId;
     const metadata = {
@@ -315,14 +304,11 @@ export default function UniverseEditInnerImg() {
       parentSpaceId: currentId,
       title,
       description,
-      startX: startPoint.xPercent,
-      startY: startPoint.yPercent,
-      endX: endPoint.xPercent,
-      endY: endPoint.yPercent,
+      points: selectedPoints,
       hidden: hidden,
     };
     try {
-      await postPieceCreateByCoordinate(metadata);
+      await postPieceCreateByCoordinateV2(metadata);
       showAlert("피스가 생성되었습니다.", "success");
       loadInitialData(currentId);
     } catch (error: any) {
@@ -339,8 +325,6 @@ export default function UniverseEditInnerImg() {
     setEditStep(null);
     resetSelection();
     setInnerImg(null);
-    setStartPoint(null);
-    setEndPoint(null);
   };
 
   const handleSpaceEditModalClose = () => {
@@ -357,8 +341,9 @@ export default function UniverseEditInnerImg() {
   };
 
   const resetSelection = () => {
-    setStartPoint(null);
-    setEndPoint(null);
+    setSelectedPoints([]);
+    setIsSelectedComplete(false);
+
   };
 
   const handleSaveInfo = async (
@@ -385,17 +370,17 @@ export default function UniverseEditInnerImg() {
   };
 
   const handleCoordinatesEdit = () => {
-    var start = {
-      xPercent: currentSpace?.startX!,
-      yPercent: currentSpace?.startY!,
-    };
-    var end = {
-      xPercent: currentSpace?.endX!,
-      yPercent: currentSpace?.endY!,
-    };
+    // var start = {
+    //   xPercent: currentSpace?.startX!,
+    //   yPercent: currentSpace?.startY!,
+    // };
+    // var end = {
+    //   xPercent: currentSpace?.endX!,
+    //   yPercent: currentSpace?.endY!,
+    // };
 
-    setStartPoint(start);
-    setEndPoint(end);
+    // setStartPoint(start);
+    // setEndPoint(end);
     setShowCoordinatesEdit("space");
     setEditStep(SpacePiece_CreateEditStep.Space_SetSizeOnEdit);
     const parentImgId = useSpaceStore.getState().getParentSpaceInnerImageId();
@@ -403,37 +388,37 @@ export default function UniverseEditInnerImg() {
   };
 
   const handleSaveCoordinates = async (type: string) => {
-    if (
-      startPoint == null ||
-      startPoint.xPercent == null ||
-      startPoint.yPercent == null ||
-      endPoint == null ||
-      endPoint.xPercent == null ||
-      endPoint.yPercent == null
-    ) {
-      return;
-    }
+    // if (
+    //   startPoint == null ||
+    //   startPoint.xPercent == null ||
+    //   startPoint.yPercent == null ||
+    //   endPoint == null ||
+    //   endPoint.xPercent == null ||
+    //   endPoint.yPercent == null
+    // ) {
+    //   return;
+    // }
 
-    const payload = {
-      startX: startPoint.xPercent,
-      startY: startPoint.yPercent,
-      endX: endPoint.xPercent,
-      endY: endPoint.yPercent,
-    };
+    // const payload = {
+    //   startX: startPoint.xPercent,
+    //   startY: startPoint.yPercent,
+    //   endX: endPoint.xPercent,
+    //   endY: endPoint.yPercent,
+    // };
 
-    if (type == "space" && currentSpaceId != null) {
-      await patchSpacePositionEdit(currentSpaceId, payload);
-      refreshUniverseData();
-      showAlert("스페이스 좌표가 수정되었습니다.", "success");
-    } else if (type == "piece" && currentPiece != null) {
-      await patchPieceCoordinatesEdit(currentPiece.pieceId, payload);
-      refreshUniverseData();
-      showAlert("피스 좌표가 수정되었습니다.", "success");
-    }
+    // if (type == "space" && currentSpaceId != null) {
+    //   await patchSpacePositionEdit(currentSpaceId, payload);
+    //   refreshUniverseData();
+    //   showAlert("스페이스 좌표가 수정되었습니다.", "success");
+    // } else if (type == "piece" && currentPiece != null) {
+    //   await patchPieceCoordinatesEdit(currentPiece.pieceId, payload);
+    //   refreshUniverseData();
+    //   showAlert("피스 좌표가 수정되었습니다.", "success");
+    // }
 
-    setShowCoordinatesEdit(null);
-    setEditStep(null);
-    resetSelection();
+    // setShowCoordinatesEdit(null);
+    // setEditStep(null);
+    // resetSelection();
   };
 
   const showAlert = (text: string, type: AlertType) => {
@@ -443,44 +428,44 @@ export default function UniverseEditInnerImg() {
   const menuItems =
     currentSpaceId == -1
       ? [
-          {
-            label: "이미지 수정",
-            icon: <RiImageEditFill size={20} />,
-            onClick: () => handleInnerImgEdit("universe"),
-          },
-          {
-            label: "이미지 다운로드",
-            icon: <RiFileDownloadLine size={20} />,
-            onClick: handleDownloadImage,
-          },
-        ]
+        {
+          label: "이미지 수정",
+          icon: <RiImageEditFill size={20} />,
+          onClick: () => handleInnerImgEdit("universe"),
+        },
+        {
+          label: "이미지 다운로드",
+          icon: <RiFileDownloadLine size={20} />,
+          onClick: handleDownloadImage,
+        },
+      ]
       : [
-          {
-            label: "이미지 수정",
-            icon: <RiImageEditFill size={20} />,
-            onClick: () => handleInnerImgEdit("space"),
-          },
-          {
-            label: "이미지 다운로드",
-            icon: <RiFileDownloadLine size={20} />,
-            onClick: handleDownloadImage,
-          },
-          {
-            label: "정보 수정",
-            icon: <TbPencilCog size={20} />,
-            onClick: () => setShowInfoEdit(true),
-          },
-          {
-            label: "좌표 수정",
-            icon: <PiGpsBold size={20} />,
-            onClick: handleCoordinatesEdit,
-          },
-          {
-            label: "스페이스 삭제",
-            icon: <RiDeleteBin6Line size={20} />,
-            onClick: handleSpaceDelete,
-          },
-        ];
+        {
+          label: "이미지 수정",
+          icon: <RiImageEditFill size={20} />,
+          onClick: () => handleInnerImgEdit("space"),
+        },
+        {
+          label: "이미지 다운로드",
+          icon: <RiFileDownloadLine size={20} />,
+          onClick: handleDownloadImage,
+        },
+        {
+          label: "정보 수정",
+          icon: <TbPencilCog size={20} />,
+          onClick: () => setShowInfoEdit(true),
+        },
+        {
+          label: "좌표 수정",
+          icon: <PiGpsBold size={20} />,
+          onClick: handleCoordinatesEdit,
+        },
+        {
+          label: "스페이스 삭제",
+          icon: <RiDeleteBin6Line size={20} />,
+          onClick: handleSpaceDelete,
+        },
+      ];
 
   const handlePieceMethod = () => {
     setEditStep(SpacePiece_CreateEditStep.Piece_FillDetails);
@@ -556,26 +541,28 @@ export default function UniverseEditInnerImg() {
             <RiFunctionAddLine size={20} />
           </button>
           <button
-            onClick={() => {}}
+            onClick={() => { }}
             className="z-10 absolute cursor-pointer bottom-3 right-22 w-9 h-9 flex items-center justify-center backdrop-blur-sm rounded-full text-white hover:opacity-70 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           >
             <MdOutlineFullscreen size={25} />
           </button>
         </>
       )}
-      <SpaceSelector
+      {/* <SpaceSelector
         innerImageId={activeInnerImageId}
         startPoint={startPoint}
         endPoint={endPoint}
         setStartPoint={setStartPoint}
         setEndPoint={setEndPoint}
-      />
-      
-      {/* <SpaceSelector_MultiSelect
+      /> */}
+
+      <SpaceSelector_MultiSelect
         innerImageId={activeInnerImageId}
         selectedPoints={selectedPoints}
+        isSelectedComplete={isSelectedComplete}
         setSelectedPoints={setSelectedPoints}
-      /> */}
+        setIsSelectedComplete={() => setIsSelectedComplete(true)}
+      />
       <PieceDetailPanel
         hidden={editStep == SpacePiece_CreateEditStep.Piece_SetSizeOnEdit}
         piece={currentPiece}
@@ -595,7 +582,7 @@ export default function UniverseEditInnerImg() {
           onSubmit={() =>
             setEditStep(SpacePiece_CreateEditStep.Space_UploadImage)
           }
-          // setCreateStep={() => setCreateStep(SpaceCreateStep.UploadImage)}
+        // setCreateStep={() => setCreateStep(SpaceCreateStep.UploadImage)}
         />
       )}
       {editStep === SpacePiece_CreateEditStep.Space_UploadImage && (
@@ -655,7 +642,10 @@ export default function UniverseEditInnerImg() {
           description="스페이스의 좌표를 수정합니다."
           handleModalClose={handleSpaceEditModalClose}
           resetSelection={resetSelection}
-          onSubmit={() => handleSaveCoordinates("space")}
+          onSubmit={() => {
+            handleSaveCoordinates("space")
+            setIsSelectedComplete(false);
+          }}
         />
       )}
 
@@ -698,6 +688,7 @@ export default function UniverseEditInnerImg() {
         <SpaceCreateSetSizeModal
           title="피스 생성"
           description="새로운 피스를 생성합니다."
+          showSaveModal={!isSelectedComplete}
           handleModalClose={handleCreateModalClose}
           resetSelection={resetSelection}
           onSubmit={handlePieceMethod}

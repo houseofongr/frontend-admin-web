@@ -2,6 +2,7 @@
 import { create } from "zustand";
 import { useUniverseStore } from "./useUniverseStore";
 import { PieceType } from "./usePieceStore";
+import { PercentPoint } from "../constants/image";
 
 export interface SpaceType {
   spaceId: number;
@@ -10,10 +11,7 @@ export interface SpaceType {
   depth: number;
   title: string;
   description: string;
-  startX: number;
-  startY: number;
-  endX: number;
-  endY: number;
+  points: PercentPoint[];
   spaces: SpaceType[];
   pieces: PieceType[];
   createdTime: number;
@@ -125,10 +123,10 @@ export const useSpaceStore = create<SpaceStore>((set, get) => ({
     set({ existingSpaces: childrenSpaces });
   },
 
-  resetSpace:() => {
+  resetSpace: () => {
     set({ currentSpace: null });
     set({ currentSpaceId: null });
     set({ parentSpaceId: -1 });
-    set({ existingSpaces:  []});
+    set({ existingSpaces: [] });
   },
 }));

@@ -186,38 +186,38 @@ export default function SpaceSelector({
   };
   const handleSpaceMouseEnter = (index: number) => {
     const space = existingSpaces[index];
-    const start = toPixel({ xPercent: space.startX, yPercent: space.startY });
-    const end = toPixel({ xPercent: space.endX, yPercent: space.endY });
-    const left = Math.min(start.x, end.x);
-    const top = Math.min(start.y, end.y);
-    const width = Math.abs(end.x - start.x);
-    const height = Math.abs(end.y - start.y);
+    // const start = toPixel({ xPercent: space.startX, yPercent: space.startY });
+    // const end = toPixel({ xPercent: space.endX, yPercent: space.endY });
+    // const left = Math.min(start.x, end.x);
+    // const top = Math.min(start.y, end.y);
+    // const width = Math.abs(end.x - start.x);
+    // const height = Math.abs(end.y - start.y);
 
-    setHoveredSpaceIndex(index);
-    setPopupData({
-      x: left + width / 2 + 10,
-      y: top + height / 2 + 5,
-      title: space.title,
-      description: space.description,
-    });
+    // setHoveredSpaceIndex(index);
+    // setPopupData({
+    //   x: left + width / 2 + 10,
+    //   y: top + height / 2 + 5,
+    //   title: space.title,
+    //   description: space.description,
+    // });
   };
 
   const handlePieceMouseEnter = (index: number) => {
     const piece = existingPieces[index];
-    const start = toPixel({ xPercent: piece.startX, yPercent: piece.startY });
-    const end = toPixel({ xPercent: piece.endX, yPercent: piece.endY });
-    const left = Math.min(start.x, end.x);
-    const top = Math.min(start.y, end.y);
-    const width = Math.abs(end.x - start.x);
-    const height = Math.abs(end.y - start.y);
+    // const start = toPixel({ xPercent: piece.startX, yPercent: piece.startY });
+    // const end = toPixel({ xPercent: piece.endX, yPercent: piece.endY });
+    // const left = Math.min(start.x, end.x);
+    // const top = Math.min(start.y, end.y);
+    // const width = Math.abs(end.x - start.x);
+    // const height = Math.abs(end.y - start.y);
 
-    setHoveredPieceIndex(index);
-    setPopupData({
-      x: left + width / 2 + 10,
-      y: top + height / 2 + 5,
-      title: piece.title,
-      description: piece.description,
-    });
+    // setHoveredPieceIndex(index);
+    // setPopupData({
+    //   x: left + width / 2 + 10,
+    //   y: top + height / 2 + 5,
+    //   title: piece.title,
+    //   description: piece.description,
+    // });
   };
   const handleSpaceMouseLeave = () => {
     setHoveredSpaceIndex(null);
@@ -376,10 +376,10 @@ export default function SpaceSelector({
               <div
                 key={`space-${index}`}
                 className="absolute"
-                style={calcBoxStyle(
-                  { xPercent: space.startX, yPercent: space.startY },
-                  { xPercent: space.endX, yPercent: space.endY }
-                )}
+                // style={calcBoxStyle(
+                //   { xPercent: space.startX, yPercent: space.startY },
+                //   { xPercent: space.endX, yPercent: space.endY }
+                // )}
                 onMouseEnter={() => handleSpaceMouseEnter(index)}
                 onMouseLeave={handleSpaceMouseLeave}
               >
@@ -397,10 +397,10 @@ export default function SpaceSelector({
               <div
                 key={`piece-${index}`}
                 className="absolute"
-                style={calcBoxStyle(
-                  { xPercent: piece.startX, yPercent: piece.startY },
-                  { xPercent: piece.endX, yPercent: piece.endY }
-                )}
+                // style={calcBoxStyle(
+                //   { xPercent: piece.startX, yPercent: piece.startY },
+                //   { xPercent: piece.endX, yPercent: piece.endY }
+                // )}
                 onMouseEnter={() => handlePieceMouseEnter(index)}
                 onMouseLeave={handlePieceMouseLeave}
               >

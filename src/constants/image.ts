@@ -1,4 +1,4 @@
 export interface PercentPoint {
-  xPercent: number; // 0 ~ 1
-  yPercent: number; // 0 ~ 1
+  x: number; // 0 ~ 1
+  y: number; // 0 ~ 1
 }

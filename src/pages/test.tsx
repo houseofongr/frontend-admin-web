@@ -28,11 +28,11 @@ export default function TestPage() {
         className="w-200 h-200 bg-amber-200"
         onClick={() => console.log(editStep?.toString())}
       >
-        <SpaceSelector_MultiSelect
-          innerImageId={`/images/house/AOO_INIT_HOUSE_GRAY.png`}
+        {/* <SpaceSelector_MultiSelect
+          innerImageId={3}
           selectedPoints={selectedPoints}
           setSelectedPoints={setSelectedPoints}
-        />
+        /> */}
       </div>
       {/* <AudioWaveform
         audioUrl={`/public/sound/Heroic Reception - Kevin MacLeod.mp3`}

@@ -405,40 +405,5 @@ export default function AudioWaveform({
         </div>
       </div>
     </div>
-    // <div
-    //   className={`flex ${
-    //     layoutDirection == "row" ? "flex-row items-center" : "flex-col"
-    //   }
-    //   w-[100%] p-5 h-[100%]
-    //   `}
-    //   style={{ backgroundColor: colors.background }}
-    // >
-    //   <audio ref={audioRef} controls={false} src={audioUrl} />
-
-    //   {waveVisible && (
-    //     <canvas
-    //       ref={canvasRef}
-    //       width={400}
-    //       height={150}
-    //       className="w-full block cursor-pointer"
-    //     />
-    //   )}
-
-    //   <AudioController
-    //     audioTitle={audioTitle}
-    //     currentTime={currentTime}
-    //     duration={duration}
-    //     isPlaying={isPlaying}
-    //     isMuted={isMuted}
-    //     volume={volume}
-    //     onSeek={handleSeek}
-    //     onPlayPause={handlePlayPause}
-    //     onStop={handleStop}
-    //     onSkip={handleSkip}
-    //     onToggleMute={toggleMute}
-    //     onVolumeChange={handleVolumeChange}
-    //     mode={mode}
-    //   />
-    // </div>
   );
 }

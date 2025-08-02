@@ -5,6 +5,7 @@ import { LuPaintbrush } from "react-icons/lu";
 interface SpaceCreateSetSizeModalProps {
   title: string;
   description: string;
+  showSaveModal: boolean;
   handleModalClose: () => void;
   resetSelection: () => void;
   onSubmit: () => void;
@@ -13,6 +14,7 @@ interface SpaceCreateSetSizeModalProps {
 export default function SpaceCreateSetSizeModal({
   title,
   description,
+  showSaveModal,
   handleModalClose,
   resetSelection,
   onSubmit,
@@ -34,7 +36,7 @@ export default function SpaceCreateSetSizeModal({
         </div>
         <button
           onClick={resetSelection}
-          className="px-10 py-2 border-2 border-neutral-600 text-neutral-600 font-bold rounded-lg hover:bg-neutral-200 transition"
+          className="px-10 py-2 border-2 border-neutral-600 text-neutral-600 font-bold rounded-lg hover:bg-neutral-200 transition cursor-pointer"
         >
           <div className="flex items-center gap-2">
             <LuPaintbrush size={20} />
@@ -43,13 +45,13 @@ export default function SpaceCreateSetSizeModal({
         </button>
         <div className="flex gap-3">
           <button
-            className="px-5 py-2 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 transition"
+            className={`px-5 py-2 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 transition cursor-pointer ${showSaveModal ?? "disabled"}`}
             onClick={onSubmit}
           >
             완료
           </button>
           <button
-            className="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition"
+            className="px-5 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition cursor-pointer"
             onClick={handleModalClose}
           >
             취소
