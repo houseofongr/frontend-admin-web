@@ -61,6 +61,20 @@ export const patchSpacePositionEdit = async (spaceId: number, payload: object) =
   return response.json();
 };
 
+// 특정 스페이스 좌표 수정 API
+export const patchSpacePositionEditV2 = async (spaceId: number, payload: object) => {
+  const response = await fetch(
+    `${API_CONFIG.BACK_ADMIN_API}/spaces/${spaceId}/move`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
+  if (!response.ok) throw new Error("Failed to edit space position");
+  return response.json();
+};
+
 // 특정 스페이스 내부이미지 변경 API
 export const patchSpaceInnerImageEdit = async (
   spaceId: number,

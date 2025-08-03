@@ -83,6 +83,24 @@ export const patchPieceCoordinatesEdit = async (
   return response.json();
 };
 
+// 특정 피스 좌표 수정 API V2
+export const patchPieceCoordinatesEditV2 = async (
+  pieceId: number,
+  payload: object
+) => {
+  const response = await fetch(
+    `${API_CONFIG.BACK_ADMIN_API}/pieces/${pieceId}/move`,
+    {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }
+  );
+
+  if (!response.ok) throw new Error("Failed to edit piece info");
+  return response.json();
+};
+
 // 특정 피스 삭제 API
 export const deletePiece = async (pieceId: number) => {
   const response = await fetch(`${API_CONFIG.BACK_ADMIN_API}/pieces/${pieceId}`, {

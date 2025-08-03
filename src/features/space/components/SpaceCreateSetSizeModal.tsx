@@ -45,8 +45,9 @@ export default function SpaceCreateSetSizeModal({
         </button>
         <div className="flex gap-3">
           <button
-            className={`px-5 py-2 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 transition cursor-pointer ${showSaveModal ?? "disabled"}`}
+            className={`px-5 py-2 bg-neutral-600 text-white rounded-lg hover:bg-neutral-700 transition cursor-pointer disabled:opacity-20`}
             onClick={onSubmit}
+            disabled={showSaveModal}
           >
             완료
           </button>

@@ -54,6 +54,7 @@ interface PieceDetailPanelProps {
   hidden: boolean;
   piece: PieceType | null;
   showCoordinatesEdit: boolean;
+  isSelectedComplete: boolean;
   setShowCoordinatesEdit: (type: string) => void;
   onClose: () => void;
   onCloseCoordinateModal: () => void;
@@ -65,6 +66,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
   hidden,
   piece,
   showCoordinatesEdit,
+  isSelectedComplete,
   setShowCoordinatesEdit,
   onClose,
   onCloseCoordinateModal,
@@ -221,7 +223,6 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
 
       showAlert("사운드가 생성되었습니다.", "success", null);
       setShowAudioCreate(null);
-
     } catch (error: any) {
       showAlert(
         error?.message || "사운드 생성 중 오류가 발생했습니다.",
@@ -419,7 +420,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
         <SpaceCreateSetSizeModal
           title="피스 수정"
           description="피스의 좌표를 수정합니다."
-          showSaveModal={piece.points.length > 2}
+          showSaveModal={!isSelectedComplete}
           handleModalClose={onCloseCoordinateModal}
           resetSelection={onResetSelection}
           onSubmit={onSaveCoordinates}
