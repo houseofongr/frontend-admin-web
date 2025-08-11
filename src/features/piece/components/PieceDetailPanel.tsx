@@ -380,7 +380,7 @@ const PieceDetailPanel: React.FC<PieceDetailPanelProps> = ({
               modalDescription="피스의 세부 정보를 변경할 수 있습니다."
               initTitle={piece.title ?? ""}
               initDescription={piece.description ?? ""}
-              initHidden
+              initHidden={piece.hidden}
               onClose={() => setShowInfoEdit(false)}
               handleSaveInfo={handleSaveInfo}
             />

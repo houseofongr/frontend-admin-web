@@ -9,6 +9,7 @@ export interface PieceType {
   title: string;
   description: string;
   points: PercentPoint[];
+  hidden: boolean;
   createdTime: number;
   updatedTime: number;
 }
